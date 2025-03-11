@@ -1,24 +1,49 @@
 import axios from 'axios';
-import  {useState} from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+//import { useNavigate } from 'react-router-dom';
+import './Login.css';
 
-function Login(){
-    
-    return(
-    <div className="form">
+function Login() {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
-        <div className="form_login">
-           <h1>Login</h1>
-           <input type="text" placeholder="Username" /> <br/>
-           <input type="password" placeholder="Password" />
-             <br/>
-           <button >Login</button>
-        </div>
-     </div>
-    )
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post('http://localhost:3001/login', {
+        username,
+        password,
+      });
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error al Iniciar sesión :", error);
     }
+  };
 
-
-
+  return (
+    <div className="form">
+      <form onSubmit={handleSubmit}>
+        <h1>Iniciar sesión</h1>
+        <input
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+        <br />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <br />
+        <button className='buttonA' type="submit">Inicio de sesión</button>
+      </form>
+    </div>
+  );
+}
 
 export default Login;
+
+

@@ -1,0 +1,22 @@
+img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1000px; 
+    height: auto; 
+}
+.header__principal{
+    display: flex;
+    justify-content: right;
+    align-items: right;
+    height: 0vh; 
+    border: 0px solid black; 
+    padding: 0px; 
+    border-radius: 10px; 
+
+}
+.logo__text{
+    display: flex;
+    justify-content: right;
+    align-items: right;  
+}

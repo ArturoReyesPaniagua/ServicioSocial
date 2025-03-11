@@ -1,4 +1,3 @@
-
 const { v4: uuidv4 } = require("uuid");
 const jwt = require("jsonwebtoken");
 const userSchema = require("../schemas/userSchema");
@@ -14,8 +13,8 @@ const generateAccessToken = (userId) => {
 };
 
 const register = async (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
+  const { username, password } = req.body;
+  if (!username || !password) {
     res
       .status(400)
       .json({ error: "Los campos de usuario y contraseña no pueden estar vacias!" });
@@ -25,7 +24,7 @@ const register = async (req, res) => {
   const hashedPassword = await bcrypt.hash(password, salt);
   const user = {
     userId: uuidv4(),
-    email,
+    username,
     password: hashedPassword,
   };
   try {
@@ -43,8 +42,8 @@ const register = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
+  const { username, password } = req.body;
+  if (!username || !password) {
     res
       .status(400)
       .json({ error: "Los campos no pueden estar vacios!" });
@@ -68,14 +67,14 @@ const login = async (req, res) => {
       if (passwordMatch) {
         res.status(200).json({
           userId: existingUser.userId,
-          email: existingUser.email,
+          username: existingUser.username,
           access_token: generateAccessToken(existingUser.userId),
         });
       } else {
         res.status(401).json({ error: "Contraseña incorrecta" });
       }
     } else {
-      res.status(401).json({ error: "Contraseña incorrecta" });
+      res.status(401).json({ error: "Nombre de usuario no registrado" });
     }
   } catch (error) {
     res.status(500).json({ error: error.message });

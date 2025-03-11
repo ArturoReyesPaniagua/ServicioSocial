@@ -2,10 +2,11 @@ const express = require("express");
 const dotenv = require("dotenv");
 dotenv.config();
 const cors = require("cors");
+
+const connectDB = require("./db/db");
 const authRoutes = require("./routes/authRoutes");
 
-const connectDB = require("./db/db"); //ajustes de la config de la base de datos
-const port = 3001; // definir puerto
+const port = process.env.PORT || 3001;
 
 const app = express();
 
