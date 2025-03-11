@@ -1,11 +1,12 @@
 import axios from 'axios';
 import { useState } from 'react';
-//import { useNavigate } from 'react-router-dom';
-import './Login.css';
+import { useNavigate } from 'react-router-dom';
+//import './Login.css';
 
 function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -15,6 +16,7 @@ function Login() {
         password,
       });
       console.log(response.data);
+      navigate('/interno'); // Cambia '/
     } catch (error) {
       console.error("Error al Iniciar sesión :", error);
     }

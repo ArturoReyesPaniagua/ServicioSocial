@@ -1,5 +1,5 @@
 import Login from "../Login/Login";
-import './Inicio.css';
+//import './Inicio.css';
 
 function Inicio() {
 
