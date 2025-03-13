@@ -13,7 +13,7 @@ const generateAccessToken = (userId) => {
 };
 
 const register = async (req, res) => {
-  const { username, password } = req.body;
+  const { username, password, role = 'user' } = req.body; // Default role is 'user'
   if (!username || !password) {
     res
       .status(400)
@@ -26,6 +26,7 @@ const register = async (req, res) => {
     userId: uuidv4(),
     username,
     password: hashedPassword,
+    role
   };
   try {
     await createTable(userSchema);
@@ -68,6 +69,7 @@ const login = async (req, res) => {
         res.status(200).json({
           userId: existingUser.userId,
           username: existingUser.username,
+          role: existingUser.role,
           access_token: generateAccessToken(existingUser.userId),
         });
       } else {

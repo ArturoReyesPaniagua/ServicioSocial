@@ -4,6 +4,7 @@ import axios from 'axios';
 function RegisterForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -11,6 +12,7 @@ function RegisterForm() {
       const response = await axios.post('http://localhost:3001/register', {
         username,
         password,
+        role,
       });
       console.log(response.data);
     } catch (error) {
@@ -35,7 +37,16 @@ function RegisterForm() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <br />
+        <br/>
+        <select
+          name="options"
+          value={role}
+          onChange={(e) => setRole(e.target.value)}
+        >
+          <option value="user">usuario</option>
+          <option value="admin">administrador</option>
+        </select>
+        <br/>
         <button type="submit">Register</button>
       </form>
     </div>

@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 //import './index.css'
 import App from './App.jsx'
 import Logo from './assets/logo_sec_educ.png'
+import RegisterForm from './components/Registration/Registration.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -21,5 +22,7 @@ createRoot(document.getElementById('root')).render(
 
             </header>
     <App />
+    {//<RegisterForm/>
+    }
   </StrictMode>,
 )
