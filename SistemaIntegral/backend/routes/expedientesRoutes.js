@@ -7,18 +7,20 @@ const {
   updateExpediente,
   deleteExpediente,
   searchExpedientes,
-  getExpedientesByStatus
-} = require('../controllers/expedientesController');
+  getExpedientesByEstado,
+  getExpedientesArchivados
+} = require('../controllers/expedienteControllers');
 
-// Rutas CRUD básicas
+// Rutas CRUD básicas para expedientes
 router.post('/expedientes', createExpediente);
 router.get('/expedientes', getAllExpedientes);
 router.get('/expedientes/:id', getExpedienteById);
-router.put('/expedientes/:idDia', updateExpediente);
+router.put('/expedientes/:id', updateExpediente);
 router.delete('/expedientes/:id', deleteExpediente);
 
-// Rutas adicionales
+// Rutas adicionales para expedientes
 router.get('/expedientes/search/:term', searchExpedientes);
-router.get('/expedientes/status/:status', getExpedientesByStatus);
+router.get('/expedientes/estado/:idEstado', getExpedientesByEstado);
+router.get('/expedientes/archivado/:archivado', getExpedientesArchivados);
 
 module.exports = router;

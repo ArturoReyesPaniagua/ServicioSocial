@@ -1,28 +1,28 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-//import './index.css'
-import App from './App.jsx'
+import { BrowserRouter } from 'react-router-dom'
+import Login from './components/Login/Login.jsx'
 import Logo from './assets/logo_sec_educ.png'
-import RegisterForm from './components/Registration/Registration.jsx'
+import { AuthProvider } from './context/AuthContext'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-            <header className='header__principal'>
-                <div className='header__img'>
-                <img src={Logo}  className='header__logo'/> {/*Logo de la secretaria*/}
-                </div>
-                
-                <div className="header__text" >
-                  <p>
-                      <i>Subsecretaria de Educación Básica <br/>
-                      <strong>Unidad de Planeación, evaluación y control escolar</strong> <br/>
-                      Departamento de información y sistemas</i>  
-                  </p>
-                </div>
-
-            </header>
-    <App />
-    {//<RegisterForm/>
-    }
+    <BrowserRouter>
+      <AuthProvider>
+        <header className='header__principal'>
+          <div className='header__img'>
+            <img src={Logo} className='header__logo'/>
+          </div>
+          <div className="header__text">
+            <p>
+              <i>Subsecretaria de Educación Básica <br/>
+              <strong>Unidad de Planeación, evaluación y control escolar</strong> <br/>
+              Departamento de información y sistemas</i>  
+            </p>
+          </div>
+        </header>
+        <Login />
+      </AuthProvider>
+    </BrowserRouter>
   </StrictMode>,
 )
