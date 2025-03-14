@@ -13,7 +13,7 @@ const generateAccessToken = (userId) => {
 };
 
 const register = async (req, res) => {
-  const { username, password, role = 'user' } = req.body; // Default role is 'user'
+  const { username, password, role = 'user' } = req.body; // se asigna automaticamente user 
   if (!username || !password) {
     res
       .status(400)

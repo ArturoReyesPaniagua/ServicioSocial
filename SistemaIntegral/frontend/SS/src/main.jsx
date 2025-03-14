@@ -1,7 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
-import Login from './components/Login/Login.jsx'
+//import Login from './components/Login/Login.jsx'
 import Logo from './assets/logo_sec_educ.png'
 import { AuthProvider } from './context/AuthContext'
 
@@ -21,7 +21,7 @@ createRoot(document.getElementById('root')).render(
             </p>
           </div>
         </header>
-        <Login />
+        <App/>
       </AuthProvider>
     </BrowserRouter>
   </StrictMode>,

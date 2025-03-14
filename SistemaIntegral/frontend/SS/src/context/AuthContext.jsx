@@ -9,7 +9,7 @@ export function AuthProvider({ children }) {
 
   const login = async (username, password) => {
     try {
-      const response = await axios.post('http://localhost:3001/api/auth/login', {
+      const response = await axios.post('http://localhost:3001/login', {
         username,
         password
       });
@@ -21,7 +21,7 @@ export function AuthProvider({ children }) {
       }
       return { success: false, message: response.data.message };
     } catch (error) {
-      console.error('Error during login:', error);
+      console.error('Error durante login:', error);
       return { 
         success: false, 
         message: 'Error al conectar con el servidor' 
