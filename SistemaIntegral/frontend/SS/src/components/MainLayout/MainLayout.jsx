@@ -1,72 +1,90 @@
-// src/components/Layout/MainLayout.jsx
-import { useState } from 'react';
+// Login.jsx con manejo de autenticación mejorado
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import './MainLayout.css';
+import './Login.css';
 
-const MainLayout = ({ children }) => {
-  const [isOpen, setIsOpen] = useState(true);
-  const { user, logout } = useAuth();
+function Login() {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login, isAuthenticated } = useAuth();
 
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen);
-  };
+  // Redireccionar si ya está autenticado
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/Layout');
+    }
+  }, [isAuthenticated, navigate]);
 
-  const navigateTo = (path) => {
-    navigate(path);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    
+    // Validación básica
+    if (!username.trim() || !password.trim()) {
+      setError('El usuario y contraseña son obligatorios');
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      const result = await login(username, password);
+      if (result.success) {
+        navigate('/Layout');
+      } else {
+        setError(result.message);
+      }
+    } catch (err) {
+      setError('Error al iniciar sesión. Intente nuevamente.');
+      console.error("Error al iniciar sesión:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="layout-container">
-      {/* Header */}
-      <header className="main-header">
-        <button className="menu-toggle" onClick={toggleSidebar}>
-          {isOpen ? '✕' : '☰'}
-        </button>
-        <div className="header-title">
-          Sistema Integral de Expedientes
-        </div>
-        <div className="user-info">
-          <span>{user?.username || 'Usuario'}</span>
-          <button className="logout-btn" onClick={logout}>Cerrar Sesión</button>
-        </div>
-      </header>
-
-      {/* Sidebar */}
-      <div className={`sidebar ${isOpen ? 'open' : 'closed'}`}>
-        <div className="sidebar-header">
-          <h3>Menú Principal</h3>
-        </div>
-        <nav className="sidebar-nav">
-          <ul>
-            <li>
-              <button onClick={() => navigateTo('/interno/expedientes')}>
-                📁 Expedientes
-              </button>
-            </li>
-            {user?.role === 'admin' && (
-              <li>
-                <button onClick={() => navigateTo('/interno/registrar')}>
-                  👤 Registrar Usuario
-                </button>
-              </li>
-            )}
-            <li>
-              <button onClick={() => navigateTo('/interno/estados')}>
-                🔄 Estados
-              </button>
-            </li>
-          </ul>
-        </nav>
+    <div className="login-container">
+      <div className="login-card">
+        <h2>Iniciar Sesión</h2>
+        {error && <div className="error-message">{error}</div>}
+        
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="username">Usuario</label>
+            <input
+              id="username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              disabled={loading}
+            />
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="password">Contraseña</label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={loading}
+            />
+          </div>
+          
+          <button 
+            type="submit" 
+            className="login-button"
+            disabled={loading}
+          >
+            {loading ? 'Iniciando...' : 'Iniciar Sesión'}
+          </button>
+        </form>
       </div>
-
-      {/* Main Content */}
-      <main className={`main-content ${isOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
-        {children}
-      </main>
     </div>
   );
-};
+}
 
-export default MainLayout;
+export default Login;

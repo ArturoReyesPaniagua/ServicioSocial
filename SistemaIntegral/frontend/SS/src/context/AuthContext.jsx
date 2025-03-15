@@ -1,4 +1,5 @@
-import { createContext, useContext, useState } from 'react';
+// AuthContext.jsx corregido
+import { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
 const AuthContext = createContext(null);
@@ -6,6 +7,20 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // Verificar si hay un token al cargar la página
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const storedUser = localStorage.getItem('user');
+    
+    if (token && storedUser) {
+      setUser(JSON.parse(storedUser));
+      setIsAuthenticated(true);
+    }
+    
+    setLoading(false);
+  }, []);
 
   const login = async (username, password) => {
     try {
@@ -14,22 +29,38 @@ export function AuthProvider({ children }) {
         password
       });
 
-      if (response.data.success) {
-        setUser(response.data.user);
+      // El backend devuelve directamente los datos del usuario y el token
+      if (response.data && response.data.access_token) {
+        // Guardar el token y los datos del usuario
+        localStorage.setItem('token', response.data.access_token);
+        localStorage.setItem('user', JSON.stringify({
+          userId: response.data.userId,
+          username: response.data.username,
+          role: response.data.role
+        }));
+        
+        setUser({
+          userId: response.data.userId,
+          username: response.data.username,
+          role: response.data.role
+        });
         setIsAuthenticated(true);
+        
         return { success: true };
       }
-      return { success: false, message: response.data.message };
+      return { success: false, message: 'Credenciales inválidas' };
     } catch (error) {
       console.error('Error durante login:', error);
       return { 
         success: false, 
-        message: 'Error al conectar con el servidor' 
+        message: error.response?.data?.error || 'Error al conectar con el servidor' 
       };
     }
   };
 
   const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     setUser(null);
     setIsAuthenticated(false);
   };
@@ -38,6 +69,7 @@ export function AuthProvider({ children }) {
     <AuthContext.Provider value={{
       user,
       isAuthenticated,
+      loading,
       login,
       logout
     }}>

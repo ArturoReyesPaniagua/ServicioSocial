@@ -1,7 +1,7 @@
 // src/components/Login/Login.jsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-//import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import './Login.css';
 
 function Login() {
@@ -10,7 +10,7 @@ function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  //const { login = () => Promise.reject('Auth context no se inicializo') } = useAuth() || {};
+  const { login = () => Promise.reject('Auth context no se inicializo') } = useAuth() || {};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,7 +26,7 @@ function Login() {
     try {
       const result = await login(username, password);
       if (result.success) {
-        navigate('/interno');
+        navigate('/MainLayout');
       } else {
         setError(result.message);
       }

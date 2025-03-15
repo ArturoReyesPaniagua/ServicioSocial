@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 //import Login from './components/Login/Login.jsx'
 import Logo from './assets/logo_sec_educ.png'
 import { AuthProvider } from './context/AuthContext'
+import App from './App'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
