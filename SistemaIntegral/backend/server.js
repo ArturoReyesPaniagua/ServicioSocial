@@ -9,7 +9,7 @@ const estadoRoutes = require("./routes/estadoRoutes");
 const expedientesRoutes = require("./routes/expedientesRoutes");
 const pdfRoutes = require("./routes/pdfRoutes");
 
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3003;
 
 const app = express();
 

@@ -1,7 +1,11 @@
 const pdfSchema = `
   CREATE TABLE IF NOT EXISTS PDF (
     idPDF INT AUTO_INCREMENT PRIMARY KEY,
-    archivo BLOB NOT NULL
+    nombreArchivo VARCHAR(255),
+    archivo BLOB NOT NULL,
+    idExpediente INT,
+    fechaSubida DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (idExpediente) REFERENCES Expediente(idExpediente) ON DELETE CASCADE
   );
 `;
 

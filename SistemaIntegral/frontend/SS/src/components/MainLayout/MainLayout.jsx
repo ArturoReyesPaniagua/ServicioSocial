@@ -1,90 +1,116 @@
-// Login.jsx con manejo de autenticación mejorado
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+// src/components/MainLayout/MainLayout.jsx
+import { useState } from 'react';
+import { useNavigate, NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import './Login.css';
+import './MainLayout.css';
+import logo from '../../assets/logo_sec_educ.png'; // Importamos el logo directamente
 
-function Login() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+const MainLayout = ({ children }) => {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const { login, isAuthenticated } = useAuth();
 
-  // Redireccionar si ya está autenticado
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/Layout');
-    }
-  }, [isAuthenticated, navigate]);
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    
-    // Validación básica
-    if (!username.trim() || !password.trim()) {
-      setError('El usuario y contraseña son obligatorios');
-      return;
-    }
-    
-    setLoading(true);
-    try {
-      const result = await login(username, password);
-      if (result.success) {
-        navigate('/Layout');
-      } else {
-        setError(result.message);
-      }
-    } catch (err) {
-      setError('Error al iniciar sesión. Intente nuevamente.');
-      console.error("Error al iniciar sesión:", err);
-    } finally {
-      setLoading(false);
-    }
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
   };
 
   return (
-    <div className="login-container">
-      <div className="login-card">
-        <h2>Iniciar Sesión</h2>
-        {error && <div className="error-message">{error}</div>}
+    <div className="layout-container">
+      {/* Header institucional con el logo */}
+      <header className="institutional-header">
+        <div className="header__img">
+          <img src={logo} alt="Logo institucional" className="header__logo" />
+        </div>
+        <div className="header__text">
+          <p>
+            <i>Subsecretaria de Educación Básica <br/>
+            <strong>Unidad de Planeación, evaluación y control escolar</strong> <br/>
+            Departamento de información y sistemas</i>  
+          </p>
+        </div>
+      </header>
+      
+      {/* Header de navegación y menú */}
+      <header className="main-header">
+        <button 
+          className="menu-toggle"
+          onClick={toggleSidebar}
+          aria-label="Toggle menu"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
         
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="username">Usuario</label>
-            <input
-              id="username"
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              disabled={loading}
-            />
-          </div>
-          
-          <div className="form-group">
-            <label htmlFor="password">Contraseña</label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={loading}
-            />
-          </div>
-          
+        <div className="header-title">
+          Sistema de Gestión Integral
+        </div>
+        
+        <div className="user-info">
+          <span>{user?.username}</span>
           <button 
-            type="submit" 
-            className="login-button"
-            disabled={loading}
+            className="logout-btn"
+            onClick={handleLogout}
           >
-            {loading ? 'Iniciando...' : 'Iniciar Sesión'}
+            Cerrar Sesión
           </button>
-        </form>
-      </div>
+        </div>
+      </header>
+
+      {/* Sidebar para navegación */}
+      <aside className={`sidebar ${sidebarOpen ? '' : 'closed'}`}>
+        <div className="sidebar-header">
+          <h2 className="text-xl font-bold">Menú Principal</h2>
+        </div>
+        
+        <nav className="sidebar-nav">
+          <ul>
+            <li>
+              <NavLink 
+                to="/expedientes" 
+                className={({ isActive }) => 
+                  isActive ? "bg-guinda-700" : ""
+                }
+              >
+                {({ isActive }) => (
+                  <button className={isActive ? "bg-guinda-700" : ""}>
+                    Expedientes
+                  </button>
+                )}
+              </NavLink>
+            </li>
+            {user?.role === 'admin' && (
+              <li>
+                <NavLink 
+                  to="/register" 
+                  className={({ isActive }) => 
+                    isActive ? "bg-guinda-700" : ""
+                  }
+                >
+                  {({ isActive }) => (
+                    <button className={isActive ? "bg-guinda-700" : ""}>
+                      Registrar Usuario
+                    </button>
+                  )}
+                </NavLink>
+              </li>
+            )}
+            {/* Puedes añadir más opciones de menú aquí */}
+          </ul>
+        </nav>
+      </aside>
+
+      {/* Contenido principal */}
+      <main className={`main-content ${sidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
+        {children}
+      </main>
     </div>
   );
-}
+};
 
-export default Login;
+export default MainLayout;

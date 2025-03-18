@@ -1,120 +1,14 @@
 const db = require('../db/db');
-const expedienteSchema = require('../schemas/expedienteSchema');
-const estadoSchema = require('../schemas/estadoSchema');
+const pdfSchema = require('../schemas/pdfSchema');
 const { createTable } = require('../utils/funtiosauth');
-const expedienteUtils = require('../utils/expedienteUtils');
 
-// Crear un nuevo expediente
-const createExpediente = async (req, res) => {
+// Asegurar que la tabla existe
+const ensurePDFTable = async () => {
   try {
-    // Asegurar que las tablas existan
-    await createTable(estadoSchema);
-    await createTable(expedienteSchema);
-
-    // Crear expediente
-    const expedienteData = {
-      idEstado: req.body.idEstado,
-      fechaDeRecepcion: req.body.fechaDeRecepcion,
-      noFolioDeSeguimiento: req.body.noFolioDeSeguimiento,
-      fechaLimite: req.body.fechaLimite,
-      solicitante: req.body.solicitante,
-      asunto: req.body.asunto,
-      responsable: req.body.responsable,
-      fechaDeRespuesta: req.body.fechaDeRespuesta,
-      observaciones: req.body.observaciones,
-      archivado: req.body.archivado || false,
-      NoExpediente: req.body.NoExpediente
-    };
-
-    const result = await expedienteUtils.createExpediente(expedienteData);
-
-    res.status(201).json({
-      message: 'Expediente creado exitosamente',
-      idExpediente: result.insertId
-    });
+    await createTable(pdfSchema);
   } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-// Obtener todos los expedientes
-const getAllExpedientes = async (req, res) => {
-  try {
-    const expedientes = await expedienteUtils.getAllExpedientes();
-    res.status(200).json(expedientes);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-// Obtener un expediente por ID
-const getExpedienteById = async (req, res) => {
-  try {
-    const expediente = await expedienteUtils.getExpedienteById(req.params.id);
-    if (!expediente) {
-      return res.status(404).json({ message: 'Expediente no encontrado' });
-    }
-    res.status(200).json(expediente);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-// Actualizar un expediente
-const updateExpediente = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const updateData = { ...req.body };
-    delete updateData.idExpediente; // Prevenir actualización del ID
-
-    await expedienteUtils.updateExpediente(id, updateData);
-    res.status(200).json({ message: 'Expediente actualizado exitosamente' });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-// Eliminar un expediente
-const deleteExpediente = async (req, res) => {
-  try {
-    await expedienteUtils.deleteExpediente(req.params.id);
-    res.status(200).json({ message: 'Expediente eliminado exitosamente' });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-// Buscar expedientes
-const searchExpedientes = async (req, res) => {
-  try {
-    const { term } = req.params;
-    const expedientes = await expedienteUtils.searchExpedientes(term);
-    res.status(200).json(expedientes);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-// Filtrar expedientes por estado
-const getExpedientesByEstado = async (req, res) => {
-  try {
-    const { idEstado } = req.params;
-    const expedientes = await expedienteUtils.getExpedientesByEstado(idEstado);
-    res.status(200).json(expedientes);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-// Obtener expedientes archivados
-const getExpedientesArchivados = async (req, res) => {
-  try {
-    const { archivado } = req.params;
-    const archivedValue = archivado === 'true';
-    const expedientes = await expedienteUtils.getExpedientesArchivados(archivedValue);
-    res.status(200).json(expedientes);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error creando tabla PDF:', error);
+    throw error;
   }
 };
 
@@ -125,16 +19,43 @@ const uploadPDF = async (req, res) => {
       return res.status(400).json({ message: 'No se proporcionó ningún archivo' });
     }
 
-    const query = 'INSERT INTO PDF (archivo) VALUES (?)';
-    const [result] = await db.execute(query, [req.file.buffer]);
+    // Asegurar que la tabla existe
+    await ensurePDFTable();
+
+    const { idExpediente } = req.body;
+    const nombreArchivo = req.file.originalname || 'documento.pdf';
+
+    // Si se proporciona idExpediente, verificar que exista
+    if (idExpediente) {
+      const [expedienteRows] = await db.execute(
+        'SELECT idExpediente FROM Expediente WHERE idExpediente = ?',
+        [idExpediente]
+      );
+      
+      if (expedienteRows.length === 0) {
+        return res.status(404).json({ message: 'Expediente no encontrado' });
+      }
+    }
+
+    // Insertar el PDF con o sin asociación a expediente
+    const query = idExpediente 
+      ? 'INSERT INTO PDF (nombreArchivo, archivo, idExpediente) VALUES (?, ?, ?)'
+      : 'INSERT INTO PDF (nombreArchivo, archivo) VALUES (?, ?)';
+    
+    const params = idExpediente 
+      ? [nombreArchivo, req.file.buffer, idExpediente]
+      : [nombreArchivo, req.file.buffer];
+
+    const [result] = await db.execute(query, params);
 
     res.status(201).json({
       message: 'PDF subido exitosamente',
-      id: result.insertId
+      id: result.insertId,
+      nombreArchivo
     });
   } catch (error) {
-
-    console.error('Error al subir PDF:', error);    res.status(500).json({ message: 'Error al procesar el archivo' });
+    console.error('Error al subir PDF:', error);    
+    res.status(500).json({ message: 'Error al procesar el archivo' });
   }
 };
 
@@ -142,14 +63,16 @@ const uploadPDF = async (req, res) => {
 const getPDF = async (req, res) => {
   try {
     const { id } = req.params;
-    const query = 'SELECT archivo FROM PDF WHERE idPDF = ?';
+    const query = 'SELECT nombreArchivo, archivo FROM PDF WHERE idPDF = ?';
     const [rows] = await db.execute(query, [id]);
 
     if (rows.length === 0) {
       return res.status(404).json({ message: 'PDF no encontrado' });
     }
 
+    // Configurar la respuesta con el nombre de archivo y el tipo de contenido
     res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `inline; filename=${rows[0].nombreArchivo}`);
     res.send(rows[0].archivo);
   } catch (error) {
     console.error('Error al obtener PDF:', error);
@@ -160,7 +83,7 @@ const getPDF = async (req, res) => {
 // Obtener todos los PDFs
 const getAllPDFs = async (req, res) => {
   try {
-    const query = 'SELECT idPDF FROM PDF';
+    const query = 'SELECT idPDF, nombreArchivo, idExpediente, fechaSubida FROM PDF';
     const [rows] = await db.execute(query);
     res.json(rows);
   } catch (error) {
@@ -169,16 +92,72 @@ const getAllPDFs = async (req, res) => {
   }
 };
 
+// Obtener PDFs por expediente
+const getPDFsByExpediente = async (req, res) => {
+  try {
+    const { idExpediente } = req.params;
+    const query = 'SELECT idPDF, nombreArchivo, fechaSubida FROM PDF WHERE idExpediente = ?';
+    const [rows] = await db.execute(query, [idExpediente]);
+    res.json(rows);
+  } catch (error) {
+    console.error('Error al obtener PDFs del expediente:', error);
+    res.status(500).json({ message: 'Error al obtener los archivos del expediente' });
+  }
+};
+
+// Eliminar un PDF
+const deletePDF = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Verificar que el PDF existe
+    const [checkRows] = await db.execute('SELECT idPDF FROM PDF WHERE idPDF = ?', [id]);
+    if (checkRows.length === 0) {
+      return res.status(404).json({ message: 'PDF no encontrado' });
+    }
+    
+    // Eliminar el PDF
+    await db.execute('DELETE FROM PDF WHERE idPDF = ?', [id]);
+    
+    res.status(200).json({ message: 'PDF eliminado exitosamente' });
+  } catch (error) {
+    console.error('Error al eliminar PDF:', error);
+    res.status(500).json({ message: 'Error al eliminar el archivo' });
+  }
+};
+
+// Asociar un PDF existente a un expediente
+const associatePDFWithExpediente = async (req, res) => {
+  try {
+    const { idPDF, idExpediente } = req.body;
+    
+    // Verificar que el PDF existe
+    const [pdfRows] = await db.execute('SELECT idPDF FROM PDF WHERE idPDF = ?', [idPDF]);
+    if (pdfRows.length === 0) {
+      return res.status(404).json({ message: 'PDF no encontrado' });
+    }
+    
+    // Verificar que el expediente existe
+    const [expRows] = await db.execute('SELECT idExpediente FROM Expediente WHERE idExpediente = ?', [idExpediente]);
+    if (expRows.length === 0) {
+      return res.status(404).json({ message: 'Expediente no encontrado' });
+    }
+    
+    // Actualizar la asociación
+    await db.execute('UPDATE PDF SET idExpediente = ? WHERE idPDF = ?', [idExpediente, idPDF]);
+    
+    res.status(200).json({ message: 'PDF asociado exitosamente al expediente' });
+  } catch (error) {
+    console.error('Error al asociar PDF con expediente:', error);
+    res.status(500).json({ message: 'Error al asociar el archivo con el expediente' });
+  }
+};
+
 module.exports = {
-  createExpediente,
-  getAllExpedientes,
-  getExpedienteById,
-  updateExpediente,
-  deleteExpediente,
-  searchExpedientes,
-  getExpedientesByEstado,
-  getExpedientesArchivados,
   uploadPDF,
   getPDF,
-  getAllPDFs
+  getAllPDFs,
+  getPDFsByExpediente,
+  deletePDF,
+  associatePDFWithExpediente
 };

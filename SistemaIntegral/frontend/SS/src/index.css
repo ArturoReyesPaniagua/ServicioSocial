@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Estilos globales adicionales */
+body {
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.header__principal {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #f0f4f8;
+  border-bottom: 1px solid #ddd;
+}
+
+.header__img {
+  margin-right: 20px;
+}
+
+.header__logo {
+  max-height: 60px;
+}
+
+.header__text {
+  font-size: 14px;
+  color: #333;
+}
+
+/* Asegúrate de que estos estilos no entren en conflicto con Tailwind */

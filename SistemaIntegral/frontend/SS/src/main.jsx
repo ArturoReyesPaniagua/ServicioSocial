@@ -5,6 +5,7 @@ import { BrowserRouter } from 'react-router-dom'
 import Logo from './assets/logo_sec_educ.png'
 import { AuthProvider } from './context/AuthContext'
 import App from './App'
+import './index.css'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
