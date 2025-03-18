@@ -12,12 +12,12 @@ import { es } from 'date-fns/locale';
 import axios from 'axios';
 
 const ExpedientesTable = ({ 
-  data = [], // Proporcionar un valor predeterminado para evitar errores si data es undefined
+  data = [], 
   onEdit, 
   onDelete, 
   onView, 
   onArchive,
-  isLoading = false // Valor predeterminado para isLoading
+  isLoading = false 
 }) => {
   const [sorting, setSorting] = useState([]);
   const [globalFilter, setGlobalFilter] = useState('');
@@ -63,7 +63,7 @@ const ExpedientesTable = ({
     },
     {
       header: 'Estado',
-      accessorKey: 'nombreEstado',
+      accessorKey: 'Estado',
       cell: info => {
         const value = info.getValue();
         if (!value) return '';

@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 
 const ExpedienteForm = ({ expediente, estados, onSave, onCancel }) => {
   const [formData, setFormData] = useState({
-    idEstado: '',
+    Estado: '',
     fechaDeRecepcion: '',
     noFolioDeSeguimiento: '',
     fechaLimite: '',
@@ -53,7 +53,7 @@ const ExpedienteForm = ({ expediente, estados, onSave, onCancel }) => {
     
     if (!formData.NoExpediente) newErrors.NoExpediente = 'El número de expediente es obligatorio';
     if (!formData.noFolioDeSeguimiento) newErrors.noFolioDeSeguimiento = 'El folio de seguimiento es obligatorio';
-    if (!formData.idEstado) newErrors.idEstado = 'Debe seleccionar un estado';
+    if (!formData.Estado) newErrors.Estado = 'Debe seleccionar un estado';
     if (!formData.fechaDeRecepcion) newErrors.fechaDeRecepcion = 'La fecha de recepción es obligatoria';
     if (!formData.solicitante) newErrors.solicitante = 'El solicitante es obligatorio';
     if (!formData.asunto) newErrors.asunto = 'El asunto es obligatorio';
@@ -142,27 +142,25 @@ const ExpedienteForm = ({ expediente, estados, onSave, onCancel }) => {
 
               {/* Estado */}
               <div>
-                <label htmlFor="idEstado" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="Estado" className="block text-sm font-medium text-gray-700">
                   Estado *
                 </label>
                 <select
-                  id="idEstado"
-                  name="idEstado"
-                  value={formData.idEstado}
+                  id="Estado"
+                  name="Estado"
+                  value={formData.Estado}
                   onChange={handleChange}
                   className={`mt-1 block w-full rounded-md shadow-sm p-2 border ${
-                    errors.idEstado ? 'border-red-500' : 'border-gray-300'
+                    errors.Estado ? 'border-red-500' : 'border-gray-300'
                   }`}
                 >
                   <option value="">Seleccione un estado</option>
-                  {estados.map(estado => (
-                    <option key={estado.idEstado} value={estado.idEstado}>
-                      {estado.nombreEstado}
-                    </option>
-                  ))}
+                  <option value="Concluido">Concluido</option>
+                  <option value="En proceso">En proceso</option>
+                  <option value="Cancelado">Cancelado</option>
                 </select>
-                {errors.idEstado && (
-                  <p className="mt-1 text-sm text-red-600">{errors.idEstado}</p>
+                {errors.Estado && (
+                  <p className="mt-1 text-sm text-red-600">{errors.Estado}</p>
                 )}
               </div>
 

@@ -9,7 +9,6 @@ import DeleteConfirmation from '../common/DeleteConfirmation';
 
 const ExpedientesPage = () => {
   const [expedientes, setExpedientes] = useState([]);
-  const [estados, setEstados] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [formVisible, setFormVisible] = useState(false);
   const [viewVisible, setViewVisible] = useState(false);
@@ -17,16 +16,19 @@ const ExpedientesPage = () => {
   const [currentExpediente, setCurrentExpediente] = useState(null);
   const [filterType, setFilterType] = useState('all'); // 'all', 'archived', 'estado'
   const [selectedEstado, setSelectedEstado] = useState('');
+  
+  // Estados disponibles (ahora son fijos en el ENUM de la BD)
+  const estadosDisponibles = [
+    { value: 'Concluido', label: 'Concluido' },
+    { value: 'En proceso', label: 'En proceso' },
+    { value: 'Cancelado', label: 'Cancelado' }
+  ];
 
-  // Fetch expedientes y estados al cargar
+  // Fetch expedientes al cargar
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        // Obtener estados para los filtros y el formulario
-        const estadosResponse = await axios.get('http://localhost:3001/api/estados');
-        setEstados(estadosResponse.data);
-        
         // Cargar expedientes
         await fetchExpedientes();
       } catch (error) {
@@ -180,9 +182,9 @@ const ExpedientesPage = () => {
                 onChange={(e) => setSelectedEstado(e.target.value)}
               >
                 <option value="">Seleccione un estado</option>
-                {estados.map(estado => (
-                  <option key={estado.idEstado} value={estado.idEstado}>
-                    {estado.nombreEstado}
+                {estadosDisponibles.map(estado => (
+                  <option key={estado.value} value={estado.value}>
+                    {estado.label}
                   </option>
                 ))}
               </select>
@@ -210,7 +212,7 @@ const ExpedientesPage = () => {
       {formVisible && (
         <ExpedienteForm
           expediente={currentExpediente}
-          estados={estados}
+          estados={estadosDisponibles} // Ya no necesitamos cargar estados desde la API
           onSave={currentExpediente ? handleUpdateExpediente : handleCreateExpediente}
           onCancel={() => setFormVisible(false)}
         />

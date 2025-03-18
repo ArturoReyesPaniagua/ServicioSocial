@@ -62,8 +62,8 @@ const ExpedienteView = ({ expediente, onClose, onEdit }) => {
                 <div>
                   <span className="text-sm font-medium text-gray-500">Estado:</span>
                   <p>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getEstadoColor(expediente.nombreEstado)}`}>
-                      {expediente.nombreEstado}
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getEstadoColor(expediente.Estado)}`}>
+                      {expediente.Estado}
                     </span>
                   </p>
                 </div>
