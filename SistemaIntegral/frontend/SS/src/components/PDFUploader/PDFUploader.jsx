@@ -1,5 +1,6 @@
 // src/components/PDFUploader/PDFUploader.jsx
 import { useState } from 'react';
+import { useEffect } from 'react';
 import axios from 'axios';
 
 function PDFUploader() {

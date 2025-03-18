@@ -2,7 +2,7 @@ const mysql = require("mysql2");
 const config = require("../db/config");
 const pool = mysql.createPool(config);
 
-// Create operations
+// Create 
 const createPDF = (pdf) => {
   return new Promise((resolve, reject) => {
     const query = `INSERT INTO PDF (archivo) VALUES (?)`;
@@ -13,7 +13,7 @@ const createPDF = (pdf) => {
   });
 };
 
-// Read operations
+// Read 
 const getPDFById = (idPDF) => {
   return new Promise((resolve, reject) => {
     const query = `SELECT * FROM PDF WHERE idPDF = ?`;
@@ -24,7 +24,7 @@ const getPDFById = (idPDF) => {
   });
 };
 
-// Update operations
+// Update 
 const updatePDF = (idPDF, data) => {
   return new Promise((resolve, reject) => {
     const query = `UPDATE PDF SET archivo = ? WHERE idPDF = ?`;
@@ -35,7 +35,7 @@ const updatePDF = (idPDF, data) => {
   });
 };
 
-// Delete operations
+// Delete 
 const deletePDF = (idPDF) => {
   return new Promise((resolve, reject) => {
     const query = `DELETE FROM PDF WHERE idPDF = ?`;
