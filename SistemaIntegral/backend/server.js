@@ -5,7 +5,7 @@ const cors = require("cors");
 
 const connectDB = require("./db/db");
 const authRoutes = require("./routes/authRoutes");
-const estadoRoutes = require("./routes/estadoRoutes");
+//const estadoRoutes = require("./routes/estadoRoutes"); Se elimino la normalizacion de la base de datos que daba a estado, ya que son solo 3 y no son dinamicos.
 const expedientesRoutes = require("./routes/expedientesRoutes");
 const pdfRoutes = require("./routes/pdfRoutes");
 
@@ -19,7 +19,7 @@ app.use(express.urlencoded({ extended: false }));
 
 // Rutas
 app.use("/", authRoutes);
-app.use("/api", estadoRoutes);
+//app.use("/api", estadoRoutes);Se elimino estado como elemento aparte
 app.use("/api", expedientesRoutes);
 app.use("/api", pdfRoutes);
 

@@ -21,7 +21,8 @@ function RegisterForm() {
         role,
       });
       console.log(response.data);
-      // Aquí podrías redirigir al usuario a la página de login o mostrar un mensaje de éxito
+      
+      alert("Usuario registrado con exito")
     } catch (error) {
       console.error("Error registrando user:", error);
       setError(error.response?.data?.message || "Error al registrar el usuario");

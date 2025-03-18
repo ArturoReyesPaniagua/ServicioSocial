@@ -16,11 +16,19 @@ const createExpediente = (expediente) => {
 // Leer expedientes
 const getAllExpedientes = () => {
   return new Promise((resolve, reject) => {
-    const query = `
-      SELECT e.*, es.nombreEstado 
-      FROM Expediente e
-      JOIN Estado es ON e.idEstado = es.idEstado
-    `;
+    const query = `SELECT * FROM Expediente`;
+    pool.query(query, (err, results) => {
+      if (err) reject(err);
+      else resolve(results);
+    });
+  });
+};
+
+// Leer Estados (valores únicos)
+const getAllEstados = () => {
+  return new Promise((resolve, reject) => {
+    // Esta consulta devolverá los valores únicos del enum Estado
+    const query = `SELECT DISTINCT Estado FROM Expediente`;
     pool.query(query, (err, results) => {
       if (err) reject(err);
       else resolve(results);
@@ -30,12 +38,7 @@ const getAllExpedientes = () => {
 
 const getExpedienteById = (idExpediente) => {
   return new Promise((resolve, reject) => {
-    const query = `
-      SELECT e.*, es.nombreEstado 
-      FROM Expediente e
-      JOIN Estado es ON e.idEstado = es.idEstado
-      WHERE e.idExpediente = ?
-    `;
+    const query = `SELECT * FROM Expediente WHERE idExpediente = ?`;
     pool.query(query, [idExpediente], (err, results) => {
       if (err) reject(err);
       else resolve(results[0]);
@@ -69,13 +72,11 @@ const deleteExpediente = (idExpediente) => {
 const searchExpedientes = (searchTerm) => {
   return new Promise((resolve, reject) => {
     const query = `
-      SELECT e.*, es.nombreEstado 
-      FROM Expediente e
-      JOIN Estado es ON e.idEstado = es.idEstado
-      WHERE e.NoExpediente LIKE ? 
-      OR e.solicitante LIKE ? 
-      OR e.asunto LIKE ?
-      OR e.noFolioDeSeguimiento LIKE ?
+      SELECT * FROM Expediente
+      WHERE NoExpediente LIKE ? 
+      OR solicitante LIKE ? 
+      OR asunto LIKE ?
+      OR noFolioDeSeguimiento LIKE ?
     `;
     const searchPattern = `%${searchTerm}%`;
     pool.query(query, [searchPattern, searchPattern, searchPattern, searchPattern], (err, results) => {
@@ -85,15 +86,11 @@ const searchExpedientes = (searchTerm) => {
   });
 };
 
-const getExpedientesByEstado = (idEstado) => {
+// Actualizado para usar el campo Estado directo
+const getExpedientesByEstado = (estado) => {
   return new Promise((resolve, reject) => {
-    const query = `
-      SELECT e.*, es.nombreEstado 
-      FROM Expediente e
-      JOIN Estado es ON e.idEstado = es.idEstado
-      WHERE e.idEstado = ?
-    `;
-    pool.query(query, [idEstado], (err, results) => {
+    const query = `SELECT * FROM Expediente WHERE Estado = ?`;
+    pool.query(query, [estado], (err, results) => {
       if (err) reject(err);
       else resolve(results);
     });
@@ -102,12 +99,7 @@ const getExpedientesByEstado = (idEstado) => {
 
 const getExpedientesArchivados = (archivado) => {
   return new Promise((resolve, reject) => {
-    const query = `
-      SELECT e.*, es.nombreEstado 
-      FROM Expediente e
-      JOIN Estado es ON e.idEstado = es.idEstado
-      WHERE e.archivado = ?
-    `;
+    const query = `SELECT * FROM Expediente WHERE archivado = ?`;
     pool.query(query, [archivado], (err, results) => {
       if (err) reject(err);
       else resolve(results);
@@ -123,5 +115,6 @@ module.exports = {
   deleteExpediente,
   searchExpedientes,
   getExpedientesByEstado,
-  getExpedientesArchivados
+  getExpedientesArchivados,
+  getAllEstados
 };

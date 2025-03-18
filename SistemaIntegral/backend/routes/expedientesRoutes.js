@@ -8,7 +8,8 @@ const {
   deleteExpediente,
   searchExpedientes,
   getExpedientesByEstado,
-  getExpedientesArchivados
+  getExpedientesArchivados,
+  getAllEstados
 } = require('../controllers/expedienteControllers');
 
 // Rutas CRUD básicas para expedientes
@@ -20,7 +21,10 @@ router.delete('/expedientes/:id', deleteExpediente);
 
 // Rutas adicionales para expedientes
 router.get('/expedientes/search/:term', searchExpedientes);
-router.get('/expedientes/estado/:idEstado', getExpedientesByEstado);
+router.get('/expedientes/estado/:estado', getExpedientesByEstado); // Cambiado de idEstado a estado porque se elimino esquema de estados 
 router.get('/expedientes/archivado/:archivado', getExpedientesArchivados);
+
+// Rutas para los estados de los expedientes
+router.get('/estados', getAllEstados);
 
 module.exports = router;

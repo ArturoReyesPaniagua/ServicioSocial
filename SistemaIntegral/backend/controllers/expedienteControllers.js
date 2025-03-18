@@ -1,18 +1,16 @@
 const expedienteSchema = require('../schemas/expedienteSchema');
-const estadoSchema = require('../schemas/estadoSchema');
 const { createTable } = require('../utils/funtiosauth');
 const expedienteUtils = require('../utils/expedienteUtils');
 
 // Crear un nuevo expediente
 const createExpediente = async (req, res) => {
   try {
-    // Asegurar que las tablas existan
-    await createTable(estadoSchema);
+    // Asegurar que la tabla exista
     await createTable(expedienteSchema);
 
     // Crear expediente
     const expedienteData = {
-      idEstado: req.body.idEstado,
+      Estado: req.body.Estado,//integrar estados a expediente
       fechaDeRecepcion: req.body.fechaDeRecepcion,
       noFolioDeSeguimiento: req.body.noFolioDeSeguimiento,
       fechaLimite: req.body.fechaLimite,
@@ -31,6 +29,16 @@ const createExpediente = async (req, res) => {
       message: 'Expediente creado exitosamente',
       idExpediente: result.insertId
     });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Obtener todos los estados
+const getAllEstados = async (req, res) => {
+  try {
+    const estados = await expedienteUtils.getAllEstados();
+    res.status(200).json(estados);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -94,11 +102,11 @@ const searchExpedientes = async (req, res) => {
   }
 };
 
-// Filtrar expedientes por estado
+// Filtrar expedientes por estado - actualizado para usar el valor de estado directamente
 const getExpedientesByEstado = async (req, res) => {
   try {
-    const { idEstado } = req.params;
-    const expedientes = await expedienteUtils.getExpedientesByEstado(idEstado);
+    const { estado } = req.params; // Cambiado de idEstado a estado
+    const expedientes = await expedienteUtils.getExpedientesByEstado(estado);
     res.status(200).json(expedientes);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -119,6 +127,7 @@ const getExpedientesArchivados = async (req, res) => {
 
 module.exports = {
   createExpediente,
+  getAllEstados,
   getAllExpedientes,
   getExpedienteById,
   updateExpediente,

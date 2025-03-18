@@ -1,7 +1,7 @@
 const expedienteSchema = `
   CREATE TABLE IF NOT EXISTS Expediente (
     idExpediente INT AUTO_INCREMENT PRIMARY KEY,
-    idEstado INT,
+    Estado ENUM('Concluido', 'En proceso', 'Cancelado') NOT NULL,
     fechaDeRecepcion DATE,
     noFolioDeSeguimiento VARCHAR(50) UNIQUE,
     fechaLimite DATE,
@@ -11,8 +11,7 @@ const expedienteSchema = `
     fechaDeRespuesta DATE,
     observaciones VARCHAR(250),
     archivado BOOLEAN,
-    NoExpediente VARCHAR(50) UNIQUE,
-    FOREIGN KEY (idEstado) REFERENCES Estado(idEstado)
+    NoExpediente VARCHAR(50) UNIQUE
   );
 `;
 
