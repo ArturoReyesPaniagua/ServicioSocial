@@ -32,7 +32,7 @@ function RegisterForm() {
   };
 
   return (
-    <div className='flex justify-center items-center min-h-screen bg-gray-100'>
+    <div className='flex justify-center'>
       <div className='bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden'>
         {/*Encabezado con color guinda*/}
         <div className="bg-guinda p-6">
