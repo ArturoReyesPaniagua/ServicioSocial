@@ -52,6 +52,12 @@ function App() {
             <Navigate to="/expedientes" />
           </ProtectedRoute>
         } />
+        {/* Ruta antigua /Layout para compatibilidad */}
+          <Route path="/Layout" element={
+            <ProtectedRoute>
+              <Navigate to="/userList" />
+          </ProtectedRoute>
+        } />
         
         {/* Ruta para cualquier otra URL no definida */}
         <Route path="*" element={<Navigate to="/" />} />

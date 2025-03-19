@@ -100,6 +100,22 @@ const MainLayout = ({ children }) => {
                 </NavLink>
               </li>
             )}
+            {user?.role === 'admin' && (
+              <li>
+                <NavLink 
+                  to="/userList" 
+                  className={({ isActive }) => 
+                    isActive ? "bg-guinda-700" : ""
+                  }
+                >
+                  {({ isActive }) => (
+                    <button className={isActive ? "bg-guinda-700" : ""}>
+                      Lista de usuarios
+                    </button>
+                  )}
+                </NavLink>
+              </li>
+            )}
             {/* Puedes añadir más opciones de menú aquí */}
           </ul>
         </nav>
