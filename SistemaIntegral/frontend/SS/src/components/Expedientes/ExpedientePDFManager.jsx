@@ -22,10 +22,11 @@ const ExpedientePDFManager = ({ expedienteId }) => {
     try {
       setIsLoading(true);
       const response = await axios.get(`http://localhost:3001/api/pdfs/expediente/${expedienteId}`);
+      console.log('PDFs del expediente:', response.data);
       setFiles(response.data);
     } catch (error) {
       console.error('Error al obtener PDFs:', error);
-      setMessage('Error al cargar los archivos');
+      setMessage('Error al cargar los archivos: ' + (error.response?.data?.message || error.message));
     } finally {
       setIsLoading(false);
     }
@@ -51,21 +52,26 @@ const ExpedientePDFManager = ({ expedienteId }) => {
     setMessage('');
 
     try {
-      await axios.post('http://localhost:3001/api/upload-pdf', formData, {
+      const response = await axios.post('http://localhost:3001/api/upload-pdf', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
 
+      console.log('Respuesta al subir PDF:', response.data);
       setMessage('Archivo subido exitosamente');
       setSelectedFile(null);
+      
       // Limpiar el input de archivo
-      document.getElementById('pdf-upload').value = '';
+      if (document.getElementById('pdf-upload')) {
+        document.getElementById('pdf-upload').value = '';
+      }
+      
       // Recargar la lista de PDFs
-      fetchPDFs();
+      await fetchPDFs();
     } catch (error) {
       console.error('Error al subir el archivo:', error);
-      setMessage('Error al subir el archivo');
+      setMessage('Error al subir el archivo: ' + (error.response?.data?.message || error.message));
     } finally {
       setIsUploading(false);
     }
@@ -83,7 +89,7 @@ const ExpedientePDFManager = ({ expedienteId }) => {
       fetchPDFs();
     } catch (error) {
       console.error('Error al eliminar el archivo:', error);
-      setMessage('Error al eliminar el archivo');
+      setMessage('Error al eliminar el archivo: ' + (error.response?.data?.message || error.message));
     }
   };
 
@@ -93,7 +99,12 @@ const ExpedientePDFManager = ({ expedienteId }) => {
 
   const formatDate = (dateString) => {
     if (!dateString) return '-';
-    return format(new Date(dateString), 'dd/MM/yyyy HH:mm', { locale: es });
+    try {
+      return format(new Date(dateString), 'dd/MM/yyyy HH:mm', { locale: es });
+    } catch (error) {
+      console.error('Error al formatear fecha:', error);
+      return dateString;
+    }
   };
 
   return (
@@ -128,14 +139,14 @@ const ExpedientePDFManager = ({ expedienteId }) => {
                       file:mr-4 file:py-2 file:px-4
                       file:rounded-md file:border-0
                       file:text-sm file:font-medium
-                      file:bg-guinda file:text-white
-                      hover:file:bg-guinda-dark"
+                      file:bg-blue-600 file:text-white
+                      hover:file:bg-blue-700"
           />
         </div>
         <button
           type="submit"
           disabled={isUploading || !selectedFile}
-          className="bg-guinda hover:bg-guinda-dark text-white py-2 px-4 rounded
+          className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded
                      disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
           {isUploading ? 'Subiendo...' : 'Subir Documento'}
@@ -148,7 +159,7 @@ const ExpedientePDFManager = ({ expedienteId }) => {
         
         {isLoading ? (
           <div className="flex justify-center items-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-guinda"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
           </div>
         ) : files.length > 0 ? (
           <div className="overflow-x-auto">

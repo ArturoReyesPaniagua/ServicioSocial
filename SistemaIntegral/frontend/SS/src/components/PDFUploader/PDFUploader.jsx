@@ -1,6 +1,5 @@
 // src/components/PDFUploader/PDFUploader.jsx
-import { useState } from 'react';
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 function PDFUploader() {
@@ -17,10 +16,13 @@ function PDFUploader() {
   // Obtener lista de PDFs
   const fetchPDFs = async () => {
     try {
+      setLoading(true);
       const response = await axios.get('http://localhost:3001/api/pdfs');
       setPdfs(response.data);
+      setLoading(false);
     } catch (error) {
       console.error('Error al obtener la lista de PDFs:', error);
+      setLoading(false);
     }
   };
 
@@ -42,6 +44,8 @@ function PDFUploader() {
     formData.append('pdf', selectedFile);
     
     setLoading(true);
+    setMessage('');
+    
     try {
       await axios.post('http://localhost:3001/api/upload-pdf', formData, {
         headers: {
@@ -51,11 +55,15 @@ function PDFUploader() {
       
       setMessage('Archivo subido exitosamente');
       setSelectedFile(null);
+      // Limpiar el input de archivo
+      if (document.getElementById('pdf-upload')) {
+        document.getElementById('pdf-upload').value = '';
+      }
       // Recargar la lista de PDFs
-      fetchPDFs();
+      await fetchPDFs();
     } catch (error) {
       console.error('Error al subir el archivo:', error);
-      setMessage('Error al subir el archivo');
+      setMessage('Error al subir el archivo: ' + (error.response?.data?.message || error.message));
     } finally {
       setLoading(false);
     }
@@ -79,21 +87,22 @@ function PDFUploader() {
           </label>
           <input
             type="file"
+            id="pdf-upload"
             accept=".pdf"
             onChange={handleFileChange}
             className="block w-full text-sm text-gray-500
                       file:mr-4 file:py-2 file:px-4
                       file:rounded-md file:border-0
                       file:text-sm file:font-medium
-                      file:bg-guinda file:text-white
-                      hover:file:bg-guinda-dark"
+                      file:bg-blue-600 file:text-white
+                      hover:file:bg-blue-700"
           />
         </div>
         
         <button
           type="submit"
           disabled={loading || !selectedFile}
-          className="bg-guinda hover:bg-guinda-dark text-white py-2 px-4 rounded-md
+          className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md
                    disabled:bg-gray-300 disabled:cursor-not-allowed"
         >
           {loading ? 'Subiendo...' : 'Subir PDF'}
@@ -109,14 +118,18 @@ function PDFUploader() {
       {/* Lista de PDFs */}
       <div>
         <h4 className="text-md font-medium mb-2">PDFs disponibles</h4>
-        {pdfs.length > 0 ? (
+        {loading ? (
+          <div className="flex justify-center py-4">
+            <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-blue-500"></div>
+          </div>
+        ) : pdfs.length > 0 ? (
           <ul className="divide-y divide-gray-200">
             {pdfs.map((pdf) => (
               <li key={pdf.idPDF} className="py-3 flex justify-between items-center">
-                <span>Documento #{pdf.idPDF}</span>
+                <span>{pdf.nombreArchivo || `Documento #${pdf.idPDF}`}</span>
                 <button
                   onClick={() => handleViewPDF(pdf.idPDF)}
-                  className="text-guinda hover:text-guinda-dark"
+                  className="text-blue-600 hover:text-blue-800"
                 >
                   Ver PDF
                 </button>

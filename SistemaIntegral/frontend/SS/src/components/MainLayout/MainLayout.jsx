@@ -110,7 +110,7 @@ const MainLayout = ({ children }) => {
                 >
                   {({ isActive }) => (
                     <button className={isActive ? "bg-guinda-700" : ""}>
-                      Lista de usuarios
+                      Lista de usuarios 
                     </button>
                   )}
                 </NavLink>

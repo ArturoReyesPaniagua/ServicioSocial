@@ -1,30 +1,40 @@
-const express = require("express");
-const dotenv = require("dotenv");
-dotenv.config();
-const cors = require("cors");
-
-const connectDB = require("./db/db");
-const authRoutes = require("./routes/authRoutes");
-//const estadoRoutes = require("./routes/estadoRoutes"); Se elimino la normalizacion de la base de datos que daba a estado, ya que son solo 3 y no son dinamicos.
-const expedientesRoutes = require("./routes/expedientesRoutes");
-const pdfRoutes = require("./routes/pdfRoutes");
-
-const port = process.env.PORT || 3003;
+const express = require('express');
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const connectDB = require('./db/db');
+const expedientesRoutes = require('./routes/expedientesRoutes');
+const pdfRoutes = require('./routes/pdfRoutes');
+const authRoutes = require('./routes/authRoutes');
+require('dotenv').config();
 
 const app = express();
+const PORT = process.env.PORT || 3001;
 
+// Middleware
 app.use(cors());
-app.use(express.json({ limit: '50mb' }));  // Aumentar el límite para permitir archivos PDF
-app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 
-// Rutas
-app.use("/", authRoutes);
-//app.use("/api", estadoRoutes);Se elimino estado como elemento aparte
-app.use("/api", expedientesRoutes);
-app.use("/api", pdfRoutes);
+// Para poder manejar datos de formulario
+app.use(bodyParser.urlencoded({ extended: true }));
 
+// Configuración para archivos de gran tamaño
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+
+// Conectar a la base de datos
 connectDB();
 
-app.listen(port, () => {
-  console.log(`El servidor corre en el puerto ${port}`);
+// Rutas
+app.use('/api', expedientesRoutes);
+app.use('/api', pdfRoutes);
+app.use('/api/auth', authRoutes);
+
+// Ruta de prueba
+app.get('/', (req, res) => {
+  res.send('API de Gestión de Expedientes funcionando');
+});
+
+// Iniciar servidor
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
