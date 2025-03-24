@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+// src/components/Registration/Registration.jsx
+import { useState } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 import './Registration.css';
 
 function RegisterForm() {
@@ -8,24 +10,47 @@ function RegisterForm() {
   const [role, setRole] = useState('user');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setSuccess(false);
     
-    try {
-      const response = await axios.post('http://localhost:3001/register', {
+    // Validación básica
+    if (!username.trim() || !password.trim()) {
+      setError('El usuario y contraseña son obligatorios');
+      setLoading(false);
+      return;
+    }
+    
+          try {
+      const response = await axios.post('http://localhost:3001/api/auth/register', {
         username,
         password,
         role,
       });
-      console.log(response.data);
       
-      alert("Usuario registrado con exito")
+      console.log('Respuesta del registro:', response.data);
+      setSuccess(true);
+      
+      // Si tienes react-toastify configurado para mostrar notificaciones
+      if (typeof toast !== 'undefined') {
+        toast.success('Usuario registrado con éxito');
+      }
+      
+      // Limpiar el formulario después del registro exitoso
+      setUsername('');
+      setPassword('');
+      setRole('user');
     } catch (error) {
-      console.error("Error registrando user:", error);
-      setError(error.response?.data?.message || "Error al registrar el usuario");
+      console.error("Error registrando usuario:", error);
+      setError(error.response?.data?.error || "Error al registrar el usuario");
+      
+      if (typeof toast !== 'undefined') {
+        toast.error(error.response?.data?.error || "Error al registrar el usuario");
+      }
     } finally {
       setLoading(false);
     }
@@ -34,7 +59,7 @@ function RegisterForm() {
   return (
     <div className='flex justify-center'>
       <div className='bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden'>
-        {/*Encabezado con color guinda*/}
+        {/* Encabezado con color guinda */}
         <div className="bg-guinda p-6">
           <h2 className="text-white text-xl font-bold text-center">
             Registrar Usuario
@@ -42,32 +67,38 @@ function RegisterForm() {
         </div>
 
         <div className='p-6'>
-          {/* Mensaje de error*/}
+          {/* Mensaje de éxito */}
+          {success && (
+            <div className="mb-6 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded" role="alert">
+              <p>Usuario registrado con éxito</p>
+            </div>
+          )}
+          
+          {/* Mensaje de error */}
           {error && (
             <div className="mb-6 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded" role="alert">
-              <p>
-                {error}
-              </p>
+              <p>{error}</p>
             </div>
           )}
           
           <form onSubmit={handleSubmit} className='space-y-6'>
-            {/*Campo de usuario*/}
+            {/* Campo de usuario */}
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
-                  Usuario
-                </label>
-                <input
-                  id="username"
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  disabled={loading}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-guinda focus:border-guinda"
-                  required
-                />
+                Usuario
+              </label>
+              <input
+                id="username"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                disabled={loading}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-guinda focus:border-guinda"
+                required
+              />
             </div>
-              {/* Campo de contraseña */}
+            
+            {/* Campo de contraseña */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
                 Contraseña

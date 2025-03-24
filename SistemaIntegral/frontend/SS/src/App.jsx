@@ -1,5 +1,5 @@
 // src/App.jsx
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Login from './components/Login/Login';
@@ -7,6 +7,7 @@ import RegisterForm from './components/Registration/Registration';
 import MainLayout from './components/MainLayout/MainLayout';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import ExpedientesPage from './components/Expedientes/ExpedientesPage';
+import UserPage from './components/userList/userPage';
 import { useAuth } from './context/AuthContext';
 import './App.css';
 
@@ -46,16 +47,18 @@ function App() {
           </ProtectedRoute>
         } />
         
+        <Route path="/userList" element={
+          <ProtectedRoute>
+            <MainLayout>
+              <UserPage />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        
         {/* Ruta antigua /Layout para compatibilidad */}
         <Route path="/Layout" element={
           <ProtectedRoute>
             <Navigate to="/expedientes" />
-          </ProtectedRoute>
-        } />
-        {/* Ruta antigua /Layout para compatibilidad */}
-          <Route path="/Layout" element={
-            <ProtectedRoute>
-              <Navigate to="/userList" />
           </ProtectedRoute>
         } />
         

@@ -1,5 +1,6 @@
 // src/components/userList/userForm.jsx
 import { useState, useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext';
 
 const UserForm = ({ user, onSave, onCancel }) => {
   const [formData, setFormData] = useState({
@@ -10,6 +11,7 @@ const UserForm = ({ user, onSave, onCancel }) => {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const { user: currentUser } = useAuth();
 
   // Inicializar el formulario con datos del usuario si existe
   useEffect(() => {
@@ -20,6 +22,13 @@ const UserForm = ({ user, onSave, onCancel }) => {
         username: user.username,
         role: user.role,
         password: '' // Contraseña vacía para edición
+      });
+    } else {
+      // Si es nuevo usuario, resetear el formulario
+      setFormData({
+        username: '',
+        password: '',
+        role: 'user'
       });
     }
   }, [user]);
@@ -42,16 +51,21 @@ const UserForm = ({ user, onSave, onCancel }) => {
   const validateForm = () => {
     const newErrors = {};
     
-    if (!formData.username) newErrors.username = 'Username is required';
+    if (!formData.username) newErrors.username = 'El nombre de usuario es obligatorio';
     
     // Solo validar contraseña en creación o si se proporciona al editar
     if (!user && !formData.password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = 'La contraseña es obligatoria para nuevos usuarios';
     } else if (formData.password && formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+      newErrors.password = 'La contraseña debe tener al menos 6 caracteres';
     }
     
-    if (!formData.role) newErrors.role = 'Role is required';
+    if (!formData.role) newErrors.role = 'El rol es obligatorio';
+    
+    // Validar si está intentando cambiar su propio rol (si es administrador)
+    if (user && user.userId === currentUser?.userId && user.role === 'admin' && formData.role !== 'admin') {
+      newErrors.role = 'No puede cambiar su propio rol de administrador';
+    }
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -73,7 +87,11 @@ const UserForm = ({ user, onSave, onCancel }) => {
       
       await onSave(submitData);
     } catch (error) {
-      console.error('Error saving user:', error);
+      console.error('Error guardando usuario:', error);
+      // Si hay un mensaje de error del servidor, mostrarlo
+      if (error.response?.data?.error) {
+        setErrors(prev => ({ ...prev, submit: error.response.data.error }));
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -90,7 +108,7 @@ const UserForm = ({ user, onSave, onCancel }) => {
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold">
-              {user ? 'Edit User' : 'New User'}
+              {user ? 'Editar Usuario' : 'Nuevo Usuario'}
             </h2>
             <button
               onClick={onCancel}
@@ -102,11 +120,17 @@ const UserForm = ({ user, onSave, onCancel }) => {
             </button>
           </div>
 
+          {errors.submit && (
+            <div className="mb-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4">
+              <p>{errors.submit}</p>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Username */}
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-                Username *
+                Nombre de Usuario *
               </label>
               <input
                 type="text"
@@ -126,7 +150,7 @@ const UserForm = ({ user, onSave, onCancel }) => {
             {/* Password */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                {user ? 'Password (leave blank to keep current)' : 'Password *'}
+                {user ? 'Contraseña (dejar en blanco para mantener la actual)' : 'Contraseña *'}
               </label>
               <div className="relative">
                 <input
@@ -164,7 +188,7 @@ const UserForm = ({ user, onSave, onCancel }) => {
             {/* Role */}
             <div>
               <label htmlFor="role" className="block text-sm font-medium text-gray-700">
-                Role *
+                Rol *
               </label>
               <select
                 id="role"
@@ -174,12 +198,16 @@ const UserForm = ({ user, onSave, onCancel }) => {
                 className={`mt-1 block w-full rounded-md shadow-sm p-2 border ${
                   errors.role ? 'border-red-500' : 'border-gray-300'
                 }`}
+                disabled={user?.userId === currentUser?.userId && user?.role === 'admin'}
               >
-                <option value="user">User</option>
-                <option value="admin">Admin</option>
+                <option value="user">Usuario</option>
+                <option value="admin">Administrador</option>
               </select>
               {errors.role && (
                 <p className="mt-1 text-sm text-red-600">{errors.role}</p>
+              )}
+              {user?.userId === currentUser?.userId && user?.role === 'admin' && (
+                <p className="mt-1 text-xs text-gray-500">No puede cambiar su propio rol de administrador.</p>
               )}
             </div>
 
@@ -189,14 +217,14 @@ const UserForm = ({ user, onSave, onCancel }) => {
                 onClick={onCancel}
                 className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
-                Cancel
+                Cancelar
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
                 className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-300"
               >
-                {isSubmitting ? 'Saving...' : user ? 'Update' : 'Create'}
+                {isSubmitting ? 'Guardando...' : user ? 'Actualizar' : 'Crear'}
               </button>
             </div>
           </form>

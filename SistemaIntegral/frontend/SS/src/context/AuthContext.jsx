@@ -1,4 +1,4 @@
-// AuthContext.jsx corregido
+// src/context/AuthContext.jsx
 import { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
@@ -24,10 +24,13 @@ export function AuthProvider({ children }) {
 
   const login = async (username, password) => {
     try {
-      const response = await axios.post('http://localhost:3001/login', {
+      // URL CORREGIDA AQUÍ - Esta es la ruta correcta según tu backend
+      const response = await axios.post('http://localhost:3001/api/auth/login', {
         username,
         password
       });
+
+      console.log('Respuesta login:', response.data);
 
       // El backend devuelve directamente los datos del usuario y el token
       if (response.data && response.data.access_token) {
