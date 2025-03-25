@@ -1,0 +1,27 @@
+login -> barraLateral: Click en ingresar //Usuario inserta datos correctos
+login -> popUpErrorLogin: Click en ingresar //Usuario inserta datos incorrectos
+popUpErrorLogin -> login
+barraLateral -> tabla: Click la opcion de tabla, aunque esta es la opcion que carga automaticamente
+
+tabla -> formularioExpediente: Click la opcion de Nuevo Expediente
+formularioExpediente -> tabla: Click en cancelar
+formularioExpediente -> tabla: Click en Crear // datos correctos
+formularioExpediente -> formularioExpediente: Click en crear // datos incorrectos
+tabla -> formularioPDF: Click en la opcion de vizualizar PDf
+formularioPDF -> cargarPDF: Click en elegir archivo
+formularioPDF -> tabla: Click en cancelar
+cargarPDF -> formularioPDF: Click en abrir
+cargarPDF -> formularioPDF: Click en cancelar
+tabla -> formularioActualizarExpediente: click en la opcion de modificar
+formularioActualizarExpediente -> formularioActualizarExpediente: click en actualizar // datos llenados correctamente
+formularioActualizarExpediente -> popUpErrorformularioActualizarExpediente: click en actualizar // datos llenados INcorrectamente
+popUpErrorformularioActualizarExpediente -> formularioActualizarExpediente
+formularioActualizarExpediente -> tabla: Click en cancelar
+
+barraLateral -> tablaUsuarios: Click en usuarios
+
+formularioUsuarios -> tablaUsuarios: Click en actualizar // datos correctos
+tablaUsuarios -> formularioUsuarios: Click en actualizar // datos incorrectos
+
+tablaUsuarios -> tablaUsuarios: Click en eliminar usuario
+

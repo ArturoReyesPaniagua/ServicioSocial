@@ -1,0 +1,62 @@
+El modelo MVC (Modelo-Vista-Controlador) con una organización modular. 
+Aquí hay una breve descripción de cada carpeta:
+
+controllers/ → Contiene los controladores que manejan la lógica de negocio y procesan las solicitudes HTTP.
+
+db/ → Maneja la conexión y configuración de la base de datos.
+
+middleware/ → Contiene funciones intermedias (middleware) para validación, autenticación, etc.
+
+node_modules/ → Contiene las dependencias instaladas mediante npm.
+
+routes/ → Define las rutas de la API y las asocia con los controladores.
+
+schemas/ → Define los esquemas de validación de datos, normalmente usados con bibliotecas como Joi o Mongoose.
+
+utils/ → Contiene funciones auxiliares o herramientas reutilizables.
+
+Este tipo de estructura modular facilita la escalabilidad y el mantenimiento del código en proyectos Node.js.
+
+backend.controllers.authControllers -> uuid
+backend.controllers.authControllers -> jsonwebtoken
+backend.controllers.authControllers -> backend.schemas.userSchema
+backend.controllers.authControllers -> bcryptjs
+backend.controllers.authControllers -> mysql2.promise
+backend.controllers.authControllers -> backend.db.config
+
+backend.controllers.expedienteControllers -> backend.schemas.expedienteSchema
+backend.controllers.expedienteControllers -> backend.utils.funtionsauth
+backend.controllers.expedienteControllers -> backend.utils.expedientesUtils
+
+backend.controllers.pdfControllers -> mysql2.promise
+backend.controllers.pdfControllers -> backend.db.config
+backend.controllers.pdfControllers -> backend.schemas.pdfSchema
+backend.controllers.pdfControllers -> backend.utils.funtionsauth
+
+backend.db.db -> mysql2
+backend.db.db -> backend.db.config
+
+backend.middleware.authMiddleware -> jsonwebtoken
+backend.middleware.authMiddleware -> mysql2.promise
+backend.middleware.authMiddleware -> backend.db.config
+
+backend.routes.authRoutes -> express
+backend.routes.authRoutes -> express.router
+backend.routes.authRoutes -> backend.controllers.authControllers
+
+backend.routes.expedienteRoutes -> express.router
+backend.routes.expedienteRoutes -> express
+backend.routes.expedienteRoutes -> backend.controllers.expedienteControllers
+
+backend.routes.pdfRoutes -> express
+backend.routes.pdfRoutes -> express.router
+backend.routes.pdfRoutes -> multer
+
+backend.server -> express
+backend.server -> corps
+backend.server -> bodyParser
+backend.server -> backend.db.db
+backend.server -> backend.route.expedienteRoutes
+backend.server -> backend.route.pdfRoutes
+backend.server -> backend.route.authRoutes
+backend.server -> dotenv.config

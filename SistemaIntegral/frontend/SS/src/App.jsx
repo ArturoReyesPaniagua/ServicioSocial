@@ -3,7 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Login from './components/Login/Login';
-import RegisterForm from './components/Registration/Registration';
+//import RegisterForm from './components/Registration/Registration'; componente eliminado para integrarlo en tabla de usuarios 
 import MainLayout from './components/MainLayout/MainLayout';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import ExpedientesPage from './components/Expedientes/ExpedientesPage';
@@ -31,14 +31,7 @@ function App() {
           isAuthenticated ? <Navigate to="/expedientes" /> : <Login />
         } />
         
-        <Route path="/register" element={
-          <ProtectedRoute>
-            <MainLayout>
-              <RegisterForm />
-            </MainLayout>
-          </ProtectedRoute>
-        } />
-        
+           
         <Route path="/expedientes" element={
           <ProtectedRoute>
             <MainLayout>

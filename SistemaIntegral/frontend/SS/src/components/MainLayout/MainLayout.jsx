@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import './MainLayout.css';
-import logo from '../../assets/logo_sec_educ.png'; // Importamos el logo directamente
+import logo from '../../assets/logo_sec_educ.png'; // Importamos el logo directamente parael header interno
 
 const MainLayout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -84,22 +84,7 @@ const MainLayout = ({ children }) => {
                 )}
               </NavLink>
             </li>
-            {user?.role === 'admin' && (
-              <li>
-                <NavLink 
-                  to="/register" 
-                  className={({ isActive }) => 
-                    isActive ? "bg-guinda-700" : ""
-                  }
-                >
-                  {({ isActive }) => (
-                    <button className={isActive ? "bg-guinda-700" : ""}>
-                      Registrar Usuario
-                    </button>
-                  )}
-                </NavLink>
-              </li>
-            )}
+
             {user?.role === 'admin' && (
               <li>
                 <NavLink 

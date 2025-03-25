@@ -1,0 +1,79 @@
+frontend.main -> react
+frontend.main -> react-dom.client
+frontend.main -> react-router-dom
+frontend.main -> frontend.context.AuthContext
+frontend.main -> frontend.App
+frontend.main -> frontend."index.css"
+
+frontend."index.css" -> "@tailwind"
+
+frontend.App -> react-router-dom
+frontend.App -> react-toastify
+frontend.App -> frontend.components.Login."Login.jsx"
+frontend.App -> frontend.components.MainLayout."MainLayout.jsx"
+frontend.App -> frontend.components.Expedientes.ExpedientesPage
+frontend.App -> frontend.components.userList.userPage
+frontend.App -> frontend.context.AuthContext
+
+frontend.context.AuthContext -> react
+frontend.context.AuthContext -> axios
+
+frontend.components.userList.userForm -> react
+frontend.components.userList.userForm -> frontend.context.AuthContext
+
+frontend.components.userList."userList.jsx" -> react
+frontend.components.userList."userList.jsx" -> "@tanstack".react-table
+frontend.components.userList."userList.jsx" -> frontend.context.AuthContext
+
+frontend.components.userList.userPage -> react
+frontend.components.userList.userPage -> axios
+frontend.components.userList.userPage -> frontend.components.userList."userList.jsx"
+frontend.components.userList.userPage -> frontend.components.userList.userForm
+frontend.components.userList.userPage -> frontend.components.common.DeleteConfirmation
+frontend.components.userList.userPage -> frontend.context.AuthContext
+
+frontend.components.ProtectedRoute."ProtectedRoute.jsx" -> react-router-dom
+frontend.components.ProtectedRoute."ProtectedRoute.jsx" -> frontend.context.AuthContext
+
+frontend.components.Principal.inicio -> frontend.components.Login."Login.jsx"
+
+frontend.components.PDFUploader."PDFUploader.jsx" -> react
+frontend.components.PDFUploader."PDFUploader.jsx" -> axios
+
+frontend.components.MainLayout."MainLayout.jsx" -> react
+frontend.components.MainLayout."MainLayout.jsx" -> react-router-dom
+frontend.components.MainLayout."MainLayout.jsx" -> frontend.context.AuthContext
+frontend.components.MainLayout."MainLayout.jsx" -> frontend.components.MainLayout."MainLayout.css"
+
+frontend.components.Login."Login.jsx" -> react
+frontend.components.Login."Login.jsx" -> react-router-dom
+frontend.components.Login."Login.jsx" -> frontend.context.AuthContext
+frontend.components.Login."Login.jsx" -> frontend.components.Login."Login.css"
+
+frontend.components.Expedientes.ExpedienteForm -> react
+frontend.components.Expedientes.ExpedienteForm -> date-fns
+
+frontend.components.Expedientes.ExpedientePDFManager -> react
+frontend.components.Expedientes.ExpedientePDFManager -> axios
+frontend.components.Expedientes.ExpedientePDFManager -> date-fns
+frontend.components.Expedientes.ExpedientePDFManager -> date.fns.locale
+
+frontend.components.Expedientes.ExpedientesPage -> react
+frontend.components.Expedientes.ExpedientesPage -> axios
+frontend.components.Expedientes.ExpedientesPage -> react-toastify
+frontend.components.Expedientes.ExpedientesPage -> frontend.components.common.DeleteConfirmation
+frontend.components.Expedientes.ExpedientesPage -> frontend.components.Expedientes.ExpedienteForm
+frontend.components.Expedientes.ExpedientesPage -> frontend.components.Expedientes.ExpedientesView
+frontend.components.Expedientes.ExpedientesPage -> frontend.components.Expedientes.ExpedienteTable
+frontend.components.Expedientes.ExpedientesPage -> frontend.components.common.DeleteConfirmation
+
+frontend.components.Expedientes.ExpedientesTable -> react
+frontend.components.Expedientes.ExpedientesTable -> "@tanstack".react-table
+frontend.components.Expedientes.ExpedientesTable -> date.fns.locale
+frontend.components.Expedientes.ExpedientesTable -> date.fns
+
+frontend.components.Expedientes.ExpedientesView -> date-fns
+frontend.components.Expedientes.ExpedientesView -> date.fns.locale
+frontend.components.Expedientes.ExpedientesView -> frontend.components.Expedientes.ExpedientePDFManager
+
+frontend.components.common.DeleteConfirmation -> react
