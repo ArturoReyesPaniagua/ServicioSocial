@@ -1,0 +1,44 @@
+erDiagram
+    USUARIOS ||--o{ EXPEDIENTES : "gestiona (1:N)"
+    EXPEDIENTES ||--o{ PDF : "tiene (1:N)"
+    
+    USUARIOS {
+        string userId PK
+        string username
+        string password
+        enum role "admin/user"
+    }
+    
+    EXPEDIENTES {
+        int idExpediente PK
+        enum Estado "Concluido/En proceso/Cancelado"
+        string noFolio
+        string NoExpediente
+        date fechaRecepcion
+        date fechaLimite
+        string solicitante
+        string asunto
+        string responsable
+        date fechaRespuesta
+        string observaciones
+        boolean archivado
+    }
+    
+    PDF {
+        int idPDF PK
+        string nombreArchivo
+        blob archivo
+        int idExpediente FK
+        date fechaSubida
+    }
+    
+    ADMIN_USERS }|..|{ USUARIOS : "es_un"
+    USER_NORMAL }|..|{ USUARIOS : "es_un"
+    
+    ADMIN_USERS {
+        string userId FK
+    }
+    
+    USER_NORMAL {
+        string userId FK
+    }

@@ -1,0 +1,494 @@
+# Sistema Integral - Diagrama de Flujo UML Básico
+
+direction: down
+
+# 1. Flujo de Autenticación
+auth: Flujo de Autenticación {
+  style: {
+    stroke: "#800020"
+    stroke-width: 2
+    border-radius: 10
+  }
+
+  inicio: inicio {
+    shape: circle
+  }
+
+  login: Login {
+    shape: rectangle
+    style: {
+      stroke: "#000000"
+      border-radius: 10
+    }
+  }
+
+  verify: Verificar Credenciales {
+    shape: rectangle
+    style: {
+      fill: "#ffffff"
+      stroke: "#000000"
+      border-radius: 10
+    }
+  }
+
+  auth_check: ¿Autenticado? {
+    shape: diamond
+    style: {
+      fill: "#ffffff"
+      stroke: "#000000"
+    }
+  }
+
+  auth_success: Acceso Concedido {
+    shape: rectangle
+    style: {
+      fill: "#ffffff"
+      stroke: "#000000"
+      border-radius: 10
+    }
+  }
+
+  auth_error: Error de Acceso {
+    shape: rectangle
+    style: {
+      fill: "#ffffff"
+      stroke: "#000000"
+      border-radius: 10
+    }
+  }
+
+  fin: fin {
+    shape: circle
+    style: {
+      stroke-width: 2
+      fill: "white"
+    }
+  }
+
+  # Conexiones
+  inicio -> login
+  login -> verify
+  verify -> auth_check
+  auth_check -> auth_success: "Sí"
+  auth_check -> auth_error: "No"
+  auth_error -> fin
+}
+
+# 2. Gestión de Usuarios (Admin)
+user_mgmt: Gestión de Usuarios (Admin) {
+  style: {
+    fill: "#ffffff"
+    stroke: "#800020"
+    stroke-width: 2
+    border-radius: 10
+  }
+
+  inicio: inicio {
+    shape: circle
+  }
+
+  user_list: Lista de Usuarios {
+    shape: rectangle
+    style: {
+      fill: "#ffffff"
+      stroke: "#000000"
+      border-radius: 10
+    }
+  }
+
+  action_decision: ¿Qué acción realizar? {
+    shape: diamond
+    style: {
+      fill: "#ffffff"
+      stroke: "#000000"
+    }
+  }
+
+  create_user: Crear Usuario {
+    shape: rectangle
+    style: {
+      fill: "#ffffff"
+      stroke: "#000000"
+      border-radius: 10
+    }
+  }
+
+  edit_user: Editar Usuario {
+    shape: rectangle
+    style: {
+      fill: "#ffffff"
+      stroke: "#000000"
+      border-radius: 10
+    }
+  }
+
+  delete_decision: ¿Eliminar usuario? {
+    shape: diamond
+    style: {
+      fill: "#ffffff"
+      stroke: "#000000"
+    }
+  }
+
+  delete_user: Eliminar Usuario {
+    shape: rectangle
+    style: {
+      fill: "#ffffff"
+      stroke: "#000000"
+      border-radius: 10
+    }
+  }
+
+  save_user: Guardar Cambios {
+    shape: rectangle
+    style: {
+      fill: "#ffffff"
+      stroke: "#000000"
+      border-radius: 10
+    }
+  }
+
+  fin: fin {
+    shape: circle
+  }
+
+  # Conexiones
+  inicio -> user_list
+  user_list -> action_decision
+  action_decision -> create_user: "Crear"
+  action_decision -> edit_user: "Editar"
+  action_decision -> delete_decision: "Eliminar"
+  create_user -> save_user
+  edit_user -> save_user
+  delete_decision -> delete_user: "Sí"
+  delete_decision -> user_list: "No"
+  delete_user -> user_list
+  save_user -> user_list
+  action_decision -> fin: "Salir"
+}
+
+# 3. Gestión de Expedientes
+exp_mgmt: Gestión de Expedientes {
+  style: {
+    fill: "#ffffff"
+    stroke: "#800020"
+    stroke-width: 2
+    border-radius: 10
+  }
+
+  inicio: incio {
+    shape: circle
+  }
+
+  exp_list: Lista de Expedientes {
+    shape: rectangle
+    style: {
+      fill: "#ffffff"
+      stroke: "#000000"
+      border-radius: 10
+    }
+  }
+
+  filtro_decision: ¿Aplicar filtros? {
+    shape: diamond
+    style: {
+      fill: "#ffffff"
+      stroke: "#000000"
+    }
+  }
+
+  filtrar_expedientes: Aplicar Filtros {
+    shape: rectangle
+    style: {
+      fill: "#ffffff"
+      stroke: "#000000"
+      border-radius: 10
+    }
+  }
+
+  action_decision: ¿Qué acción realizar? {
+    shape: diamond
+    style: {
+      fill: "#ffffff"
+      stroke: "#000000"
+    }
+  }
+
+  create_exp: Crear Expediente {
+    shape: rectangle
+    style: {
+      fill: "#ffffff"
+      stroke: "#000000"
+      border-radius: 10
+    }
+  }
+
+  view_edit_exp: Ver/Editar Expediente {
+    shape: rectangle
+    style: {
+      fill: "#ffffff"
+      stroke: "#000000"
+      border-radius: 10
+    }
+  }
+
+  delete_decision: ¿Eliminar expediente? {
+    shape: diamond
+    style: {
+      fill: "#ffffff"
+      stroke: "#000000"
+    }
+  }
+
+  delete_exp: Eliminar Expediente {
+    shape: rectangle
+    style: {
+      fill: "#ffffff"
+      stroke: "#000000"
+      border-radius: 10
+    }
+  }
+
+  exp_form: Formulario de Expediente {
+    shape: rectangle
+    style: {
+      fill: "#ffffff"
+      stroke: "#000000"
+      border-radius: 10
+    }
+  }
+
+  exp_detail: Vista Detallada {
+    shape: rectangle
+    style: {
+      fill: "#ffffff"
+      stroke: "#000000"
+      border-radius: 10
+    }
+  }
+
+  save_exp: Guardar Expediente {
+    shape: rectangle
+    style: {
+      fill: "#ffffff"
+      stroke: "#000000"
+      border-radius: 10
+    }
+  }
+
+  fin: fin {
+    shape: circle
+  }
+
+  # Conexiones
+  inicio -> exp_list
+  exp_list -> filtro_decision
+  filtro_decision -> filtrar_expedientes: "Sí"
+  filtro_decision -> action_decision: "No"
+  filtrar_expedientes -> exp_list
+
+  exp_list -> action_decision
+  action_decision -> create_exp: "Crear"
+  action_decision -> view_edit_exp: "Ver/Editar"
+  action_decision -> delete_decision: "Eliminar"
+
+  create_exp -> exp_form
+  view_edit_exp -> exp_detail
+
+  exp_form -> save_exp
+  exp_detail -> save_exp
+
+  delete_decision -> delete_exp: "Sí"
+  delete_decision -> exp_list: "No"
+
+  save_exp -> exp_list
+  delete_exp -> exp_list
+
+  action_decision -> fin: "Salir"
+}
+
+# 4. Gestión de Documentos PDF
+pdf_mgmt: Gestión de Documentos PDF {
+  style: {
+    fill: "#ffffff"
+    stroke: "#800020"
+    stroke-width: 2
+    border-radius: 10
+  }
+
+  inicio: inicio
+
+  pdf_list: PDF Asociados a Expediente {
+    shape: rectangle
+    style: {
+      fill: "#ffffff"
+      stroke: "#000000"
+      border-radius: 10
+    }
+  }
+
+  action_decision: ¿Qué acción realizar? {
+    shape: diamond
+    style: {
+      fill: "#ffffff"
+      stroke: "#000000"
+    }
+  }
+
+  upload_pdf: Subir PDF {
+    shape: rectangle
+    style: {
+      fill: "#ffffff"
+      stroke: "#000000"
+      border-radius: 10
+    }
+  }
+
+  view_pdf: Ver PDF {
+    shape: rectangle
+    style: {
+      fill: "#ffffff"
+      stroke: "#000000"
+      border-radius: 10
+    }
+  }
+
+  delete_decision: ¿Eliminar PDF? {
+    shape: diamond
+    style: {
+      fill: "#ffffff"
+      stroke: "#000000"
+    }
+  }
+
+  delete_pdf: Eliminar PDF {
+    shape: rectangle
+    style: {
+      fill: "#ffffff"
+      stroke: "#000000"
+      border-radius: 10
+    }
+  }
+
+  valid_decision: ¿PDF válido? {
+    shape: diamond
+    style: {
+      fill: "#ffffff"
+      stroke: "#000000"
+    }
+  }
+
+  associate_pdf: Asociar a Expediente {
+    shape: rectangle
+    style: {
+      fill: "#ffffff"
+      stroke: "#000000"
+      border-radius: 10
+    }
+  }
+
+  store_pdf: Almacenar en Base de Datos {
+    shape: rectangle
+    style: {
+      fill: "#ffffff"
+      stroke: "#000000"
+      border-radius: 10
+    }
+  }
+
+  fin: {
+    shape: circle
+    style: {
+      stroke: "black"
+      stroke-width: 2
+      fill: "white"
+    }
+  }
+
+  # Conexiones
+  inicio -> pdf_list
+  pdf_list -> action_decision
+  action_decision -> upload_pdf: "Subir"
+  action_decision -> view_pdf: "Ver"
+  action_decision -> delete_decision: "Eliminar"
+
+  upload_pdf -> valid_decision
+  valid_decision -> store_pdf: "Sí"
+  valid_decision -> pdf_list: "No"
+
+  view_pdf -> associate_pdf
+  associate_pdf -> store_pdf
+
+  delete_decision -> delete_pdf: "Sí"
+  delete_decision -> pdf_list: "No"
+
+  delete_pdf -> pdf_list
+  store_pdf -> pdf_list
+
+  action_decision -> fin: "Salir"
+}
+
+# 5. Interconexión entre Módulos
+connections_diagram: Interconexión entre Módulos {
+  style: {
+    fill: "#ffffff"
+    stroke: "#800020"
+    stroke-width: 2
+    border-radius: 10
+  }
+
+  auth_module: Módulo de Autenticación {
+    shape: rectangle
+    style: {
+      fill: "#ffffff"
+      stroke: "#000000"
+      border-radius: 10
+    }
+  }
+
+  user_module: Módulo de Usuarios {
+    shape: rectangle
+    style: {
+      fill: "#ffffff"
+      stroke: "#000000"
+      border-radius: 10
+    }
+  }
+
+  exp_module: Módulo de Expedientes {
+    shape: rectangle
+    style: {
+      fill: "#ffffff"
+      stroke: "#000000"
+      border-radius: 10
+    }
+  }
+
+  pdf_module: Módulo de PDF {
+    shape: rectangle
+    style: {
+      fill: "#ffffff"
+      stroke: "#000000"
+      border-radius: 10
+    }
+  }
+
+  role_decision: ¿Es Administrador? {
+    shape: diamond
+    style: {
+      fill: "#ffffff"
+      stroke: "#000000"
+    }
+  }
+
+  # Conexiones
+  auth_module -> role_decision
+  role_decision -> user_module: "Sí"
+  role_decision -> exp_module: "No"
+  role_decision -> exp_module: "Sí"
+  exp_module -> pdf_module: "Asociación de documentos"
+}
+
+# Conexiones entre secciones principales
+auth.auth_success -> user_mgmt.inicio: "Admin"
+auth.auth_success -> exp_mgmt.inicio: "Todos los usuarios"
