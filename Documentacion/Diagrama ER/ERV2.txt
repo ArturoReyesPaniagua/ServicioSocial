@@ -1,0 +1,76 @@
+erDiagram
+    FECHA_RECEPCION {
+        int id_fecha PK
+        int factor
+        date fecha
+    }
+    
+    COLABORADOR {
+        int id_colaborador PK
+        string colaborador
+    }
+    
+    SOLICITANTE {
+        int id_solicitante PK
+        string nombre
+    }
+    
+    FECHA_LIMITE {
+        int id_fecha PK
+        date fecha
+    }
+    
+    RESPONSABLE {
+        int id_responsable PK
+        string nombre
+    }
+    
+    FECHA_RESPUESTA {
+        int id_fecha_respuesta PK
+        date fecha
+    }
+    
+    URGENCIA {
+        int id_urgencia PK
+        string nombre
+    }
+    
+    OFICIO {
+        int id_oficio PK
+        int id_colaborador FK
+        int n_folio
+        int n_dependiente
+        int id_fecha_rec FK
+        int id_fecha_lim FK
+        int id_fecha_res FK
+        int id_solicitante FK
+        string asunto
+        int id_responsable FK
+        string observaciones
+        string archivado
+        int id_pdf FK
+    }
+    
+    PDF {
+        int id_pdf PK
+        string archivo
+        int id_oficio FK
+        date fecha_de_subida
+    }
+    
+    USUARIO {
+        int id_user PK
+        string username
+        string password
+        string role
+    }
+
+    FECHA_RECEPCION ||--o{ OFICIO : tiene
+    COLABORADOR ||--o{ OFICIO : pertenece
+    SOLICITANTE ||--o{ OFICIO : solicita
+    FECHA_LIMITE ||--o{ OFICIO : asigna
+    RESPONSABLE ||--o{ OFICIO : asignado
+    FECHA_RESPUESTA ||--o{ OFICIO : responde
+    URGENCIA ||--o{ OFICIO : clasifica
+    OFICIO ||--|| PDF : asociado
+    USUARIO }o--o{ OFICIO : gestiona

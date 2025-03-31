@@ -1,0 +1,196 @@
+# Flujo principal de inicio y login
+inicio: "Inicio" {
+  shape: circle
+}
+
+login: "Login" {
+  shape: rectangle
+}
+
+validar: "validar" {
+  shape: diamond
+}
+
+# Caminos desde validación
+accesoSatisfactorio: "Acceso\nsatisfactorio" {
+  shape: rectangle
+}
+
+reporteError: "Mensaje\nde error" {
+  shape: rectangle
+}
+
+# Conexiones iniciales
+inicio -> login
+login -> validar
+validar -> accesoSatisfactorio: "Si"
+validar -> reporteError: "No"
+reporteError -> Login
+
+esAdmin: "Es\nAdmin?" {
+  shape: diamond
+}
+
+accesoSatisfactorio -> esAdmin
+
+# Opciones de menú basadas en tipo de usuario
+menuAdmin: "Menú Admin" {
+  shape: rectangle
+}
+
+menuUsuario: "Menu Usuario\nStandard" {
+  shape: rectangle
+}
+
+esAdmin -> menuAdmin: "Si"
+esAdmin -> menuUsuario: "No"
+
+AccionAdmo: "Accion a realizar?" {
+  shape: diamond
+}
+
+ListaUsuarios: "Accion a realizar Lista usuarios" {
+  shape: diamond
+}
+
+FormularioCrearUsuario: "Formulario crear usuario" {
+  shape: rectangle
+}
+
+FormularioCrearUsuarioPop: "Crear usuario?" {
+  shape: diamond
+}
+FormularioCrearUsuarioValidar: "Datos validos?" {
+  shape: diamond
+}
+FormularioEditarUsuario: "Formulario Editar usuario" {
+  shape: rectangle
+}
+
+FormularioEditarUsuarioPop: "Editar Usuario?" {
+  shape: diamond
+}
+FormularioEditarUsuarioValidar: "Datos validos?" {
+  shape: diamond
+}
+
+FormularioEliminarUsuarioValidar: " eliminar el usuario?" {
+  shape: diamond
+}
+
+menuAdmin -> AccionAdmo
+AccionAdmo -> ListaUsuarios
+
+ListaUsuarios -> FormularioCrearUsuario: Editar
+FormularioCrearUsuario -> ListaUsuarios: cancelar
+FormularioCrearUsuario -> FormularioCrearUsuarioPop: Editar
+FormularioCrearUsuarioPop -> ListaUsuarios: Cancelar
+FormularioCrearUsuarioPop -> FormularioCrearUsuarioValidar: Aceptar
+FormularioCrearUsuarioValidar -> ListaUsuarios: Datos validos
+FormularioCrearUsuarioValidar -> FormularioCrearUsuario: Datos invalidos
+
+ListaUsuarios -> FormularioEditarUsuario: Editar
+FormularioEditarUsuario -> ListaUsuarios: cancelar
+FormularioEditarUsuario -> FormularioEditarUsuarioPop: Editar
+FormularioEditarUsuarioPop -> ListaUsuarios: Cancelar
+FormularioEditarUsuarioPop -> FormularioEditarUsuarioValidar: Aceptar
+FormularioEditarUsuarioValidar -> ListaUsuarios: Datos validos
+FormularioEditarUsuarioValidar -> FormularioEditarUsuario: Datos invalidos
+
+ListaUsuarios -> FormularioEliminarUsuarioValidar: Eliminar
+FormularioEliminarUsuarioValidar -> ListaUsuarios: Eliminar
+FormularioEliminarUsuarioValidar -> ListaUsuarios: Cancelar
+
+ListaOficios: "Accion a realizar Lista Oficios" {
+  shape: diamond
+}
+FormularioCrearUsuario: "Formulario crear usuario" {
+  shape: rectangle
+}
+
+FormularioCrearOficiosPop: "Crear usuario?" {
+  shape: diamond
+}
+FormularioCrearOficiosValidar: "Datos validos?" {
+  shape: diamond
+}
+FormularioEditarOficios: "Formulario Editar usuario" {
+  shape: rectangle
+}
+
+FormularioEditarOficiosPop: "Editar Usuario?" {
+  shape: diamond
+}
+FormularioEditarOficiosValidar: "Datos validos?" {
+  shape: diamond
+}
+
+FormularioEliminarOficiosValidar: " Deseas eliminar el usuario?" {
+  shape: diamond
+}
+AccionUsuario: "Accion a realizar?" {
+  shape: diamond
+}
+
+VerOficcio: " Detalles del oficio" {
+  shape: rectangle
+}
+
+AccionVerOficcio: " Accion a realizar?" {
+  shape: diamond
+}
+
+VerPDF: " Ver PDF " {
+  shape: rectangle
+}
+
+AccionVerPDf: " Accion a realizar?" {
+  shape: diamond
+}
+
+ImprimirPdf: Imprimir PDF {
+  shape: rectangle
+}
+CargarPDF: CargarPDF {
+  shape: rectangle
+}
+AccionPDF: "Accion a realizar?" {
+  shape: rectangle
+}
+
+ListaOficios -> VerOficcio
+VerOficcio -> AccionVerOficcio
+AccionVerOficcio -> VerPDF: Visualizar PDF
+AccionVerOficcio -> ListaOficios: Cancelar
+VerPDF -> AccionVerPDf
+AccionVerPDf -> VerOficcio: cancelar
+AccionVerPDF -> ImprimirPdf: imprimir
+ImprimirPdf -> VerOficcio
+AccionVerPDF -> CargarPDF
+CargarPDF -> AccionPDF
+AccionPDF -> VerOficcio: Cancelar
+AccionPDF -> VerOficcio: Cargar
+
+AccionAdmo -> ListaOficios
+menuUsuario -> AccionUsuario
+AccionUsuario -> ListaOficios
+
+ListaOficios -> FormularioCrearOficios: Editar
+FormularioCrearOficios -> ListaOficios: cancelar
+FormularioCrearOficios -> FormularioCrearOficiosPop: Editar
+FormularioCrearOficiosPop -> ListaOficios: Cancelar
+FormularioCrearOficiosPop -> FormularioCrearOficiosValidar: Aceptar
+FormularioCrearOficiosValidar -> ListaOficios: Datos validos
+FormularioCrearOficiosValidar -> FormularioCrearOficios: Datos invalidos
+
+ListaOficios -> FormularioEditarOficios: Editar
+FormularioEditarOficios -> ListaOficios: cancelar
+FormularioEditarOficios -> FormularioEditarOficiosPop: Editar
+FormularioEditarOficiosPop -> ListaOficios: Cancelar
+FormularioEditarOficiosPop -> FormularioEditarOficiosValidar: Aceptar
+FormularioEditarOficiosValidar -> ListaOficios: Datos validos
+FormularioEditarOficiosValidar -> FormularioEditarOficios: Datos invalidos
+
+ListaOficios -> FormularioEliminarOficiosValidar: Eliminar
+FormularioEliminarOficiosValidar -> ListaOficios: Eliminar
+FormularioEliminarOficiosValidar -> ListaOficios: Cancelar

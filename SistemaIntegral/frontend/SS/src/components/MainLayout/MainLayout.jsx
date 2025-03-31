@@ -62,7 +62,7 @@ const MainLayout = ({ children }) => {
         </div>
       </header>
 
-      {/* Sidebar para navegación */}
+      {/* Sidebar para navegación  SideBar es el menu lateral "barra de lado" */}
       <aside className={`sidebar ${sidebarOpen ? '' : 'closed'}`}>
         <div className="sidebar-header">
           <h2 className="text-xl font-bold">Menú Principal</h2>
@@ -84,6 +84,20 @@ const MainLayout = ({ children }) => {
                 )}
               </NavLink>
             </li>
+            <li>
+              <NavLink 
+                to="/expedientes" 
+                className={({ isActive }) => 
+                  isActive ? "bg-guinda-700" : ""
+                }
+              >
+                {({ isActive }) => (
+                  <button className={isActive ? "bg-guinda-700" : ""}>
+                    Generar reporte
+                  </button>
+                )}
+              </NavLink>
+            </li>
 
             {user?.role === 'admin' && (
               <li>
@@ -101,7 +115,7 @@ const MainLayout = ({ children }) => {
                 </NavLink>
               </li>
             )}
-            {/* Puedes añadir más opciones de menú aquí */}
+            {/* Aqui puedes añadir más opciones, saludos programador perdon por el desmadre */}
           </ul>
         </nav>
       </aside>

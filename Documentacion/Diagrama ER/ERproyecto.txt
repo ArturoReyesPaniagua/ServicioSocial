@@ -1,0 +1,53 @@
+Usuarios: {
+  shape: sql_table
+  id_usuario: INT {constraint: primary_key, AUTO_INCREMENT}
+  username: VARCHAR {constraint: unique}
+  password: VARCHAR
+  role: ENUM('admin', 'user')
+}
+
+Oficio: {
+  shape: sql_table
+  id_oficio: INT {constraint: primary_key}
+  estado: ENUM('concluido', 'en proceso', "cancelado")
+  numero_de_oficio: VARCHAR
+  fecha_recepcion: DATE
+  fecha_limite: DATE
+  fecha_respuesta: DATE
+  id_solicitante: INT {constraint: foreign_key}
+  asunto: VARCHAR
+  id_responsable: INT {constraint: foreign_key}
+  id_area: INT {constraint: foreign key}
+}
+
+PDF: {
+  shape: sql_table
+  id_archivo: int {constraint: primary_key}
+  archivo: BLOB
+  id_oficio: int {constraint: foreign key}
+}
+
+Area: {
+  shape: sql_table
+  id_area: INT {constraint: primary_key}
+  nombre_area: VARCHAR
+  contador: INT
+}
+
+Responsable: {
+  shape: sql_table
+  id_responsable: INT {constraint: primary_key}
+  Nombre_responsable: VARCHAR
+}
+
+Solicitante: {
+  shape: sql_table
+  id_solicitante: INT {constraint: primary_key}
+  Nombre_solicitante: VARCHAR
+}
+
+Oficio.id_solicitante <-> Solicitante.id_solicitante: Tiene N:1
+Oficio.id_area <-> Area.id_area: Tiene N:1
+Usuarios <-> Oficio: gestionan N:N
+PDF.id_oficio <-> Oficio.id_oficio: asociados 1:1
+Oficio.id_responsable <-> Responsable.id_responsable: tiene N:1

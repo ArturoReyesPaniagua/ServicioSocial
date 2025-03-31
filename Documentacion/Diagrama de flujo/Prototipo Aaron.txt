@@ -1,0 +1,51 @@
+inicio: Inicio {
+  shape: circle
+}
+Login: Ingresa a la plataforma con un formulario de inciio de sesión, con los campos usuario, contraseña y un\n boton que dice inicio de serision. Tu usuario y contraseña son los datos con los que te dio de alta el\n aministrador {
+  shape: rectangle
+}
+LoginRecibe: Recibe los datos proporcionados y determina si: {
+  shape: rectangle
+}
+IngresoDatosCorrectosLogin: Ingreso la informacion correcta? {
+  shape: diamond
+}
+EmergenteLoginError: Muestra un mensaje emergente indicando que los datos proporcionados no son correctos {
+  shape: rectangle
+}
+ElSistemaDeterminaUsuario: El sistema determina: {
+  shape: rectangle
+}
+RectificarDatosLogin: Se dan por enterado al usuario que sus datos son erroneos {
+  shape: rectangle
+}
+VerificarAdmin: El usuario es administrador? {
+  shape: diamond
+}
+MenuAdmi: Despliega un menú con las opciones de: Tablas usuarios, Tablas Oficios, altas y generar reporte {
+  shape: rectangle
+}
+MenuUsuario: Despliega un menú con las opciones de:  Tablas Oficios, generar reporte, altas {
+  shape: rectangle
+}
+
+inicio -> Login
+Login -> LoginRecibe
+LoginRecibe -> IngresoDatosCorrectosLogin
+IngresoDatosCorrectosLogin -> EmergenteLoginError: No
+EmergenteLoginError -> RectificarDatosLogin
+RectificarDatosLogin -> Login
+IngresoDatosCorrectosLogin -> ElSistemaDeterminaUsuario: si
+ElSistemaDeterminaUsuario -> VerificarAdmin
+VerificarAdmin -> MenuAdmi: si
+VerificarAdmin -> MenuUsuario: no
+
+MenuAdmi -> MenuAdmin1
+MenuAdmin1: El usuario leyo todas las opciones y selecciono la opcion de Tabla oficios? {
+  shape: diamond
+}
+MenuAdmin2: {
+  shape:diamond 
+}
+MenuAdmin1 -> MenuAdmin2: No
+MenuAdmin1 -> ListaOficios

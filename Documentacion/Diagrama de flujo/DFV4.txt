@@ -1,0 +1,261 @@
+# Flujo principal de inicio y login
+inicio: "Inicio" {
+  shape: circle
+}
+
+login: "Formulario Login El usuario ingresa sus datos de usuario dentro del sistema para proseguir el\n usuario tendrá que dar clic sobre el botón de iniciar sesión, el formulario en esta sección cuenta con\n los siguientes datos:Nombre de usuario y Contraseña" {
+  shape: parallelogram
+}
+
+validar: "el sistema valida datos de usuario " {
+  shape: diamond
+}
+
+accesoSatisfactorio: "Acceso\nsatisfactorio" {
+  shape: rectangle
+}
+
+reporteError: "Mensaje\nde error" {
+  shape: rectangle
+}
+
+# Conexiones iniciales
+inicio -> login
+login -> validar
+validar -> accesoSatisfactorio: "Si"
+validar -> reporteError: "No"
+reporteError -> Login
+
+esAdmin: "Sistema valida tipo de usuario" {
+  shape: diamond
+}
+
+accesoSatisfactorio -> esAdmin
+
+# Opciones de menú basadas en tipo de usuario
+menuAdmin: "Menú Usuario Administrador Se encuentran las opciones de navegacion del usuario\n administrador en las cuales estam: Tablas de oficios, Tablas de usuarios y Generar reporte" {
+  shape: rectangle
+}
+
+menuUsuario: "Menu Usuario Estandard  se encuentran las opciones de navegacion del usuario administrador\n en las cuales estan: Tablas de oficios, Tablas de usuarios y Generar reporte" {
+  shape: rectangle
+}
+
+esAdmin -> menuAdmin: "Administrador"
+esAdmin -> menuUsuario: "Usuario estandar"
+
+AccionAdmo: "Accion a realizar?" {
+  shape: diamond
+}
+
+ListaUsuarios: "Tabla usuarios: en esta tabla el usuario podra ver nombres de los usuarios, el rol que \ndesempeña y las opciones a realizar que son: ver detalles de los usuarios, modificar o eliminar.  " {
+  shape: rectangle
+}
+ListaUsuariosAccion: "Accion a realizar tabla usuarios" {
+  shape: diamond
+}
+
+FormularioCrearUsuario: "Formulario crear usuario que cuenta con los siguientes datos:\n nombre de usuario\n, contraseña y el role que va a desempeñar. " {
+  shape: parallelogram
+  # style: {
+  #   fill: LightBlue
+  # }
+}
+
+FormularioCrearUsuarioPop: "Anuncio de crear usuario?" {
+  shape: diamond
+}
+FormularioCrearUsuarioValidar: "Validar datos en el formulario crear usuarios" {
+  shape: diamond
+}
+FormularioEditarUsuario: "Formulario Editar usuario donde el administrador puede modificar del usuario \n seleccionado" {
+  shape: parallelogram
+}
+
+FormularioEditarUsuarioPop: "Anuncio de Editar Usuario?" {
+  shape: diamond
+}
+FormularioEditarUsuarioValidar: "Validar que la entrada de datos sean validas" {
+  shape: diamond
+}
+
+FormularioEliminarUsuarioValidar: "Anuncio de Eliminar el usuario?" {
+  shape: diamond
+}
+
+StorageCrearUsuario: "Mandar dados a base de datos" {
+  shape: rectangle
+}
+
+StorageEditarUsuario: "Mandar datos a base de datos" {
+  shape: rectangle
+}
+CargarDatosListaUsuarios: " Cargar datos de base de datos" {
+  shape: stored_data
+}
+
+menuAdmin -> AccionAdmo
+AccionAdmo -> CargarDatosListaUsuarios
+CargarDatosListaUsuarios -> ListaUsuarios: Tabla usuarios
+
+ListaUsuariosAccion -> FormularioCrearUsuario: Crear
+FormularioCrearUsuario -> ListaUsuarios: cancelar
+ListaUsuarios -> ListaUsuariosAccion
+FormularioCrearUsuario -> FormularioCrearUsuarioPop: Crear
+FormularioCrearUsuarioPop -> ListaUsuarios: Cancelar
+FormularioCrearUsuarioPop -> FormularioCrearUsuarioValidar: Aceptar
+FormularioCrearUsuarioValidar -> StorageCrearUsuario: Datos validos
+StorageCrearUsuario -> ListaUsuarios
+FormularioCrearUsuarioValidar -> FormularioCrearUsuario: Datos invalidos
+
+ListaUsuariosAccion -> FormularioEditarUsuario: Editar
+FormularioEditarUsuario -> ListaUsuarios: cancelar
+FormularioEditarUsuario -> FormularioEditarUsuarioPop: Editar
+FormularioEditarUsuarioPop -> ListaUsuarios: Cancelar
+FormularioEditarUsuarioPop -> FormularioEditarUsuarioValidar: Aceptar
+FormularioEditarUsuarioValidar -> StorageEditarUsuario: Datos validos
+StorageEditarUsuario -> ListaUsuarios
+FormularioEditarUsuarioValidar -> FormularioEditarUsuario: Datos invalidos
+
+ListaUsuariosAccion -> FormularioEliminarUsuarioValidar: Eliminar
+FormularioEliminarUsuarioValidar -> ListaUsuarios: Eliminar
+FormularioEliminarUsuarioValidar -> ListaUsuarios: Cancelar
+
+ListaOficios: " En esta tabla de oficios el usuario podra ver Numero de oficio, folio, estado, fecha de\n recepcion, fecha limite, solicitante asunto y las opciones a realizar que son: ver detalles \n del oficio, archivar, modificar o eliminar. " {
+  shape: rectangle
+}
+ListaOficiosAccion: "Accion a realizar Tabla Oficios" {
+  shape: diamond
+}
+
+FormularioCrearOficios: "Formulario crear oficios, el usuario tendra que ingresar los siguientes datos: \n Numero de expediente, folio de seguimiento UPyCE, estado del documento, fecha de recepción, fecha\n limite, solicitante, asunto, responsable, fecha de respuesta, observaciones y si este documento esta \narchivado  " {
+  shape: parallelogram
+}
+
+FormularioCrearOficiosPop: "Anuncio de confirmacion crear oficio?" {
+  shape: diamond
+}
+FormularioCrearOficiosValidar: "Validar datos del formulario crear oficios" {
+  shape: diamond
+}
+FormularioEditarOficios: "Formulario Editar oficio el usuario podra modificar los siguientes datos: \n Numero de expediente, folio de seguimiento UPyCE, estado del documento, fecha de recepción, fecha\n limite, solicitante, asunto, responsable, fecha de respuesta, observaciones y si este documento esta \narchivado " {
+  shape: parallelogram
+}
+
+FormularioEditarOficiosPop: "Anuncio de confirmacion de editar oficio?" {
+  shape: diamond
+}
+FormularioEditarOficiosValidar: "Sistema validar" {
+  shape: diamond
+}
+
+FormularioEliminarOficiosValidar: "Anuncio de confirmacion eliminar el oficio?" {
+  shape: diamond
+}
+AccionUsuario: "Accion a realizar?" {
+  shape: diamond
+}
+
+VerOficcio: " Detalles del oficio de cada uno de los datos que contiene" {
+  shape: rectangle
+}
+
+AccionVerOficcio: " Accion a realizar?" {
+  shape: diamond
+}
+
+VerPDF: " Ver PDF asociado al oficio que se esta seleccionando, con las opciones de imprimir   " {
+  shape: document
+}
+
+AccionVerPDf: " Accion a realizar?" {
+  shape: diamond
+}
+
+ImprimirPdf: se activa la interfaz de la API para Imprimir PDF {
+  shape: rectangle
+}
+CargarPDF: Asociar {
+  shape: rectangle
+}
+AccionPDF: "Accion a realizar?" {
+  shape: diamond
+}
+
+CargarDatosListaOficios: " Cargar datos de base de datos" {
+  shape: stored_data
+}
+Salir: Usuario cierra sessión {
+  shape: circle
+}
+GuardarEditarOficio: Modificar base d edatos {
+  shape: rectangle
+}
+GuardarCrearOficio: Insertar en base de datos {
+  shape: rectangle
+}
+GuardarEliminarOficio: Eliminar de la base de datos {
+  shape: rectangle
+}
+
+ListaOficios -> ListaOficiosAccion
+ListaOficiosAccion -> VerOficcio
+VerOficcio -> AccionVerOficcio
+AccionVerOficcio -> VerPDF: Visualizar PDF
+AccionVerOficcio -> ListaOficios: Cancelar
+VerPDF -> AccionVerPDf
+AccionVerPDf -> VerOficcio: cancelar
+AccionVerPDF -> ImprimirPdf: imprimir
+ImprimirPdf -> VerOficcio
+AccionVerPDF -> CargarPDF
+CargarPDF -> AccionPDF
+AccionPDF -> VerOficcio: Cancelar
+AccionPDF -> VerOficcio: Asociar
+
+AccionAdmo -> CargarDatosListaOficios: Tabla Oficios
+menuUsuario -> AccionUsuario
+AccionUsuario -> CargarDatosListaOficios: Tabla Oficios
+CargarDatosListaOficios -> ListaOficios
+ListaOficiosAccion -> FormularioCrearOficios: Editar
+FormularioCrearOficios -> ListaOficios: cancelar
+FormularioCrearOficios -> FormularioCrearOficiosPop: Editar
+FormularioCrearOficiosPop -> ListaOficios: Cancelar
+FormularioCrearOficiosPop -> FormularioCrearOficiosValidar: Aceptar
+FormularioCrearOficiosValidar -> GuardarCrearOficio: Datos validos
+GuardarCrearOficio -> ListaOficios
+FormularioCrearOficiosValidar -> FormularioCrearOficios: Datos invalidos
+
+ListaOficiosAccion -> FormularioEditarOficios: Editar
+FormularioEditarOficios -> ListaOficios: cancelar
+FormularioEditarOficios -> FormularioEditarOficiosPop: Editar
+FormularioEditarOficiosPop -> ListaOficios: Cancelar
+FormularioEditarOficiosPop -> FormularioEditarOficiosValidar: Aceptar
+FormularioEditarOficiosValidar -> GuardarEditarOficio: Datos validos
+GuardarEditarOficio -> ListaOficios
+FormularioEditarOficiosValidar -> FormularioEditarOficios: Datos invalidos
+
+ListaOficiosAccion -> FormularioEliminarOficiosValidar: Eliminar
+FormularioEliminarOficiosValidar -> GuardarEliminarOficio: Eliminar
+GuardarEliminarOficio -> ListaOficios
+FormularioEliminarOficiosValidar -> ListaOficios: Cancelar
+
+AccionAdmo -> Salir
+AccionUsuario -> Salir
+AccionAdmo -> GenerarReporte
+AccionUsuario -> GenerarReporte
+GenerarReporte -> GenerarReportePopUp
+GenerarReportePopUp -> GenerarReporteDocumento: Confirmar
+GenerarReporteDocumento -> GenerarReporte
+GenerarReportePopUp -> GenerarReporte: Cancelar
+
+GenerarReporte: "Generar reporte, el usuario tendra que elegir el dia y las condiciones que se \n requieren para generar el reporte" {
+  shape: rectangle
+}
+
+GenerarReportePopUp: "Anuncio  de confirmacion de generar reporte" {
+  shape: diamond
+}
+
+GenerarReporteDocumento: "Documento del reporte en pdf " {
+  shape: Document
+}
