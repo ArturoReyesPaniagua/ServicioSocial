@@ -17,7 +17,7 @@ const ExpedientesPage = () => {
   const [filterType, setFilterType] = useState('all'); // 'all', 'archived', 'estado'
   const [selectedEstado, setSelectedEstado] = useState('');
   
-  // Estados disponibles (ahora son fijos en el ENUM de la BD)
+  // Estados disponibles (
   const estadosDisponibles = [
     { value: 'Concluido', label: 'Concluido' },
     { value: 'En proceso', label: 'En proceso' },

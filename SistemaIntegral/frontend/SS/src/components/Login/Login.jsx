@@ -1,4 +1,4 @@
-// src/components/Login/Login.jsx
+// src/components/Login/Login.jsx Ubicacion 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';

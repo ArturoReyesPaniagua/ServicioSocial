@@ -1,7 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
-//import Login from './components/Login/Login.jsx'
+//import Login from './components/Login/Login.jsx' se elimino el componente de la portada 
 import Logo from './assets/logo_sec_educ.png'
 import { AuthProvider } from './context/AuthContext'
 import App from './App'

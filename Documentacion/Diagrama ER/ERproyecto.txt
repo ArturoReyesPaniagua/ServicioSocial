@@ -13,6 +13,7 @@ Oficio: {
   numero_de_oficio: VARCHAR
   fecha_recepcion: DATE
   fecha_limite: DATE
+  archivado: BOOLEAN
   fecha_respuesta: DATE
   id_solicitante: INT {constraint: foreign_key}
   asunto: VARCHAR

@@ -31,7 +31,7 @@ app.use('/api/auth', authRoutes);
 
 // Ruta de prueba
 app.get('/', (req, res) => {
-  res.send('API de Gestión de Expedientes funcionando');
+  res.send('API de Gestión de Oficios funcionando');
 });
 
 // Iniciar servidor
