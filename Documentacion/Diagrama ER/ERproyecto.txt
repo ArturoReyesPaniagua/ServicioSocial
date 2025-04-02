@@ -3,6 +3,7 @@ Usuarios: {
   id_usuario: INT {constraint: primary_key, AUTO_INCREMENT}
   username: VARCHAR {constraint: unique}
   password: VARCHAR
+  id_area: VARCHAR {constraint: foreing key}
   role: ENUM('admin', 'user')
 }
 
@@ -52,3 +53,5 @@ Oficio.id_area <-> Area.id_area: Tiene N:1
 Usuarios <-> Oficio: gestionan N:N
 PDF.id_oficio <-> Oficio.id_oficio: asociados 1:1
 Oficio.id_responsable <-> Responsable.id_responsable: tiene N:1
+Usuarios <-> Area: pertenece N:1
+

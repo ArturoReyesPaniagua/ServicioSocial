@@ -238,8 +238,8 @@ FormularioEliminarOficiosValidar -> GuardarEliminarOficio: Eliminar
 GuardarEliminarOficio -> ListaOficios
 FormularioEliminarOficiosValidar -> ListaOficios: Cancelar
 
-AccionAdmo -> Salir
-AccionUsuario -> Salir
+AccionAdmo -> Salir: Salir de la seccion
+AccionUsuario -> Salir: Salir de la seccion
 AccionAdmo -> GenerarReporte
 AccionUsuario -> GenerarReporte
 GenerarReporte -> GenerarReportePopUp
@@ -258,3 +258,250 @@ GenerarReportePopUp: "Anuncio  de confirmacion de generar reporte" {
 GenerarReporteDocumento: "Documento del reporte en pdf " {
   shape: Document
 }
+
+MenúRegistro: Es un menú que muestra las opciones Responsable, Solicitante  y en la respectiva seleccion\n  las opciones agregar, eliminar y modificar de una lista de registros que pueden ser  Responsable,\n Solicitante y Area {
+  shape: rectangle
+}
+MenúArea: Es un menú de area  y en la respectiva seleccion  las opciones agregar, eliminar y modificar de una lista de registros que \n pueden ser  Responsable, Solicitante y Area {
+  shape: rectangle
+}
+
+AccionARealizarMenuRegis: Acción a realizar en el menú registro {
+  shape: diamond
+}
+
+ResponsableAccion: Accion en responsable {
+  shape: diamond
+}
+
+SolicitanteAccion: Accion en solicitante {
+  shape: diamond
+}
+
+AreaAccion: Accion en area {
+  shape: diamond
+}
+
+ListaResponsables: "Tabla Responsables: en esta tabla el Responsable podra ver nombres de los Responsables, el rol que \ndesempeña y las opciones a realizar que son: ver detalles de los Responsables, modificar o eliminar.  " {
+  shape: rectangle
+}
+ListaResponsablesAccion: "Acción a realizar tabla Responsables" {
+  shape: diamond
+}
+
+FormularioCrearResponsable: "Formulario crear Responsable que cuenta con los siguientes datos:\n nombre de Responsable\n " {
+  shape: parallelogram
+  # style: {
+  #   fill: LightBlue
+  # }
+}
+
+FormularioCrearResponsablePop: "Anuncio de crear Responsable?" {
+  shape: diamond
+}
+FormularioCrearResponsableValidar: "Validar datos en el formulario crear Responsables" {
+  shape: diamond
+}
+FormularioEditarResponsable: "Formulario Editar Responsable donde el administrador puede modificar el nombre del Responsable seleccionado" {
+  shape: parallelogram
+}
+
+FormularioEditarResponsablePop: "Anuncio de Editar Responsable?" {
+  shape: diamond
+}
+FormularioEditarResponsableValidar: "verificando que la entrada de datos sean validas" {
+  shape: diamond
+}
+
+FormularioEliminarResponsableValidar: "Anuncio de Eliminar el Responsable?" {
+  shape: diamond
+}
+
+StorageCrearResponsable: "enviar datos a base de datos" {
+  shape: rectangle
+}
+
+StorageEditarResponsable: "Mandar datos a base de datos" {
+  shape: rectangle
+}
+CargarDatosListaResponsable: " Cargar datos de base de datos" {
+  shape: stored_data
+}
+
+AccionAdmo -> MenúArea
+AccionAdmo -> MenúRegistro
+AccionUsuario -> MenúRegistro
+MenúArea -> AreaAccion
+MenúRegistro -> AccionARealizarMenuRegis
+AccionARealizarMenuRegis -> ResponsableAccion: Responsable
+AccionARealizarMenuRegis -> SolicitanteAccion: Solicitante
+
+ResponsableAccion -> CargarDatosListaResponsable: Tabla Responsables
+CargarDatosListaResponsable -> ListaResponsables
+
+ListaResponsablesAccion -> FormularioCrearResponsable: Crear
+FormularioCrearResponsable -> ListaResponsables: cancelar
+ListaResponsables -> ListaResponsablesAccion
+FormularioCrearResponsable -> FormularioCrearResponsablePop: Crear
+FormularioCrearResponsablePop -> ListaResponsables: Cancelar
+FormularioCrearResponsablePop -> FormularioCrearResponsableValidar: Aceptar
+FormularioCrearResponsableValidar -> StorageCrearResponsable: Datos validos
+StorageCrearResponsable -> ListaResponsables
+FormularioCrearResponsableValidar -> FormularioCrearResponsable: Datos invalidos
+
+ListaResponsablesAccion -> FormularioEditarResponsable: Editar
+FormularioEditarResponsable -> ListaResponsables: cancelar
+FormularioEditarResponsable -> FormularioEditarResponsablePop: Editar
+FormularioEditarResponsablePop -> ListaResponsables: Cancelar
+FormularioEditarResponsablePop -> FormularioEditarResponsableValidar: Aceptar
+FormularioEditarResponsableValidar -> StorageEditarResponsable: Datos validos
+StorageEditarResponsable -> ListaResponsables
+FormularioEditarResponsableValidar -> FormularioEditarResponsable: Datos invalidos
+
+ListaResponsablesAccion -> FormularioEliminarResponsableValidar: Eliminar
+FormularioEliminarResponsableValidar -> ListaResponsables: Eliminar
+FormularioEliminarResponsableValidar -> ListaResponsables: Cancelar
+
+ListaSolicitantes: "Tabla Solicitantes: en esta tabla el Solicitante podra ver nombres de los Solicitantes y las opciones a realizar que son: ver detalles de los Solicitantes, modificar o eliminar.  " {
+  shape: rectangle
+}
+ListaSolicitantesAccion: "Acción a realizar tabla Solicitantes" {
+  shape: diamond
+}
+
+FormularioCrearSolicitante: "Formulario crear Solicitante que cuenta con los siguientes datos: nombre de Solicitante" {
+  shape: parallelogram
+  # style: {
+  #   fill: LightBlue
+  # }
+}
+
+FormularioCrearSolicitantePop: "Anuncio de crear Solicitante?" {
+  shape: diamond
+}
+FormularioCrearSolicitanteValidar: "Validar datos en el formulario crear Solicitantes" {
+  shape: diamond
+}
+FormularioEditarSolicitante: "Formulario Editar Solicitante donde el administrador puede modificar el nombre del solicitante seleccionado" {
+  shape: parallelogram
+}
+
+FormularioEditarSolicitantePop: "Anuncio de Editar Solicitante?" {
+  shape: diamond
+}
+FormularioEditarSolicitanteValidar: "verificando que la entrada de datos sean validas" {
+  shape: diamond
+}
+
+FormularioEliminarSolicitanteValidar: "Anuncio de Eliminar el Solicitante?" {
+  shape: diamond
+}
+
+StorageCrearSolicitante: "enviar datos a base de datos" {
+  shape: rectangle
+}
+
+StorageEditarSolicitante: "Mandar datos a base de datos" {
+  shape: rectangle
+}
+CargarDatosListaSolicitantes: " Cargar datos de base de datos" {
+  shape: stored_data
+}
+
+SolicitanteAccion -> CargarDatosListaSolicitantes: Tabla Solicitantes
+CargarDatosListaSolicitantes -> ListaSolicitantes
+
+ListaSolicitantesAccion -> FormularioCrearSolicitante: Crear
+FormularioCrearSolicitante -> ListaSolicitantes: cancelar
+ListaSolicitantes -> ListaSolicitantesAccion
+FormularioCrearSolicitante -> FormularioCrearSolicitantePop: Crear
+FormularioCrearSolicitantePop -> ListaSolicitantes: Cancelar
+FormularioCrearSolicitantePop -> FormularioCrearSolicitanteValidar: Aceptar
+FormularioCrearSolicitanteValidar -> StorageCrearSolicitante: Datos validos
+StorageCrearSolicitante -> ListaSolicitantes
+FormularioCrearSolicitanteValidar -> FormularioCrearSolicitante: Datos invalidos
+
+ListaSolicitantesAccion -> FormularioEditarSolicitante: Editar
+FormularioEditarSolicitante -> ListaSolicitantes: cancelar
+FormularioEditarSolicitante -> FormularioEditarSolicitantePop: Editar
+FormularioEditarSolicitantePop -> ListaSolicitantes: Cancelar
+FormularioEditarSolicitantePop -> FormularioEditarSolicitanteValidar: Aceptar
+FormularioEditarSolicitanteValidar -> StorageEditarSolicitante: Datos validos
+StorageEditarSolicitante -> ListaSolicitantes
+FormularioEditarSolicitanteValidar -> FormularioEditarSolicitante: Datos invalidos
+
+ListaSolicitantesAccion -> FormularioEliminarSolicitanteValidar: Eliminar
+FormularioEliminarSolicitanteValidar -> ListaSolicitantes: Eliminar
+FormularioEliminarSolicitanteValidar -> ListaSolicitantes: Cancelar
+
+ListaAreas: "Tabla Areas: en esta tabla el Area podra ver nombres de los Areas y las opciones a realizar que son: ver detalles de los Areas, modificar o eliminar.  " {
+  shape: rectangle
+}
+ListaAreasAccion: "Acción a realizar tabla Areas" {
+  shape: diamond
+}
+
+FormularioCrearArea: "Formulario crear Area que cuenta con los siguientes datos:\n nombre de Area\n" {
+  shape: parallelogram
+  # style: {
+  #   fill: LightBlue
+  # }
+}
+
+FormularioCrearAreaPop: "Anuncio de crear Area?" {
+  shape: diamond
+}
+FormularioCrearAreaValidar: "Validar datos en el formulario crear Areas" {
+  shape: diamond
+}
+FormularioEditarArea: "Formulario Editar Area donde el administrador puede modificar el nombre del Area \n seleccionado" {
+  shape: parallelogram
+}
+
+FormularioEditarAreaPop: "Anuncio de Editar Area?" {
+  shape: diamond
+}
+FormularioEditarAreaValidar: "verificando que la entrada de datos sean validas" {
+  shape: diamond
+}
+
+FormularioEliminarAreaValidar: "Anuncio de Eliminar el Area?" {
+  shape: diamond
+}
+
+StorageCrearArea: "enviar datos a base de datos" {
+  shape: rectangle
+}
+
+StorageEditarArea: "Mandar datos a base de datos" {
+  shape: rectangle
+}
+CargarDatosListaAreas: " Cargar datos de base de datos" {
+  shape: stored_data
+}
+
+AreaAccion -> CargarDatosListaAreas: Tabla Areas
+CargarDatosListaAreas -> ListaAreas
+
+ListaAreasAccion -> FormularioCrearArea: Crear
+FormularioCrearArea -> ListaAreas: cancelar
+ListaAreas -> ListaAreasAccion
+FormularioCrearArea -> FormularioCrearAreaPop: Crear
+FormularioCrearAreaPop -> ListaAreas: Cancelar
+FormularioCrearAreaPop -> FormularioCrearAreaValidar: Aceptar
+FormularioCrearAreaValidar -> StorageCrearArea: Datos validos
+StorageCrearArea -> ListaAreas
+FormularioCrearAreaValidar -> FormularioCrearArea: Datos invalidos
+
+ListaAreasAccion -> FormularioEditarArea: Editar
+FormularioEditarArea -> ListaAreas: cancelar
+FormularioEditarArea -> FormularioEditarAreaPop: Editar
+FormularioEditarAreaPop -> ListaAreas: Cancelar
+FormularioEditarAreaPop -> FormularioEditarAreaValidar: Aceptar
+FormularioEditarAreaValidar -> StorageEditarArea: Datos validos
+StorageEditarArea -> ListaAreas
+FormularioEditarAreaValidar -> FormularioEditarArea: Datos invalidos
+
+ListaAreasAccion -> FormularioEliminarAreaValidar: Eliminar
+FormularioEliminarAreaValidar -> ListaAreas: Eliminar
+FormularioEliminarAreaValidar -> ListaAreas: Cancelar
