@@ -16,3 +16,21 @@ const connectDB = async () => {
 };
 
 module.exports = connectDB;
+
+/* 
+import sql from "mssql";
+import dbconfig = from "./config.js";
+
+async function connectar() {
+  try{
+    await sql.connect(dbconfig);
+    console.log("Conectado a la base de datos SQL Server");
+  }
+  catch (error) {
+    console.error("Error de conexión a la base de datos:", error);
+  }
+
+
+connectar();  // llamar a la función para establecer la conexión inicial
+
+*/ 
