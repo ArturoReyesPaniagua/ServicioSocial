@@ -1,9 +1,11 @@
+direction: left
+
 Usuarios: {
   shape: sql_table
-  id_usuario: INT {constraint: primary_key, AUTO_INCREMENT}
+  id_usuario: INT {constraint: primary_key , AUTO_INCREMENT}
   username: VARCHAR {constraint: unique}
   password: VARCHAR
-  id_area: VARCHAR {constraint: foreing key}
+  id_area: VARCHAR {constraint: foreign_key}
   role: ENUM('admin', 'user')
 }
 
@@ -18,22 +20,23 @@ Oficio: {
   fecha_respuesta: DATE
   id_solicitante: INT {constraint: foreign_key}
   asunto: VARCHAR
+  observaciones: VARCHAR
   id_responsable: INT {constraint: foreign_key}
-  id_area: INT {constraint: foreign key}
+  id_area: INT {constraint: foreign_key}
 }
 
 PDF: {
   shape: sql_table
   id_archivo: int {constraint: primary_key}
   archivo: BLOB
-  id_oficio: int {constraint: foreign key}
+  id_oficio: int {constraint: foreign_key}
 }
 
 Area: {
   shape: sql_table
   id_area: INT {constraint: primary_key}
   nombre_area: VARCHAR
-  contador: INT
+  contador: INT {constraint: AUTO_INCREMENT}
 }
 
 Responsable: {
@@ -48,10 +51,9 @@ Solicitante: {
   Nombre_solicitante: VARCHAR
 }
 
-Oficio.id_solicitante <-> Solicitante.id_solicitante: Tiene N:1
-Oficio.id_area <-> Area.id_area: Tiene N:1
+Oficio.id_solicitante <-> Solicitante.id_solicitante: asigna N:1
+Oficio.id_area <-> Area.id_area: asigna N:1
 Usuarios <-> Oficio: gestionan N:N
 PDF.id_oficio <-> Oficio.id_oficio: asociados 1:1
-Oficio.id_responsable <-> Responsable.id_responsable: tiene N:1
-Usuarios <-> Area: pertenece N:1
-
+Oficio.id_responsable <-> Responsable.id_responsable: asigna N:1
+Usuarios.id_area <-> Area.id_area: pertenece N:1

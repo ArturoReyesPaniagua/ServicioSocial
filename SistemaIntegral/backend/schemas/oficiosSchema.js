@@ -9,6 +9,7 @@ const oficioSchema = `
     fecha_respuesta DATE,
     id_solicitante INT,
     asunto VARCHAR(255),
+    observaciones VARCHAR(255),
     id_responsable INT,
     id_area INT,
     FOREIGN KEY (id_solicitante) REFERENCES Solicitante(id_solicitante),

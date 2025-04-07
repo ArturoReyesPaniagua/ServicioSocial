@@ -2,11 +2,11 @@ inicio: "Inicio" {
   shape: circle
 }
 
-login: "Formulario Login El usuario ingresa sus datos de usuario dentro del sistema para proseguir el\n usuario tendrá que dar clic sobre el botón de iniciar sesión, el formulario en esta sección cuenta con\n los siguientes datos:Nombre de usuario y Contraseña" {
+login: "Formulario Login, el usuario ingresa sus datos de usuario dentro del sistema, para proseguir el usuario\n tendrá que dar clic sobre el botón de iniciar sesión, el formulario en esta sección cuenta con los siguientes datos:\n Nombre de usuario y Contraseña" {
   shape: parallelogram
 }
 
-validar: "el sistema válida datos de usuario " {
+validar: "El sistema válida datos de usuario " {
   shape: diamond
 }
 
@@ -32,11 +32,11 @@ esAdmin: "Sistema válida tipo de usuario" {
 accesoSatisfactorio -> esAdmin
 
 # Opciones de menú basadas en tipo de usuario
-menuAdmin: "Menú Usuario Administrador Se encuentran las opciones de navegación del usuario\n administrador en las cuales estam: Tablas de oficios, Tablas de usuarios y Generar reporte" {
+menuAdmin: "Menú del usuario administrador cuenta con las opciones de navegación del usuario administrador\n en las cuales estan: tablas de oficios, tablas de usuarios, registro de responsablesy solicitantes, registro de areas y generar reporte" {
   shape: rectangle
 }
 
-menuUsuario: "Menu Usuario Estandard  se encuentran las opciones de navegación del usuario administrador\n en las cuales estan: Tablas de oficios, Tablas de usuarios y Generar reporte" {
+menuUsuario: "Menú del usuario estandard  se encuentran las opciones de navegación del usuario administrador\n en las cuales estan: tablas de oficios,registro de responsablesy solicitantes, tablas de usuarios y Generar reporte" {
   shape: rectangle
 }
 
@@ -47,21 +47,21 @@ AccionAdmo: "Acción a realizar?" {
   shape: diamond
 }
 
-ListaUsuarios: "Tabla usuarios: en esta tabla el usuario podra ver nombres de los usuarios, el rol que \ndesempeña y las opciones a realizar que son: ver detalles de los usuarios, modificar o eliminar.  " {
+ListaUsuarios: "Tabla usuarios: en esta tabla el usuario podra ver nombres de los usuarios, el rol que \ndesempeña y las opciones a realizar que son: ver detalles de los usuarios, modificar o eliminar usuario.  " {
   shape: rectangle
 }
 ListaUsuariosAccion: "Acción a realizar tabla usuarios" {
   shape: diamond
 }
 
-FormularioCrearUsuario: "Formulario crear usuario que cuenta con los siguientes datos:\n nombre de usuario\n, contraseña y el role que va a desempeñar. " {
+FormularioCrearUsuario: "Formulario crear usuario que cuenta con los siguientes datos: nombre de usuario\n, contraseña y el role que va a desempeñar. " {
   shape: parallelogram
   # style: {
   #   fill: LightBlue
   # }
 }
 
-FormularioCrearUsuarioPop: "Anuncio de crear usuario?" {
+FormularioCrearUsuarioPop: "anúncio de confirmación de crear usuario?" {
   shape: diamond
 }
 FormularioCrearUsuarioValidar: "Validar datos en el formulario crear usuarios" {
@@ -71,18 +71,18 @@ FormularioEditarUsuario: "Formulario Editar usuario donde el administrador puede
   shape: parallelogram
 }
 
-FormularioEditarUsuarioPop: "Anuncio de Editar Usuario?" {
+FormularioEditarUsuarioPop: "anúncio de confirmación de Editar Usuario?" {
   shape: diamond
 }
-FormularioEditarUsuarioValidar: "verificando que la entrada de datos sean validas" {
-  shape: diamond
-}
-
-FormularioEliminarUsuarioValidar: "Anuncio de Eliminar el usuario?" {
+FormularioEditarUsuarioValidar: "Verificando que la entrada de datos sean validas" {
   shape: diamond
 }
 
-StorageCrearUsuario: "enviar datos a base de datos" {
+FormularioEliminarUsuarioValidar: "anúncio de confirmación de Eliminar el usuario?" {
+  shape: diamond
+}
+
+StorageCrearUsuario: "Enviar datos a base de datos" {
   shape: rectangle
 }
 
@@ -120,18 +120,18 @@ ListaUsuariosAccion -> FormularioEliminarUsuarioValidar: Eliminar
 FormularioEliminarUsuarioValidar -> ListaUsuarios: Eliminar
 FormularioEliminarUsuarioValidar -> ListaUsuarios: Cancelar
 
-ListaOficios: "Tabla oficios en esta tabla de oficios el usuario podra ver Numero de oficio, folio, estado, fecha de\n recepcion, fecha limite, solicitante asunto y las opciones a realizar que son: ver detalles \n del oficio, archivar, modificar o eliminar. " {
+ListaOficios: "Tabla oficios en esta tabla de oficios el usuario podra ver Numero de oficio,\n folio, estado, fecha de recepcion, fecha limite, solicitante asunto y las opciones a realizar que son:\n ver detalles  del oficio, archivar, modificar o eliminar oficio. " {
   shape: rectangle
 }
 ListaOficiosAccion: "Accion a realizar Tabla Oficios" {
   shape: diamond
 }
 
-FormularioCrearOficios: "Formulario crear oficios, el usuario tendra que ingresar los siguientes datos: \n Numero de expediente, folio de seguimiento UPyCE, estado del documento, fecha de recepción, fecha\n limite, solicitante, asunto, responsable, fecha de respuesta, observaciones y si este documento esta \narchivado  " {
+FormularioCrearOficios: "Formulario crear oficios, el usuario tendra que ingresar los siguientes datos: \n Numero de expediente, folio de seguimiento UPyCE, estado del documento, fecha de recepción, fecha\n limite, solicitante, asunto, observaciones, responsable, fecha de respuesta, observaciones y si este documento esta \narchivado  " {
   shape: parallelogram
 }
 
-FormularioCrearOficiosPop: "Anuncio de confirmacion crear oficio?" {
+FormularioCrearOficiosPop: "anúncio de confirmacion crear oficio?" {
   shape: diamond
 }
 FormularioCrearOficiosValidar: "Validar datos del formulario crear oficios" {
@@ -141,14 +141,14 @@ FormularioEditarOficios: "Formulario Editar oficio el usuario podra modificar lo
   shape: parallelogram
 }
 
-FormularioEditarOficiosPop: "Anuncio de confirmacion de editar oficio?" {
+FormularioEditarOficiosPop: "anúncio de confirmacion de editar oficio?" {
   shape: diamond
 }
 FormularioEditarOficiosValidar: "Sistema validar" {
   shape: diamond
 }
 
-FormularioEliminarOficiosValidar: "Anuncio de confirmacion eliminar el oficio?" {
+FormularioEliminarOficiosValidar: "anúncio de confirmacion eliminar el oficio?" {
   shape: diamond
 }
 AccionUsuario: "Acción a realizar?" {
@@ -171,7 +171,7 @@ AccionVerPDf: " Acción a realizar?" {
   shape: diamond
 }
 
-ImprimirPdf: se activa la interfaz de la API para Imprimir PDF {
+ImprimirPdf: Se activa la interfaz de la API para Imprimir PDF {
   shape: document
 }
 CargarPDF: Asociar {
@@ -247,11 +247,11 @@ GenerarReportePopUp -> GenerarReporteDocumento: Confirmar
 GenerarReporteDocumento -> GenerarReporte
 GenerarReportePopUp -> GenerarReporte: Cancelar
 
-GenerarReporte: "Generar reporte, el usuario tendra que elegir el dia y las condiciones que se \n requieren para generar el reporte" {
+GenerarReporte: "Generar reporte, el usuario tendra que elegir el dia y el estado de los oficios que se \n requieren para generar el reporte" {
   shape: rectangle
 }
 
-GenerarReportePopUp: "Anuncio  de confirmacion de generar reporte" {
+GenerarReportePopUp: "anúncio de confirmacion de generar reporte" {
   shape: diamond
 }
 
@@ -259,10 +259,10 @@ GenerarReporteDocumento: "Documento del reporte en pdf " {
   shape: Document
 }
 
-MenúRegistro: Es un menú que muestra las opciones Responsable, Solicitante  y en la respectiva seleccion\n  las opciones agregar, eliminar y modificar de una lista de registros que pueden ser  Responsable,\n Solicitante y Area {
+MenúRegistro: Es un menú que muestra las opciones agregar, eliminar y modificar de una lista de \n registros que pueden ser  Responsable y Solicitante {
   shape: rectangle
 }
-MenúArea: Es un menú de area  y en la respectiva seleccion  las opciones agregar, eliminar y modificar de una lista de registros que \n pueden ser  Responsable, Solicitante y Area {
+MenúArea: Es un menú de area  y en la respectiva seleccion  las opciones agregar, eliminar y modificar\n de una lista de registros de areas {
   shape: rectangle
 }
 
@@ -282,42 +282,42 @@ AreaAccion: Accion en area {
   shape: diamond
 }
 
-ListaResponsables: "Tabla Responsables: en esta tabla el Responsable podra ver nombres de los Responsables, el rol que \ndesempeña y las opciones a realizar que son: ver detalles de los Responsables, modificar o eliminar.  " {
+ListaResponsables: "Tabla Responsables: en esta tabla el Responsable podra ver nombres de los Responsables y \n las opciones a realizar que son: crear responsable, modificar o eliminar responsable.  " {
   shape: rectangle
 }
 ListaResponsablesAccion: "Acción a realizar tabla Responsables" {
   shape: diamond
 }
 
-FormularioCrearResponsable: "Formulario crear Responsable que cuenta con los siguientes datos:\n nombre de Responsable\n " {
+FormularioCrearResponsable: "Formulario crear responsable que cuenta con los siguientes datos: nombre de Responsable\n " {
   shape: parallelogram
   # style: {
   #   fill: LightBlue
   # }
 }
 
-FormularioCrearResponsablePop: "Anuncio de crear Responsable?" {
+FormularioCrearResponsablePop: "anúnciode confirmación  de crear responsable?" {
   shape: diamond
 }
 FormularioCrearResponsableValidar: "Validar datos en el formulario crear Responsables" {
   shape: diamond
 }
-FormularioEditarResponsable: "Formulario Editar Responsable donde el administrador puede modificar el nombre del Responsable seleccionado" {
+FormularioEditarResponsable: "Formulario Editar Responsable donde el administrador puede modificar el nombre del\n Responsable seleccionado" {
   shape: parallelogram
 }
 
-FormularioEditarResponsablePop: "Anuncio de Editar Responsable?" {
+FormularioEditarResponsablePop: "anúncio de confirmación de editar responsable?" {
   shape: diamond
 }
-FormularioEditarResponsableValidar: "verificando que la entrada de datos sean validas" {
-  shape: diamond
-}
-
-FormularioEliminarResponsableValidar: "Anuncio de Eliminar el Responsable?" {
+FormularioEditarResponsableValidar: "Verificando que la entrada de datos sean validas" {
   shape: diamond
 }
 
-StorageCrearResponsable: "enviar datos a base de datos" {
+FormularioEliminarResponsableValidar: "anúncio de confirmación de eliminar el responsable?" {
+  shape: diamond
+}
+
+StorageCrearResponsable: "Enviar datos a base de datos" {
   shape: rectangle
 }
 
@@ -362,42 +362,42 @@ ListaResponsablesAccion -> FormularioEliminarResponsableValidar: Eliminar
 FormularioEliminarResponsableValidar -> ListaResponsables: Eliminar
 FormularioEliminarResponsableValidar -> ListaResponsables: Cancelar
 
-ListaSolicitantes: "Tabla Solicitantes: en esta tabla el Solicitante podra ver nombres de los Solicitantes y las opciones a realizar que son: ver detalles de los Solicitantes, modificar o eliminar.  " {
+ListaSolicitantes: "Tabla Solicitantes: en esta tabla el Solicitante podra ver nombres de los Solicitantes\n y las opciones a realizar que son: crear solicitante, modificar o eliminar solicitante.  " {
   shape: rectangle
 }
 ListaSolicitantesAccion: "Acción a realizar tabla Solicitantes" {
   shape: diamond
 }
 
-FormularioCrearSolicitante: "Formulario crear Solicitante que cuenta con los siguientes datos: nombre de Solicitante" {
+FormularioCrearSolicitante: "Formulario crear Solicitante que cuenta con los siguientes datos: nombre de solicitante" {
   shape: parallelogram
   # style: {
   #   fill: LightBlue
   # }
 }
 
-FormularioCrearSolicitantePop: "Anuncio de crear Solicitante?" {
+FormularioCrearSolicitantePop: "anúncio de confirmación de crear solicitante?" {
   shape: diamond
 }
 FormularioCrearSolicitanteValidar: "Validar datos en el formulario crear Solicitantes" {
   shape: diamond
 }
-FormularioEditarSolicitante: "Formulario Editar Solicitante donde el administrador puede modificar el nombre del solicitante seleccionado" {
+FormularioEditarSolicitante: "Formulario Editar Solicitante donde el administrador puede modificar\n el nombre del solicitante seleccionado" {
   shape: parallelogram
 }
 
-FormularioEditarSolicitantePop: "Anuncio de Editar Solicitante?" {
+FormularioEditarSolicitantePop: "anúncio de confirmación de editar solicitante?" {
   shape: diamond
 }
-FormularioEditarSolicitanteValidar: "verificando que la entrada de datos sean validas" {
-  shape: diamond
-}
-
-FormularioEliminarSolicitanteValidar: "Anuncio de Eliminar el Solicitante?" {
+FormularioEditarSolicitanteValidar: "Verificando que la entrada de datos sean validas" {
   shape: diamond
 }
 
-StorageCrearSolicitante: "enviar datos a base de datos" {
+FormularioEliminarSolicitanteValidar: "anúncio de confirmación de eliminar el solicitante?" {
+  shape: diamond
+}
+
+StorageCrearSolicitante: "Enviar datos a base de datos" {
   shape: rectangle
 }
 
@@ -434,21 +434,21 @@ ListaSolicitantesAccion -> FormularioEliminarSolicitanteValidar: Eliminar
 FormularioEliminarSolicitanteValidar -> ListaSolicitantes: Eliminar
 FormularioEliminarSolicitanteValidar -> ListaSolicitantes: Cancelar
 
-ListaAreas: "Tabla Areas: en esta tabla el Area podra ver nombres de los Areas y las opciones a realizar que son: ver detalles de los Areas, modificar o eliminar.  " {
+ListaAreas: "Tabla Areas: en esta tabla el Area podra ver nombres de los Areas y las opciones a realizar\n que son: crear, modificar o eliminar area.  " {
   shape: rectangle
 }
 ListaAreasAccion: "Acción a realizar tabla Areas" {
   shape: diamond
 }
 
-FormularioCrearArea: "Formulario crear Area que cuenta con los siguientes datos:\n nombre de Area\n" {
+FormularioCrearArea: "Formulario crear Area que cuenta con los siguientes datos: nombre de Area\n" {
   shape: parallelogram
   # style: {
   #   fill: LightBlue
   # }
 }
 
-FormularioCrearAreaPop: "Anuncio de crear Area?" {
+FormularioCrearAreaPop: "anúncio de confirmación de crear Area?" {
   shape: diamond
 }
 FormularioCrearAreaValidar: "Validar datos en el formulario crear Areas" {
@@ -458,18 +458,18 @@ FormularioEditarArea: "Formulario Editar Area donde el administrador puede modif
   shape: parallelogram
 }
 
-FormularioEditarAreaPop: "Anuncio de Editar Area?" {
+FormularioEditarAreaPop: "anúncio de confirmación de Editar Area?" {
   shape: diamond
 }
 FormularioEditarAreaValidar: "verificando que la entrada de datos sean validas" {
   shape: diamond
 }
 
-FormularioEliminarAreaValidar: "Anuncio de Eliminar el Area?" {
+FormularioEliminarAreaValidar: "anúncio de confirmación de eliminar el Area?" {
   shape: diamond
 }
 
-StorageCrearArea: "enviar datos a base de datos" {
+StorageCrearArea: "Enviar datos a base de datos" {
   shape: rectangle
 }
 
@@ -505,3 +505,4 @@ FormularioEditarAreaValidar -> FormularioEditarArea: Datos invalidos
 ListaAreasAccion -> FormularioEliminarAreaValidar: Eliminar
 FormularioEliminarAreaValidar -> ListaAreas: Eliminar
 FormularioEliminarAreaValidar -> ListaAreas: Cancelar
+
