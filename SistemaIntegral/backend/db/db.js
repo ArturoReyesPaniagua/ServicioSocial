@@ -31,6 +31,6 @@ async function connectar() {
   }
 
 
-connectar();  // llamar a la función para establecer la conexión inicial
+module.exports = connectar();  // llamar a la función para establecer la conexión inicial
 
 */ 
