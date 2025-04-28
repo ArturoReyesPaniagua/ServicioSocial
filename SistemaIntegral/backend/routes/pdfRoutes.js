@@ -1,3 +1,8 @@
+// File pdfRoutes.js
+// SistemaIntegral/backend/routes/pdfRoutes.js
+// Este archivo contiene las rutas para la gestion de archivos PDF
+// que interactúan con los controladores y manejan las solicitudes HTTP relacionadas con los archivos PDF
+
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');

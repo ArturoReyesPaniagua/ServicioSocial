@@ -1,3 +1,8 @@
+//  File expedientesRoutes.js
+// SistemaIntegral/backend/routes/expedientesRoutes.js 
+// este archivo contiene las rutas para la gestión de expedientes
+// que interactúan con los controladores y manejan las solicitudes HTTP relacionadas con los expedientes
+
 const express = require('express');
 const router = express.Router();
 const {

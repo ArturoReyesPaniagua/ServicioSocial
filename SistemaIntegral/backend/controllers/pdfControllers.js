@@ -1,3 +1,9 @@
+// File: pdfControllers.js
+// SistemaIntegral/backend/controllers/pdfControllers.js
+//Documento que contiene las funciones de autenticación y gestión de usuarios
+// que interactúan con la base de datos y manejan las solicitudes HTTP relacionadas con los usuarios
+// **Checar aqui lo del PDF** apartir de la linea 100 ... 
+
 const mysql = require('mysql2/promise');
 const config = require('../db/config');
 const pdfSchema = require('../schemas/pdfSchema');

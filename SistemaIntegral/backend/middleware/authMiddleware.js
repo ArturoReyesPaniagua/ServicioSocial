@@ -1,4 +1,9 @@
-// middleware/authMiddleware.js
+// middleware/authMiddleware.js 
+// Middleware para autenticación y autorización de usuarios
+// Este archivo contiene los middlewares para autenticar y verificar el rol de los usuarios
+
+
+
 const jwt = require('jsonwebtoken');
 const mysql = require('mysql2/promise');
 const config = require('../db/config');
@@ -11,7 +16,7 @@ const getConnection = async () => {
 // Middleware para verificar el token JWT
 const authenticateToken = async (req, res, next) => {
   const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+  const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN La traducción de la cadena de autorización a un token.
   
   if (!token) {
     return res.status(401).json({ error: 'Acceso denegado, token no proporcionado' });
@@ -38,7 +43,7 @@ const isAdmin = async (req, res, next) => {
     connection = await getConnection();
     
     const [rows] = await connection.execute(
-      'SELECT role FROM users WHERE userId = ?',
+      'SELECT role FROM users WHERE userId = ?',  // Query para obtener el rol del usuario solicita el usuario del id
       [userId]
     );
   

@@ -1,3 +1,8 @@
+// File authRoutes.js
+// SistemaIntegral/backend/routes/authRoutes.js 
+// Este archivo contiene las rutas de autenticación y gestión de usuarios
+// que interactúan con los controladores y manejan las solicitudes HTTP relacionadas con los usuarios
+
 const express = require("express");
 const router = express.Router();
 const authControllers = require("../controllers/authControllers");

@@ -1,3 +1,7 @@
+// OficioSchema.js
+// SistemaIntegral/backend/schemas/oficioSchema.js
+// Este archivo define el esquema de la tabla "Oficio" en la base de datos
+
 const oficioSchema = `
   CREATE TABLE IF NOT EXISTS Oficio (
     id_oficio INT PRIMARY KEY,

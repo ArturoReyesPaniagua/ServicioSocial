@@ -1,3 +1,9 @@
+// File: db.js
+// SistemaIntegral/backend/db/db.js 
+// Conexión a la base de datos MySQL
+// Este archivo contiene la configuración y la función para conectar a la base de datos MySQL
+// ** cambiar a SQL Server ** El codigo de abajo es para MySQL, el de arriba es para SQL Server 
+
 const mysql = require("mysql2");
 const config = require("./config");
 

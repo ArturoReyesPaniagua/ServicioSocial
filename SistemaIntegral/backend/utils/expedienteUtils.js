@@ -1,3 +1,8 @@
+// FIle expedienteUtils.js
+// SistemaIntegral/backend/utils/expedienteUtils.js
+// Este archivo contiene las funciones para interactuar con la base de datos
+// relacionadas con la tabla "Expediente".
+
 const mysql = require("mysql2");
 const config = require("../db/config");
 const pool = mysql.createPool(config);
@@ -5,7 +10,7 @@ const pool = mysql.createPool(config);
 // Crear expediente
 const createExpediente = (expediente) => {
   return new Promise((resolve, reject) => {
-    const query = `INSERT INTO Expediente SET ?`;
+    const query = `INSERT INTO Expediente SET ?`; //querry para insertar un nuevo expediente
     pool.query(query, [expediente], (err, results) => {
       if (err) reject(err);
       else resolve(results);

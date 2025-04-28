@@ -1,8 +1,13 @@
+// File: authControllers.js
+// Este archivo contiene las funciones de autenticación y gestión de usuarios
+// que interactúan con la base de datos y manejan las solicitudes HTTP relacionadas con los usuarios
+
+
 const expedienteSchema = require('../schemas/expedienteSchema');
 const { createTable } = require('../utils/funtiosauth');
 const expedienteUtils = require('../utils/expedienteUtils');
 
-// Crear un nuevo expediente
+// **Crear un nuevo expediente**
 const createExpediente = async (req, res) => {
   try {
     // Asegurar que la tabla exista
@@ -32,7 +37,7 @@ const createExpediente = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-};
+}; // **Crear un nuevo expediente** Termina aqui
 
 // Obtener todos los estados
 const getAllEstados = async (req, res) => {
@@ -57,7 +62,7 @@ const getAllExpedientes = async (req, res) => {
 // Obtener un expediente por ID
 const getExpedienteById = async (req, res) => {
   try {
-    const expediente = await expedienteUtils.getExpedienteById(req.params.id);
+    const expediente = await expedienteUtils.getExpedienteById(req.params.id); // llamar a la función para obtener el expediente por ID ubicada en utils/expedienteUtils.js
     if (!expediente) {
       return res.status(404).json({ message: 'Expediente no encontrado' });
     }
