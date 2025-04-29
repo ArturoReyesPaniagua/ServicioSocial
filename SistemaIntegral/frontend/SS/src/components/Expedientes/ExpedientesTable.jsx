@@ -1,4 +1,8 @@
-// src/components/Expedientes/ExpedientesTable.jsx
+// File: ExpedientesTable.jsx
+// // SistemaIntegral/frontend/SS/src/components/Expedientes/ExpedientesTable.jsx
+// Este componente muestra una tabla de expedientes
+// y permite realizar acciones como editar, eliminar, ver detalles y archivar 
+// funciona con reacttable y axios para la gestión de datos
 import { useState, useEffect, useMemo } from 'react';
 import {
   useReactTable,

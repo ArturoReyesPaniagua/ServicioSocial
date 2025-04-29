@@ -1,4 +1,9 @@
-// src/components/Expedientes/ExpedienteView.jsx
+// ExpedienteView.jsx
+// sistemaIntegral/frontend/SS/src/components/Expedientes/ExpedienteView.jsx
+// Este componente muestra los detalles de un expediente específico
+// y permite editar o cancelar el expediente
+
+
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import ExpedientePDFManager from './ExpedientePDFManager';
