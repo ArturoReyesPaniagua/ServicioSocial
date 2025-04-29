@@ -1,4 +1,5 @@
-// File: authControllers.js
+// File: expedienteCorntrollers.js
+// SistemaIntegral/backend/controllers/expedienteControllers.js
 // Este archivo contiene las funciones de autenticación y gestión de usuarios
 // que interactúan con la base de datos y manejan las solicitudes HTTP relacionadas con los usuarios
 

@@ -23,9 +23,9 @@ const ExpedientesTable = ({
   onArchive,
   isLoading = false 
 }) => {
-  const [sorting, setSorting] = useState([]);
-  const [globalFilter, setGlobalFilter] = useState('');
-  const [expedientesWithFiles, setExpedientesWithFiles] = useState({});
+  const [sorting, setSorting] = useState([]); //Estado inciail para el ordenamiento de la tabla
+  const [globalFilter, setGlobalFilter] = useState(''); // Estado inicial para el filtrado global de la tabla
+  const [expedientesWithFiles, setExpedientesWithFiles] = useState({}); //E
 
   // Cargar información de archivos para expedientes
   useEffect(() => {
@@ -33,7 +33,7 @@ const ExpedientesTable = ({
       if (!data || !data.length) return;
       
       try {
-        const response = await axios.get('http://localhost:3001/api/pdfs');
+        const response = await axios.get('http://localhost:3001/api/pdfs'); // url de la API para cargar archivos
         if (response && response.data) {
           // Crear un objeto con idExpediente como clave y el conteo de archivos como valor
           const filesCount = {};
@@ -56,9 +56,9 @@ const ExpedientesTable = ({
   // Definir columnas
   const columns = useMemo(() => [
     {
-      header: 'No. Expediente',
-      accessorKey: 'NoExpediente',
-      cell: info => info.getValue() || '',
+      header: 'No. Expediente', //el letrero
+      accessorKey: 'NoExpediente', //la clave del objeto
+      cell: info => info.getValue() || '', //el valor de la celda
     },
     {
       header: 'Folio',
@@ -72,7 +72,7 @@ const ExpedientesTable = ({
         const value = info.getValue();
         if (!value) return '';
         
-        let bgColor;
+        let bgColor; //colores de fondo para los distintos tipos de estado 
         switch(value) {
           case 'Concluido':
             bgColor = 'bg-green-100 text-green-800';
