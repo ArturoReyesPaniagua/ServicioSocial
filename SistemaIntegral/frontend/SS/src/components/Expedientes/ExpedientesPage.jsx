@@ -1,4 +1,8 @@
-// src/components/Expedientes/ExpedientesPage.jsx
+//ExpedientesPage.jsx
+// SistemaIntegral/frontend/SS/src/components/Expedientes/ExpedientesPage.jsx
+//// Este componente es la página principal de gestión de expedientes
+// // y permite crear, editar, eliminar y ver detalles de los expedientes
+
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -6,6 +10,7 @@ import ExpedientesTable from './ExpedientesTable';
 import ExpedienteForm from './ExpedienteForm';
 import ExpedienteView from './ExpedienteView';
 import DeleteConfirmation from '../common/DeleteConfirmation';
+
 
 const ExpedientesPage = () => {
   const [expedientes, setExpedientes] = useState([]);
@@ -43,20 +48,23 @@ const ExpedientesPage = () => {
   }, []);
 
   // Función para cargar expedientes según el filtro seleccionado
+  // Aqui se pueden agregar mas filtros si se desea
   const fetchExpedientes = async () => {
     setIsLoading(true);
     try {
+      // URL base para cargar expedientes
       let url = 'http://localhost:3001/api/expedientes';
-      
+      // Cargar expedientes según el filtro seleccionado
       if (filterType === 'archived') {
-        url = 'http://localhost:3001/api/expedientes/archivado/true';
+        url = 'http://localhost:3001/api/expedientes/archivado/true'; // Cambiado de archivado a true
       } else if (filterType === 'active') {
-        url = 'http://localhost:3001/api/expedientes/archivado/false';
+        url = 'http://localhost:3001/api/expedientes/archivado/false'; // Cambiado de archivado a false
       } else if (filterType === 'estado' && selectedEstado) {
-        url = `http://localhost:3001/api/expedientes/estado/${selectedEstado}`;
+        url = `http://localhost:3001/api/expedientes/estado/${selectedEstado}`; // Cambiado de idEstado a estado
       }
       
-      const response = await axios.get(url);
+      const response = await axios.get(url); // Cambiado de /expedientes/archivado a /expedientes/archivado/true
+      // Actualizar el estado con los expedientes obtenidos
       setExpedientes(response.data);
     } catch (error) {
       console.error('Error cargando expedientes:', error);
@@ -87,6 +95,7 @@ const ExpedientesPage = () => {
   // Actualizar un expediente existente
   const handleUpdateExpediente = async (expedienteData) => {
     try {
+      // Aquí se debe enviar el ID del expediente a actualizar junto con los datos
       await axios.put(`http://localhost:3001/api/expedientes/${expedienteData.idExpediente}`, expedienteData);
       toast.success('Expediente actualizado exitosamente');
       setFormVisible(false);
@@ -102,7 +111,10 @@ const ExpedientesPage = () => {
     if (!currentExpediente) return;
     
     try {
+      // Aquí se debe enviar el ID del expediente a eliminar
+      // y se debe eliminar el PDF asociado si es necesario
       await axios.delete(`http://localhost:3001/api/expedientes/${currentExpediente.idExpediente}`);
+      await axios.delete(`http://localhost:3001/api/pdf/${currentExpediente.idPDF}`); // cambiado de idPDF a idExpediente
       toast.success('Expediente eliminado exitosamente');
       setDeleteVisible(false);
       setCurrentExpediente(null);
@@ -115,13 +127,15 @@ const ExpedientesPage = () => {
 
   // Archivar/Desarchivar expediente
   const handleArchiveExpediente = async (expediente) => {
+    // Aquí se debe enviar el ID del expediente a archivar/desarchivar
+    // y se debe actualizar el estado del expediente
     try {
       const updatedData = {
         ...expediente,
         archivado: !expediente.archivado
       };
       
-      await axios.put(`http://localhost:3001/api/expedientes/${expediente.idExpediente}`, updatedData);
+      await axios.put(`http://localhost:3001/api/expedientes/${expediente.idExpediente}`, updatedData); // Cambiado de idPDF a idExpediente
       
       toast.success(expediente.archivado 
         ? 'Expediente desarchivado exitosamente' 

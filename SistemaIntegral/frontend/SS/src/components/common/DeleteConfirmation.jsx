@@ -1,6 +1,15 @@
-// src/components/common/DeleteConfirmation.jsx
+//File:DeleteConfirmation.jsx
+// SistemaIntegral/frontend/SS/src/components/common/DeleteConfirmation.jsx
+// Este componente muestra un cuadro de confirmación para eliminar un registro
+// y permite al usuario confirmar o cancelar la acción.
+
+
 import React from 'react';
 
+
+// Componente DeleteConfirmation
+// Este componente muestra un cuadro de confirmación para eliminar un registro
+// Fue realizado con Tailwind CSS para el diseño y estilo
 const DeleteConfirmation = ({ title, message, onConfirm, onCancel }) => {
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex justify-center items-center p-4 z-50">

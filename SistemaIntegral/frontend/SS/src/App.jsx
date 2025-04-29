@@ -1,4 +1,7 @@
-// src/App.jsx
+//App.jsx
+// SistemaIntegral/frontend/SS/src/App.jsx
+// Este archivo contiene la configuaracion de las rutas de la aplicacion en react 
+
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -12,7 +15,8 @@ import { useAuth } from './context/AuthContext';
 import './App.css';
 
 function App() {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading } = useAuth(); // Importa el contexto de autenticación para verificar el estado de autenticación del usuario
+  // loading es un estado que indica si la aplicacion esta cargando o no
 
   if (loading) {
     return (
@@ -32,6 +36,7 @@ function App() {
         } />
         
            
+        {/* Ruta de lista de lista expedientes // es la utilidad de expedientes  */}
         <Route path="/expedientes" element={
           <ProtectedRoute>
             <MainLayout>
@@ -40,6 +45,7 @@ function App() {
           </ProtectedRoute>
         } />
         
+        {/* Ruta de lista de usuarios // es la utilidad de expedientes  */}
         <Route path="/userList" element={
           <ProtectedRoute>
             <MainLayout>
@@ -55,6 +61,13 @@ function App() {
           </ProtectedRoute>
         } />
         
+        {/* Ruta para la página de registro (eliminada) */}
+        {/* <Route path="/register" element={<RegisterForm />} /> */}
+        {/* Ruta para la página de inicio (eliminada) */}
+        {/* <Route path="/home" element={<Home />} /> */}
+        
+        
+       
         {/* Ruta para cualquier otra URL no definida */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>

@@ -1,4 +1,7 @@
-// src/components/Expedientes/ExpedientePDFManager.jsx
+// File: ExpedientePDFManager.jsx
+// SistemaIntegral/frontend/SS/src/components/Expedientes/ExpedientePDFManager.jsx
+// Este componente maneja la carga, visualización y eliminación de documentos PDF asociados a un expediente específico.
+// Permite al usuario subir nuevos documentos, ver los existentes y eliminarlos si es necesario.
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { format } from 'date-fns';
@@ -14,14 +17,17 @@ const ExpedientePDFManager = ({ expedienteId }) => {
   // Cargar PDFs asociados al expediente
   useEffect(() => {
     if (expedienteId) {
-      fetchPDFs();
+      fetchPDFs(); // Llama a la función para cargar los PDFs al montar el componente 
     }
   }, [expedienteId]);
 
+  // Función para obtener los PDFs del expediente
+  // Esta función se encarga de hacer una petición al backend para obtener los PDFs asociados a un expediente específico
   const fetchPDFs = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get(`http://localhost:3001/api/pdfs/expediente/${expedienteId}`);
+      const response = await axios.get(`http://localhost:3001/api/pdfs/expediente/${expedienteId}`); // peticion al backend para obtener los PDFs
+      // La respuesta contiene el pdf o los PDFs asociados al expediente
       console.log('PDFs del expediente:', response.data);
       setFiles(response.data);
     } catch (error) {
@@ -32,10 +38,11 @@ const ExpedientePDFManager = ({ expedienteId }) => {
     }
   };
 
+  // Función para manejar el cambio de archivo
   const handleFileChange = (e) => {
     setSelectedFile(e.target.files[0]);
   };
-
+  // Función para manejar la subida del archivo
   const handleFileUpload = async (e) => {
     e.preventDefault();
     
@@ -44,6 +51,7 @@ const ExpedientePDFManager = ({ expedienteId }) => {
       return;
     }
 
+    // Validar el tipo de archivo, para evitar subir cualquier otro archivo 
     const formData = new FormData();
     formData.append('pdf', selectedFile);
     formData.append('idExpediente', expedienteId);
@@ -52,12 +60,15 @@ const ExpedientePDFManager = ({ expedienteId }) => {
     setMessage('');
 
     try {
+      // Subir el archivo al servidor
+      // Esta función se encarga de hacer una petición al backend para subir el archivo PDF
       const response = await axios.post('http://localhost:3001/api/upload-pdf', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
 
+      // La respuesta contiene el resultado de la subida del archivo
       console.log('Respuesta al subir PDF:', response.data);
       setMessage('Archivo subido exitosamente');
       setSelectedFile(null);
@@ -76,13 +87,14 @@ const ExpedientePDFManager = ({ expedienteId }) => {
       setIsUploading(false);
     }
   };
-
+  //Funcion para manejar la eliminacion de archivos
   const handleDeleteFile = async (idPDF) => {
     if (!confirm('¿Está seguro que desea eliminar este archivo?')) {
       return;
     }
 
     try {
+      //comunicacion con el backend para eliminar los archivos de la base de datos 
       await axios.delete(`http://localhost:3001/api/pdfs/${idPDF}`);
       setMessage('Archivo eliminado exitosamente');
       // Actualizar la lista de archivos
@@ -92,11 +104,14 @@ const ExpedientePDFManager = ({ expedienteId }) => {
       setMessage('Error al eliminar el archivo: ' + (error.response?.data?.message || error.message));
     }
   };
-
+  
+  // Función para manejar la visualización del archivo PDF
+  // Esta función se encarga de abrir el PDF en una nueva pestaña del navegador
   const handleViewFile = (idPDF) => {
     window.open(`http://localhost:3001/api/pdf/${idPDF}`, '_blank');
   };
-
+  // Función para formatear la fecha
+  // Esta función se encarga de formatear la fecha de subida del archivo PDF
   const formatDate = (dateString) => {
     if (!dateString) return '-';
     try {
@@ -108,6 +123,8 @@ const ExpedientePDFManager = ({ expedienteId }) => {
   };
 
   return (
+
+    // Componente principal que contiene el formulario para subir archivos y la lista de archivos
     <div className="bg-white rounded-lg shadow p-4 mb-6">
       <h3 className="text-lg font-medium text-gray-900 mb-4">Documentos del Expediente</h3>
 

@@ -1,3 +1,7 @@
+// File Main.jsx
+// SistemaIntegral/frontend/SS/src/main.jsx
+// Este archivo es el punto de entrada de la aplicación React
+
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'

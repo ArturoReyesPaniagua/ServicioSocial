@@ -1,6 +1,9 @@
-// src/components/Expedientes/ExpedienteForm.jsx
+// File ExpedienteForm.jsx
+// SistemaIntegral/frontend/SS/src/components/common/DeleteConfirmation.jsx
+// Como su nombre lo dice es un componente es el formulario de los expedientes 
+
 import { useState, useEffect } from 'react';
-import { format } from 'date-fns';
+import { format } from 'date-fns'; // Librería para formatear fechas
 
 const ExpedienteForm = ({ expediente, estados, onSave, onCancel }) => {
   const [formData, setFormData] = useState({
@@ -51,6 +54,7 @@ const ExpedienteForm = ({ expediente, estados, onSave, onCancel }) => {
   const validateForm = () => {
     const newErrors = {};
     
+    //Errores cuando no se colocan los datos especificos en el formulario
     if (!formData.NoExpediente) newErrors.NoExpediente = 'El número de expediente es obligatorio';
     if (!formData.noFolioDeSeguimiento) newErrors.noFolioDeSeguimiento = 'El folio de seguimiento es obligatorio';
     if (!formData.Estado) newErrors.Estado = 'Debe seleccionar un estado';
@@ -72,7 +76,8 @@ const ExpedienteForm = ({ expediente, estados, onSave, onCancel }) => {
     setIsSubmitting(true);
     try {
       await onSave(formData);
-      // onSave manejará la redirección/cierre del modal
+      // onSave manejará la redirección/cierre del modal // el modal es el emergente que contiene el formulario por si alguien llega aqui sin saber que es
+      // yo recomendaria buscar otra carrera que no sea el codigo
     } catch (error) {
       console.error('Error guardando expediente:', error);
     } finally {
@@ -81,11 +86,28 @@ const ExpedienteForm = ({ expediente, estados, onSave, onCancel }) => {
   };
 
   return (
+
+    // Modal de formulario
+    // Este es el contenedor del modal que se muestra al hacer clic en "Nuevo Expediente" o "Editar Expediente"
     <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex justify-center items-center p-4 z-50">
+      { //Contenedor del formulario
+      // Este es el contenedor del formulario que se muestra al hacer clic en "Nuevo Expediente" o "Editar Expediente"
+      // Se usa Tailwind CSS para el diseño y estilo
+      }
       <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        {
+          // Encabezado del modal
+          // Este es el encabezado del modal que muestra el título y el botón de cerrar
+        }
         <div className="p-6">
+
           <div className="flex justify-between items-center mb-6">
+            {
+            }
             <h2 className="text-2xl font-bold">
+              {
+              // Empiezan los recuadros del formulario preguntas del formulario
+              }
               {expediente ? 'Editar Expediente' : 'Nuevo Expediente'}
             </h2>
             <button
@@ -318,6 +340,10 @@ const ExpedienteForm = ({ expediente, estados, onSave, onCancel }) => {
                 disabled={isSubmitting}
                 className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-300"
               >
+                {
+                // Guardando el expediente o creando uno nuevo
+                // El texto del botón cambia dependiendo de si se está editando o creando un nuevo expediente
+                }
                 {isSubmitting ? 'Guardando...' : expediente ? 'Actualizar' : 'Crear'}
               </button>
             </div>
