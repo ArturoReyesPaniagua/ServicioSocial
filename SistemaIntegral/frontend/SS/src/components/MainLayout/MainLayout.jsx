@@ -1,21 +1,24 @@
-// src/components/MainLayout/MainLayout.jsx
+//MainLayout.jsx
+// SistemaIntegral/frontend/SS/src/components/MainLayout/MainLayout.jsx
+// // Este componente es el diseño principal de la aplicación
+// // y contiene el encabezado, barra lateral y contenido principal
 import { useState } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import './MainLayout.css';
-import logo from '../../assets/logo_sec_educ.png'; // Importamos el logo directamente parael header interno
+import logo from '../../assets/logo_sec_educ.png'; 
 
-const MainLayout = ({ children }) => {
+const MainLayout = ({ children }) => { // Componente de diseño principal que incluye el encabezado, barra lateral y contenido principal
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
+  const handleLogout = () => { // Función para cerrar sesión y redirigir al usuario a la página de inicio de sesión
     logout();
-    navigate('/login');
+    navigate('/login');   // Aui podemos cambiar la ruta a la que queremos redirigir al usuario al cerrar sesión
   };
 
-  const toggleSidebar = () => {
+  const toggleSidebar = () => {//Funcion para alternar la visibilidad de la barra lateral ***Abrir y cerrar el menu lateral***
     setSidebarOpen(!sidebarOpen);
   };
 
@@ -115,7 +118,7 @@ const MainLayout = ({ children }) => {
                 </NavLink>
               </li>
             )}
-            {/* Aqui puedes añadir más opciones, saludos programador perdon por el desmadre */}
+            {/* Aqui puedes añadir más opciones, Toma tu tiempo para reposar en la hogera mi compa;ero sin vida*/}
           </ul>
         </nav>
       </aside>

@@ -1,4 +1,7 @@
-// src/components/PDFUploader/PDFUploader.jsx
+// File: PDFUploader.jsx
+// SistemaIntegral/frontend/SS/src/components/PDFUploader/PDFUploader.jsx
+
+
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
@@ -8,7 +11,7 @@ function PDFUploader() {
   const [message, setMessage] = useState('');
   const [pdfs, setPdfs] = useState([]);
 
-  // Cargar la lista de PDFs al montar el componente
+  // Cargar la lista de PDFs al iniciar el componente
   useEffect(() => {
     fetchPDFs();
   }, []);
@@ -17,8 +20,8 @@ function PDFUploader() {
   const fetchPDFs = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:3001/api/pdfs');
-      setPdfs(response.data);
+      const response = await axios.get('http://localhost:3001/api/pdfs'); //Cambiar la url si se cambia el backend
+      setPdfs(response.data); //Guardar la lista de PDFs en el estado
       setLoading(false);
     } catch (error) {
       console.error('Error al obtener la lista de PDFs:', error);
@@ -46,7 +49,7 @@ function PDFUploader() {
     setLoading(true);
     setMessage('');
     
-    try {
+    try {// esta parte es la que se encarga de subir el archivo al servidor
       await axios.post('http://localhost:3001/api/upload-pdf', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
@@ -62,8 +65,8 @@ function PDFUploader() {
       // Recargar la lista de PDFs
       await fetchPDFs();
     } catch (error) {
-      console.error('Error al subir el archivo:', error);
-      setMessage('Error al subir el archivo: ' + (error.response?.data?.message || error.message));
+      console.error('Error al subir el archivo:', error); // Mostrar error en consola
+      setMessage('Error al subir el archivo: ' + (error.response?.data?.message || error.message)); // Mostrar mensaje de error
     } finally {
       setLoading(false);
     }
@@ -71,11 +74,14 @@ function PDFUploader() {
 
   // Manejar visualización de PDF
   const handleViewPDF = (id) => {
-    // Abrir el PDF en una nueva pestaña
-    window.open(`http://localhost:3001/api/pdf/${id}`, '_blank');
+    // Abrir el PDF 
+    window.open(`http://localhost:3001/api/pdf/${id}`, '_blank'); //permitir abrir el pdf en una nueva pestaña, esto es para que no se cierre la pestaña actual
   };
 
   return (
+    // Componente principal este es un contenedor que contiene el formulario de carga y la lista de PDFs
+    // cuenta como un modal que se puede abrir y cerrar
+    // y contiene el formulario de carga y la lista de PDFs
     <div className="p-4 bg-white rounded-lg shadow-md">
       <h3 className="text-lg font-medium mb-4">Gestión de PDFs</h3>
       

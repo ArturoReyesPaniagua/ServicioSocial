@@ -1,4 +1,6 @@
-/* src/components/Layout/MainLayout.css  Ubicacion*/
+/* MainLayout.css */
+/*SistemaIntegral/SistemaIntegral/Src/Components/Layout/MainLayout.css*/
+
 :root {
   --guinda-color: #800020; /* Color guinda básico */
   --guinda-dark: #600018; /* Versión más oscura */
@@ -86,7 +88,7 @@
   cursor: pointer;
 }
 
-.sidebar {
+.sidebar { /* Menú lateral */
   position: fixed;
   top: calc(var(--institutional-header-height) + var(--main-header-height));
   left: 0;
@@ -150,8 +152,8 @@
   margin-left: 0;
 }
 
-/* Clases para NavLink activo */
-.bg-guinda-700 {
+
+.bg-guinda-700 {/* Clases para NavLink activo */
   background-color: var(--guinda-light);
 }
 
@@ -176,7 +178,7 @@
     position: sticky;
   }
 
-  .sidebar {
+  .sidebar { /*  Menú lateral altura y tamano*/
     width: 100%;
     top: var(--main-header-height);
     height: calc(100vh - var(--main-header-height));
@@ -191,6 +193,6 @@
   }
 
   :root {
-    --institutional-header-height: auto; /* Auto height for mobile */
+    --institutional-header-height: auto; /* telegofono movil, tomar como ejemplo para ir mejorando el diseño, aunque no es necesario y es muy a la larga */
   }
 }

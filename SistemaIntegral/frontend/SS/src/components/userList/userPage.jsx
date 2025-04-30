@@ -1,4 +1,7 @@
-// src/components/userList/userPage.jsx
+//File: userPage.jsx
+// SistemaIntegral/frontend/SS/src/components/userList/userPage.jsx
+// Este componente es la página principal para la gestión de usuarios, donde se pueden crear, editar y eliminar usuarios
+
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';

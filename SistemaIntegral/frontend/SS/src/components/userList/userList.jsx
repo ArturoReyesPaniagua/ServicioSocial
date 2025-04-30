@@ -1,4 +1,7 @@
-// src/components/userList/userList.jsx
+// File UserList.jsx
+// SistemaIntegral/frontend/SS/src/components/userList/UserList.jsx
+// Este componente es una tabla que muestra una lista de usuarios y permite editar y eliminar usuarios
+
 import { useState, useMemo } from 'react';
 import {
   useReactTable,
@@ -9,7 +12,7 @@ import {
 } from '@tanstack/react-table';
 import { useAuth } from '../../context/AuthContext';
 
-const UserList = ({ 
+const UserList = ({  
   data = [], 
   onEdit, 
   onDelete, 

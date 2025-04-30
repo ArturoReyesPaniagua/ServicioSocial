@@ -1,4 +1,6 @@
-// src/components/Login/Login.jsx Ubicacion 
+// File: Login.jsx
+//sistemaIntegral/frontend/SS/src/components/Login/Login.jsx
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';

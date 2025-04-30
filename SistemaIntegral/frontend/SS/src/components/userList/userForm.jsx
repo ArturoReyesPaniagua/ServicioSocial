@@ -1,9 +1,11 @@
-// src/components/userList/userForm.jsx
+// userForm.jsx
+// SistemaIntegral/frontend/SS/src/components/userList/userForm.jsx
+
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 
 const UserForm = ({ user, onSave, onCancel }) => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState({ // Estado inicial del formulario
     username: '',
     password: '',
     role: 'user'
@@ -16,26 +18,27 @@ const UserForm = ({ user, onSave, onCancel }) => {
   // Inicializar el formulario con datos del usuario si existe
   useEffect(() => {
     if (user) {
-      // Al editar, no incluimos la contraseña ya que generalmente no queremos actualizarla
+      // Al editar, no incluimos la contraseña ya que generalmente no deberia de ser visible
+      // y se espera que el usuario la ingrese nuevamente si desea cambiarla
       setFormData({
         userId: user.userId,
         username: user.username,
         role: user.role,
-        password: '' // Contraseña vacía para edición
+        password: '' // Contraseña vacía para edición se puede cambiar si se desea // PROBABLEMENTE NO SE DEBERIA DE MOSTRAR EN EL FORMULARIO PORUQE PUES LA GENTE NO ES MUY LISTA
       });
     } else {
       // Si es nuevo usuario, resetear el formulario
       setFormData({
         username: '',
         password: '',
-        role: 'user'
-      });
+        role: 'user' //USUARIO POR DEFECTO  
+      }); 
     }
   }, [user]);
 
   // Manejar cambios en el formulario
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value } = e.target; // Obtener el nombre y valor del campo para mandarlo al estado
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -54,17 +57,18 @@ const UserForm = ({ user, onSave, onCancel }) => {
     if (!formData.username) newErrors.username = 'El nombre de usuario es obligatorio';
     
     // Solo validar contraseña en creación o si se proporciona al editar
-    if (!user && !formData.password) {
+    if (!user && !formData.password) { //verificar si se llenaron los campos de contraseña y nombre de usuario
       newErrors.password = 'La contraseña es obligatoria para nuevos usuarios';
-    } else if (formData.password && formData.password.length < 6) {
-      newErrors.password = 'La contraseña debe tener al menos 6 caracteres';
+    } else if (formData.password && formData.password.length < 6) { // aqui se pueden poner mas condiciones si se desea para la contraseña pero no es necesario 
+      newErrors.password = 'La contraseña debe tener al menos 6 caracteres'; 
     }
     
-    if (!formData.role) newErrors.role = 'El rol es obligatorio';
+    if (!formData.role) newErrors.role = 'El rol es obligatorio';// aunque el rol se ajusta automaticamente al usuario no se puede dejar vacio *** el role auto asignado es user ***
     
     // Validar si está intentando cambiar su propio rol (si es administrador)
     if (user && user.userId === currentUser?.userId && user.role === 'admin' && formData.role !== 'admin') {
-      newErrors.role = 'No puede cambiar su propio rol de administrador';
+      newErrors.role = 'No puede cambiar su propio rol de administrador'; // necesito evitar que todos se pongan usuarios y no exita un administrador // ya los conozco usuarios promedio
+      // si leen esto muchos de los mensajes que dejo para ustedes son creados en tiempos de aburrimiento
     }
     
     setErrors(newErrors);
@@ -79,13 +83,13 @@ const UserForm = ({ user, onSave, onCancel }) => {
     
     setIsSubmitting(true);
     try {
-      // Si estamos editando y no se proporciona contraseña, la omitimos del envío
+      // Si estamos editando y no se proporciona contraseña, la omitimos del envío ***Esto dejaria la misma contraseña que el usuario tenia***
       const submitData = {...formData};
       if (user && !submitData.password) {
         delete submitData.password;
       }
       
-      await onSave(submitData);
+      await onSave(submitData);// Llamar a la función de guardado proporcionada por el padre
     } catch (error) {
       console.error('Error guardando usuario:', error);
       // Si hay un mensaje de error del servidor, mostrarlo
