@@ -4,7 +4,7 @@
 
 const oficioSchema = `
   CREATE TABLE IF NOT EXISTS Oficio (
-    id_oficio INT PRIMARY KEY,
+    id_oficio INT PRIMARY KEY AUTO_INCREMENT,
     estado ENUM('concluido', 'en proceso', 'cancelado') NOT NULL,
     numero_de_oficio VARCHAR(255),
     fecha_recepcion DATE,
