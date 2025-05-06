@@ -19,18 +19,18 @@ function Login() {
     setError('');
     
     // Validación básica
-    if (!username.trim() || !password.trim()) {
-      setError('El usuario y contraseña son obligatorios');
+    if (!username.trim() || !password.trim()) { // Verifica si los campos están vacíos
+      setError('El usuario y contraseña son obligatorios'); //Mensaje de error de validación
       return;
     }
     
     setLoading(true);
     try {
-      const result = await login(username, password);
+      const result = await login(username, password); // Llama a la función de inicio de sesión del contexto de autenticación
       if (result.success) {
-        navigate('/expedientes');
+        navigate('/expedientes'); // Redirige a la página de expedientes después de iniciar sesión *** Aqui puedes cambiar la ruta a la que quieras redirigir ***
       } else {
-        setError(result.message);
+        setError(result.message); // Muestra el mensaje de error devuelto por la API
       }
     } catch (err) {
       setError('Error al iniciar sesión. Intente nuevamente.');
