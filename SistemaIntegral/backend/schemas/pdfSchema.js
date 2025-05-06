@@ -1,12 +1,17 @@
-// pdfSchema.js
-// sistemaIntegral/backend/schemas/pdfSchema.js
+
+// File: pdfSchema.js
+// SistemaIntegral/backend/schemas/pdfSchema.js
 // Este archivo define el esquema de la tabla "PDF" en la base de datos
+
 const pdfSchema = `
   CREATE TABLE IF NOT EXISTS PDF (
-    id_archivo INT PRIMARY KEY,
-    archivo BLOB,
+    idPDF INT PRIMARY KEY AUTO_INCREMENT,
+    nombreArchivo VARCHAR(255) NOT NULL,
+    archivo LONGBLOB NOT NULL,
     id_oficio INT,
-    FOREIGN KEY (id_oficio) REFERENCES Oficio(id_oficio)
+    fechaSubida TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_oficio) REFERENCES Oficio(id_oficio) ON DELETE SET NULL
   )
 `;
+
 module.exports = pdfSchema;

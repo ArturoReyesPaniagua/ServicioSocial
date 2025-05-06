@@ -1,137 +1,169 @@
 // File: responsableControllers.js
 // SistemaIntegral/backend/controllers/responsableControllers.js
-
-
-// Este archivo contiene las funciones de responsbles para la gestión de expedientes
+// Este archivo contiene las funciones para la gestión de responsables
 // que interactúan con la base de datos y manejan las solicitudes HTTP relacionadas con los responsables
-
 
 const responsableSchema = require('../schemas/responsableSchema');
 const { createTable } = require('../utils/funtiosauth');
-const responsableUtils = require('../utils/expedienteUtils');
+const mysql = require('mysql2/promise');
+const config = require('../db/config');
 
-// **Crear un nuevo expediente**
+// Obtener conexión a la base de datos
+const getConnection = async () => {
+  return await mysql.createConnection(config);
+};
+
+// Crear un nuevo responsable
 const createResponsable = async (req, res) => {
+  let connection;
   try {
     // Asegurar que la tabla exista
     await createTable(responsableSchema);
 
-    // Crear expediente
-    const responsableData = {
-        nombre: req.body.nombre
-      
-    };
+    const { nombre_responsable } = req.body;
+    
+    if (!nombre_responsable) {
+      return res.status(400).json({ error: 'El nombre del responsable es requerido' });
+    }
 
-    const result = await responsableUtils.createResponsable(responsableData);
+    connection = await getConnection();
+    const [result] = await connection.execute(
+      'INSERT INTO Responsable (nombre_responsable) VALUES (?)',
+      [nombre_responsable]
+    );
 
     res.status(201).json({
       message: 'Responsable creado exitosamente',
-      idResponsable: result.insertId
+      id_responsable: result.insertId
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
-  }
-}; // **Crear un nuevo responsable** Termina aqui
-
-// Obtener todos los estados
-const getAllEstados = async (req, res) => {
-  try {
-    const estados = await expedienteUtils.getAllEstados();
-    res.status(200).json(estados);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  } finally {
+    if (connection) await connection.end();
   }
 };
 
-// Obtener todos los expedientes
-const getAllExpedientes = async (req, res) => {
+// Obtener todos los responsables
+const getAllResponsables = async (req, res) => {
+  let connection;
   try {
-    const expedientes = await expedienteUtils.getAllExpedientes();
-    res.status(200).json(expedientes);
+    connection = await getConnection();
+    const [rows] = await connection.execute('SELECT * FROM Responsable');
+    res.status(200).json(rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
+  } finally {
+    if (connection) await connection.end();
   }
 };
 
-// Obtener un expediente por ID
-const getExpedienteById = async (req, res) => {
-  try {
-    const expediente = await expedienteUtils.getExpedienteById(req.params.id); // llamar a la función para obtener el expediente por ID ubicada en utils/expedienteUtils.js
-    if (!expediente) {
-      return res.status(404).json({ message: 'Expediente no encontrado' });
-    }
-    res.status(200).json(expediente);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-// Actualizar un expediente
-const updateExpediente = async (req, res) => {
+// Obtener un responsable por ID
+const getResponsableById = async (req, res) => {
+  let connection;
   try {
     const { id } = req.params;
-    const updateData = { ...req.body };
-    delete updateData.idExpediente; // Prevenir actualización del ID
+    connection = await getConnection();
+    const [rows] = await connection.execute(
+      'SELECT * FROM Responsable WHERE id_responsable = ?',
+      [id]
+    );
 
-    await expedienteUtils.updateExpediente(id, updateData);
-    res.status(200).json({ message: 'Expediente actualizado exitosamente' });
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Responsable no encontrado' });
+    }
+
+    res.status(200).json(rows[0]);
   } catch (error) {
     res.status(500).json({ error: error.message });
+  } finally {
+    if (connection) await connection.end();
   }
 };
 
-// Eliminar un expediente
-const deleteExpediente = async (req, res) => {
+// Actualizar un responsable
+const updateResponsable = async (req, res) => {
+  let connection;
   try {
-    await expedienteUtils.deleteExpediente(req.params.id);
-    res.status(200).json({ message: 'Expediente eliminado exitosamente' });
+    const { id } = req.params;
+    const { nombre_responsable } = req.body;
+    
+    if (!nombre_responsable) {
+      return res.status(400).json({ error: 'El nombre del responsable es requerido' });
+    }
+
+    connection = await getConnection();
+    
+    // Verificar que el responsable existe
+    const [checkRows] = await connection.execute(
+      'SELECT * FROM Responsable WHERE id_responsable = ?',
+      [id]
+    );
+
+    if (checkRows.length === 0) {
+      return res.status(404).json({ error: 'Responsable no encontrado' });
+    }
+
+    // Actualizar el responsable
+    await connection.execute(
+      'UPDATE Responsable SET nombre_responsable = ? WHERE id_responsable = ?',
+      [nombre_responsable, id]
+    );
+
+    res.status(200).json({ message: 'Responsable actualizado correctamente' });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  } finally {
+    if (connection) await connection.end();
   }
 };
 
-// Buscar expedientes
-const searchExpedientes = async (req, res) => {
+// Eliminar un responsable
+const deleteResponsable = async (req, res) => {
+  let connection;
   try {
-    const { term } = req.params;
-    const expedientes = await expedienteUtils.searchExpedientes(term);
-    res.status(200).json(expedientes);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+    const { id } = req.params;
+    connection = await getConnection();
 
-// Filtrar expedientes por estado - actualizado para usar el valor de estado directamente
-const getExpedientesByEstado = async (req, res) => {
-  try {
-    const { estado } = req.params; // Cambiado de idEstado a estado
-    const expedientes = await expedienteUtils.getExpedientesByEstado(estado);
-    res.status(200).json(expedientes);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+    // Verificar que el responsable existe
+    const [checkRows] = await connection.execute(
+      'SELECT * FROM Responsable WHERE id_responsable = ?',
+      [id]
+    );
 
-// Obtener expedientes archivados
-const getExpedientesArchivados = async (req, res) => {
-  try {
-    const { archivado } = req.params;
-    const archivedValue = archivado === 'true';
-    const expedientes = await expedienteUtils.getExpedientesArchivados(archivedValue);
-    res.status(200).json(expedientes);
+    if (checkRows.length === 0) {
+      return res.status(404).json({ error: 'Responsable no encontrado' });
+    }
+
+    // Verificar si el responsable está siendo utilizado en oficios
+    const [oficioRows] = await connection.execute(
+      'SELECT * FROM Oficio WHERE id_responsable = ?',
+      [id]
+    );
+
+    if (oficioRows.length > 0) {
+      return res.status(400).json({ 
+        error: 'No se puede eliminar el responsable porque está siendo utilizado en oficios' 
+      });
+    }
+
+    // Eliminar el responsable
+    await connection.execute(
+      'DELETE FROM Responsable WHERE id_responsable = ?',
+      [id]
+    );
+
+    res.status(200).json({ message: 'Responsable eliminado correctamente' });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  } finally {
+    if (connection) await connection.end();
   }
 };
 
 module.exports = {
-  createExpediente,
-  getAllEstados,
-  getAllExpedientes,
-  getExpedienteById,
-  updateExpediente,
-  deleteExpediente,
-  searchExpedientes,
-  getExpedientesByEstado,
-  getExpedientesArchivados
+  createResponsable,
+  getAllResponsables,
+  getResponsableById,
+  updateResponsable,
+  deleteResponsable
 };

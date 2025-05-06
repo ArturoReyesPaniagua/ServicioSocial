@@ -1,13 +1,12 @@
-// File : areaSchema.js
-// sistemaIntegral/backend/schemas/areaSchema.js
-// Este archivo define el esquema de la tabla "Area" en la base de datos  
+// File: responsableSchema.js
+// SistemaIntegral/backend/schemas/responsableSchema.js
+// Este archivo define el esquema de la tabla "Responsable" en la base de datos
 
-
-const areaSchema = `
-  CREATE TABLE IF NOT EXISTS Area (
-    id_area INT PRIMARY KEY,
-    nombre_area VARCHAR(255),
-    contador INT AUTO_INCREMENT
+const responsableSchema = `
+  CREATE TABLE IF NOT EXISTS Responsable (
+    id_responsable INT PRIMARY KEY AUTO_INCREMENT,
+    nombre_responsable VARCHAR(255) NOT NULL
   )
 `;
-module.exports = areaSchema;
+
+module.exports = responsableSchema;

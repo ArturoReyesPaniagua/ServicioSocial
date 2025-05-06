@@ -1,8 +1,7 @@
 // File: pdfControllers.js
 // SistemaIntegral/backend/controllers/pdfControllers.js
-//Documento que contiene las funciones de autenticación y gestión de usuarios
-// que interactúan con la base de datos y manejan las solicitudes HTTP relacionadas con los usuarios
-// **Checar aqui lo del PDF** apartir de la linea 100 ... 
+// Este archivo contiene las funciones para la gestión de archivos PDF
+// que interactúan con la base de datos y manejan las solicitudes HTTP relacionadas con los PDFs
 
 const mysql = require('mysql2/promise');
 const config = require('../db/config');
@@ -37,35 +36,35 @@ const uploadPDF = async (req, res) => {
 
     connection = await getConnection();
 
-    const { idExpediente } = req.body;
+    const { id_oficio } = req.body;
     const nombreArchivo = req.file.originalname || 'documento.pdf';
 
-    // Si se proporciona idExpediente, verificar que exista
-    if (idExpediente) {
-      const [expedienteRows] = await connection.execute(
-        'SELECT idExpediente FROM Expediente WHERE idExpediente = ?',
-        [idExpediente]
+    // Si se proporciona id_oficio, verificar que exista
+    if (id_oficio) {
+      const [oficioRows] = await connection.execute(
+        'SELECT id_oficio FROM Oficio WHERE id_oficio = ?',
+        [id_oficio]
       );
       
-      if (expedienteRows.length === 0) {
-        return res.status(404).json({ message: 'Expediente no encontrado' });
+      if (oficioRows.length === 0) {
+        return res.status(404).json({ message: 'Oficio no encontrado' });
       }
     }
 
-    // Insertar el PDF con o sin asociación a expediente
-    const query = idExpediente 
-      ? 'INSERT INTO PDF (nombreArchivo, archivo, idExpediente) VALUES (?, ?, ?)'
+    // Insertar el PDF con o sin asociación a oficio
+    const query = id_oficio 
+      ? 'INSERT INTO PDF (nombreArchivo, archivo, id_oficio) VALUES (?, ?, ?)'
       : 'INSERT INTO PDF (nombreArchivo, archivo) VALUES (?, ?)';
     
-    const params = idExpediente 
-      ? [nombreArchivo, req.file.buffer, idExpediente]
+    const params = id_oficio 
+      ? [nombreArchivo, req.file.buffer, id_oficio]
       : [nombreArchivo, req.file.buffer];
 
     const [result] = await connection.execute(query, params);
 
     res.status(201).json({
       message: 'PDF subido exitosamente',
-      id: result.insertId,
+      idPDF: result.insertId,
       nombreArchivo
     });
   } catch (error) {
@@ -107,7 +106,8 @@ const getAllPDFs = async (req, res) => {
   let connection;
   try {
     connection = await getConnection();
-    const query = 'SELECT idPDF, nombreArchivo, idExpediente, fechaSubida FROM PDF';
+    // No incluimos el campo 'archivo' para evitar cargar datos BLOB pesados
+    const query = 'SELECT idPDF, nombreArchivo, id_oficio, fechaSubida FROM PDF';
     const [rows] = await connection.execute(query);
     res.json(rows);
   } catch (error) {
@@ -118,19 +118,19 @@ const getAllPDFs = async (req, res) => {
   }
 };
 
-// Obtener PDFs por expediente
-const getPDFsByExpediente = async (req, res) => {
+// Obtener PDFs por oficio
+const getPDFsByOficio = async (req, res) => {
   let connection;
   try {
-    const { idExpediente } = req.params;
+    const { id_oficio } = req.params;
     
     connection = await getConnection();
-    const query = 'SELECT idPDF, nombreArchivo, fechaSubida FROM PDF WHERE idExpediente = ?';
-    const [rows] = await connection.execute(query, [idExpediente]);
+    const query = 'SELECT idPDF, nombreArchivo, fechaSubida FROM PDF WHERE id_oficio = ?';
+    const [rows] = await connection.execute(query, [id_oficio]);
     res.json(rows);
   } catch (error) {
-    console.error('Error al obtener PDFs del expediente:', error);
-    res.status(500).json({ message: 'Error al obtener los archivos del expediente' });
+    console.error('Error al obtener PDFs del oficio:', error);
+    res.status(500).json({ message: 'Error al obtener los archivos del oficio' });
   } finally {
     if (connection) await connection.end();
   }
@@ -161,11 +161,11 @@ const deletePDF = async (req, res) => {
   }
 };
 
-// Asociar un PDF existente a un expediente
-const associatePDFWithExpediente = async (req, res) => {
+// Asociar un PDF existente a un oficio
+const associatePDFWithOficio = async (req, res) => {
   let connection;
   try {
-    const { idPDF, idExpediente } = req.body;
+    const { idPDF, id_oficio } = req.body;
     
     connection = await getConnection();
     // Verificar que el PDF existe
@@ -174,19 +174,19 @@ const associatePDFWithExpediente = async (req, res) => {
       return res.status(404).json({ message: 'PDF no encontrado' });
     }
     
-    // Verificar que el expediente existe
-    const [expRows] = await connection.execute('SELECT idExpediente FROM Expediente WHERE idExpediente = ?', [idExpediente]);
-    if (expRows.length === 0) {
-      return res.status(404).json({ message: 'Expediente no encontrado' });
+    // Verificar que el oficio existe
+    const [oficioRows] = await connection.execute('SELECT id_oficio FROM Oficio WHERE id_oficio = ?', [id_oficio]);
+    if (oficioRows.length === 0) {
+      return res.status(404).json({ message: 'Oficio no encontrado' });
     }
     
     // Actualizar la asociación
-    await connection.execute('UPDATE PDF SET idExpediente = ? WHERE idPDF = ?', [idExpediente, idPDF]);
+    await connection.execute('UPDATE PDF SET id_oficio = ? WHERE idPDF = ?', [id_oficio, idPDF]);
     
-    res.status(200).json({ message: 'PDF asociado exitosamente al expediente' });
+    res.status(200).json({ message: 'PDF asociado exitosamente al oficio' });
   } catch (error) {
-    console.error('Error al asociar PDF con expediente:', error);
-    res.status(500).json({ message: 'Error al asociar el archivo con el expediente' });
+    console.error('Error al asociar PDF con oficio:', error);
+    res.status(500).json({ message: 'Error al asociar el archivo con el oficio' });
   } finally {
     if (connection) await connection.end();
   }
@@ -196,7 +196,7 @@ module.exports = {
   uploadPDF,
   getPDF,
   getAllPDFs,
-  getPDFsByExpediente,
+  getPDFsByOficio,
   deletePDF,
-  associatePDFWithExpediente
+  associatePDFWithOficio
 };
