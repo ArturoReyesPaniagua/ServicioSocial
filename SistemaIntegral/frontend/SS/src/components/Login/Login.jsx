@@ -1,10 +1,10 @@
 // File: Login.jsx
-//sistemaIntegral/frontend/SS/src/components/Login/Login.jsx
+// SistemaIntegral/frontend/SS/src/components/Login/Login.jsx
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import './Login.css'; // Mantenemos el CSS por ahora
+import './Login.css';
 
 function Login() {
   const [username, setUsername] = useState('');
@@ -19,22 +19,23 @@ function Login() {
     setError('');
     
     // Validación básica
-    if (!username.trim() || !password.trim()) { // Verifica si los campos están vacíos
-      setError('El usuario y contraseña son obligatorios'); //Mensaje de error de validación
+    if (!username.trim() || !password.trim()) {
+      setError('El usuario y contraseña son obligatorios');
       return;
     }
     
     setLoading(true);
     try {
-      const result = await login(username, password); // Llama a la función de inicio de sesión del contexto de autenticación
+      const result = await login(username, password);
       if (result.success) {
-        navigate('/expedientes'); // Redirige a la página de expedientes después de iniciar sesión *** Aqui puedes cambiar la ruta a la que quieras redirigir ***
+        // Redirigir a la página principal después de iniciar sesión
+        navigate('/oficios');
       } else {
-        setError(result.message); // Muestra el mensaje de error devuelto por la API
+        setError(result.message);
       }
     } catch (err) {
-      setError('Error al iniciar sesión. Intente nuevamente.');
       console.error("Error al iniciar sesión:", err);
+      setError('Error al iniciar sesión. Intente nuevamente.');
     } finally {
       setLoading(false);
     }

@@ -8,7 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Login from './components/Login/Login';
 import MainLayout from './components/MainLayout/MainLayout';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
-import OficiosPage from './components/Oficios/OficiosPage.jsx';
+import OficiosPage from './components/Oficios/OficiosPage';
 import UserPage from './components/userList/userPage';
 import { useAuth } from './context/AuthContext';
 import './App.css';

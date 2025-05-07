@@ -1,8 +1,9 @@
-// File: ExpedientesTable.jsx
-// // SistemaIntegral/frontend/SS/src/components/Expedientes/ExpedientesTable.jsx
-// Este componente muestra una tabla de expedientes
+// File: OficiosTable.jsx
+// SistemaIntegral/frontend/SS/src/components/Oficios/OficiosTable.jsx
+// Este componente muestra una tabla de oficios
 // y permite realizar acciones como editar, eliminar, ver detalles y archivar 
 // funciona con reacttable y axios para la gestión de datos
+
 import { useState, useEffect, useMemo } from 'react';
 import {
   useReactTable,
@@ -15,7 +16,7 @@ import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import axios from 'axios';
 
-const ExpedientesTable = ({ 
+const OficiosTable = ({ 
   data = [], 
   onEdit, 
   onDelete, 
@@ -23,27 +24,27 @@ const ExpedientesTable = ({
   onArchive,
   isLoading = false 
 }) => {
-  const [sorting, setSorting] = useState([]); //Estado inciail para el ordenamiento de la tabla
-  const [globalFilter, setGlobalFilter] = useState(''); // Estado inicial para el filtrado global de la tabla
-  const [expedientesWithFiles, setExpedientesWithFiles] = useState({}); //E
+  const [sorting, setSorting] = useState([]);
+  const [globalFilter, setGlobalFilter] = useState('');
+  const [oficiosWithFiles, setOficiosWithFiles] = useState({});
 
-  // Cargar información de archivos para expedientes
+  // Cargar información de archivos para oficios
   useEffect(() => {
     const fetchFilesInfo = async () => {
       if (!data || !data.length) return;
       
       try {
-        const response = await axios.get('http://localhost:3001/api/pdfs'); // url de la API para cargar archivos
+        const response = await axios.get('http://localhost:3001/api/pdfs');
         if (response && response.data) {
-          // Crear un objeto con idExpediente como clave y el conteo de archivos como valor
+          // Crear un objeto con id_oficio como clave y el conteo de archivos como valor
           const filesCount = {};
           response.data.forEach(pdf => {
-            if (pdf.idExpediente) {
-              filesCount[pdf.idExpediente] = (filesCount[pdf.idExpediente] || 0) + 1;
+            if (pdf.id_oficio) {
+              filesCount[pdf.id_oficio] = (filesCount[pdf.id_oficio] || 0) + 1;
             }
           });
           
-          setExpedientesWithFiles(filesCount);
+          setOficiosWithFiles(filesCount);
         }
       } catch (error) {
         console.error('Error al cargar información de archivos:', error);
@@ -56,31 +57,26 @@ const ExpedientesTable = ({
   // Definir columnas
   const columns = useMemo(() => [
     {
-      header: 'No. Expediente', //el letrero
-      accessorKey: 'NoExpediente', //la clave del objeto
-      cell: info => info.getValue() || '', //el valor de la celda
-    },
-    {
-      header: 'Folio',
-      accessorKey: 'noFolioDeSeguimiento',
+      header: 'No. Oficio',
+      accessorKey: 'numero_de_oficio',
       cell: info => info.getValue() || '',
     },
     {
       header: 'Estado',
-      accessorKey: 'Estado',
+      accessorKey: 'estado',
       cell: info => {
         const value = info.getValue();
         if (!value) return '';
         
-        let bgColor; //colores de fondo para los distintos tipos de estado 
+        let bgColor;
         switch(value) {
-          case 'Concluido':
+          case 'concluido':
             bgColor = 'bg-green-100 text-green-800';
             break;
-          case 'En proceso':
+          case 'en proceso':
             bgColor = 'bg-yellow-100 text-yellow-800';
             break;
-          case 'Cancelado':
+          case 'cancelado':
             bgColor = 'bg-red-100 text-red-800';
             break;
           default:
@@ -95,7 +91,7 @@ const ExpedientesTable = ({
     },
     {
       header: 'Fecha Recepción',
-      accessorKey: 'fechaDeRecepcion',
+      accessorKey: 'fecha_recepcion',
       cell: info => {
         const value = info.getValue();
         try {
@@ -108,7 +104,7 @@ const ExpedientesTable = ({
     },
     {
       header: 'Fecha Límite',
-      accessorKey: 'fechaLimite',
+      accessorKey: 'fecha_limite',
       cell: info => {
         const value = info.getValue();
         if (!value) return '';
@@ -131,7 +127,7 @@ const ExpedientesTable = ({
     },
     {
       header: 'Solicitante',
-      accessorKey: 'solicitante',
+      accessorKey: 'nombre_solicitante',
       cell: info => info.getValue() || '',
     },
     {
@@ -143,10 +139,10 @@ const ExpedientesTable = ({
       header: 'Docs',
       id: 'documentos',
       cell: ({ row }) => {
-        const expedienteId = row.original?.idExpediente;
-        if (!expedienteId) return null;
+        const oficioId = row.original?.id_oficio;
+        if (!oficioId) return null;
         
-        const fileCount = expedientesWithFiles[expedienteId] || 0;
+        const fileCount = oficiosWithFiles[oficioId] || 0;
         
         return (
           <div className="flex items-center justify-center">
@@ -208,7 +204,7 @@ const ExpedientesTable = ({
         );
       },
     },
-  ], [onEdit, onDelete, onView, onArchive, expedientesWithFiles]);
+  ], [onEdit, onDelete, onView, onArchive, oficiosWithFiles]);
 
   // Configurar tabla con TanStack
   const table = useReactTable({
@@ -290,4 +286,4 @@ const ExpedientesTable = ({
   );
 };
 
-export default ExpedientesTable;
+export default OficiosTable;
