@@ -1,22 +1,20 @@
 //App.jsx
 // SistemaIntegral/frontend/SS/src/App.jsx
-// Este archivo contiene la configuaracion de las rutas de la aplicacion en react 
+// Este archivo contiene la configuración de las rutas de la aplicación en React 
 
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Login from './components/Login/Login';
-//import RegisterForm from './components/Registration/Registration'; componente eliminado para integrarlo en tabla de usuarios 
 import MainLayout from './components/MainLayout/MainLayout';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
-import ExpedientesPage from './components/Expedientes/ExpedientesPage';
+import OficiosPage from './components/Oficios/OficiosPage.jsx';
 import UserPage from './components/userList/userPage';
 import { useAuth } from './context/AuthContext';
 import './App.css';
 
 function App() {
-  const { isAuthenticated, loading } = useAuth(); // Importa el contexto de autenticación para verificar el estado de autenticación del usuario
-  // loading es un estado que indica si la aplicacion esta cargando o no
+  const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
     return (
@@ -29,23 +27,22 @@ function App() {
   return (
     <>
       <Routes>
-        <Route path="/" element={<Navigate to={isAuthenticated ? "/expedientes" : "/login"} />} />
+        <Route path="/" element={<Navigate to={isAuthenticated ? "/oficios" : "/login"} />} />
         
         <Route path="/login" element={
-          isAuthenticated ? <Navigate to="/expedientes" /> : <Login />
+          isAuthenticated ? <Navigate to="/oficios" /> : <Login />
         } />
         
-           
-        {/* Ruta de lista de lista expedientes // es la utilidad de expedientes  */}
-        <Route path="/expedientes" element={
+        {/* Ruta principal de oficios */}
+        <Route path="/oficios" element={
           <ProtectedRoute>
             <MainLayout>
-              <ExpedientesPage />
+              <OficiosPage />
             </MainLayout>
           </ProtectedRoute>
         } />
         
-        {/* Ruta de lista de usuarios // es la utilidad de expedientes  */}
+        {/* Ruta de lista de usuarios */}
         <Route path="/userList" element={
           <ProtectedRoute>
             <MainLayout>
@@ -54,20 +51,19 @@ function App() {
           </ProtectedRoute>
         } />
         
-        {/* Ruta antigua /Layout para compatibilidad */}
-        <Route path="/Layout" element={
+        {/* Mantener compatibilidad con rutas antiguas */}
+        <Route path="/expedientes" element={
           <ProtectedRoute>
-            <Navigate to="/expedientes" />
+            <Navigate to="/oficios" />
           </ProtectedRoute>
         } />
         
-        {/* Ruta para la página de registro (eliminada) */}
-        {/* <Route path="/register" element={<RegisterForm />} /> */}
-        {/* Ruta para la página de inicio (eliminada) */}
-        {/* <Route path="/home" element={<Home />} /> */}
+        <Route path="/Layout" element={
+          <ProtectedRoute>
+            <Navigate to="/oficios" />
+          </ProtectedRoute>
+        } />
         
-        
-       
         {/* Ruta para cualquier otra URL no definida */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>

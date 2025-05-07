@@ -1,24 +1,24 @@
 //MainLayout.jsx
 // SistemaIntegral/frontend/SS/src/components/MainLayout/MainLayout.jsx
-// // Este componente es el diseño principal de la aplicación
-// // y contiene el encabezado, barra lateral y contenido principal
+// Este componente es el diseño principal de la aplicación
+
 import { useState } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/AuthContext'; 
 import './MainLayout.css';
-import logo from '../../assets/logo_sec_educ.png'; 
+import logo from '../../assets/logo_sec_educ.png';  
 
-const MainLayout = ({ children }) => { // Componente de diseño principal que incluye el encabezado, barra lateral y contenido principal
+const MainLayout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => { // Función para cerrar sesión y redirigir al usuario a la página de inicio de sesión
+  const handleLogout = () => {
     logout();
-    navigate('/login');   // Aui podemos cambiar la ruta a la que queremos redirigir al usuario al cerrar sesión
+    navigate('/login');
   };
 
-  const toggleSidebar = () => {//Funcion para alternar la visibilidad de la barra lateral ***Abrir y cerrar el menu lateral***
+  const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
@@ -65,7 +65,7 @@ const MainLayout = ({ children }) => { // Componente de diseño principal que in
         </div>
       </header>
 
-      {/* Sidebar para navegación  SideBar es el menu lateral "barra de lado" */}
+      {/* Sidebar para navegación */}
       <aside className={`sidebar ${sidebarOpen ? '' : 'closed'}`}>
         <div className="sidebar-header">
           <h2 className="text-xl font-bold">Menú Principal</h2>
@@ -75,21 +75,21 @@ const MainLayout = ({ children }) => { // Componente de diseño principal que in
           <ul>
             <li>
               <NavLink 
-                to="/expedientes" 
+                to="/oficios" 
                 className={({ isActive }) => 
                   isActive ? "bg-guinda-700" : ""
                 }
               >
                 {({ isActive }) => (
                   <button className={isActive ? "bg-guinda-700" : ""}>
-                    Expedientes
+                    Gestión de Oficios
                   </button>
                 )}
               </NavLink>
             </li>
             <li>
               <NavLink 
-                to="/expedientes" 
+                to="/oficios" 
                 className={({ isActive }) => 
                   isActive ? "bg-guinda-700" : ""
                 }
@@ -118,7 +118,6 @@ const MainLayout = ({ children }) => { // Componente de diseño principal que in
                 </NavLink>
               </li>
             )}
-            {/* Aqui puedes añadir más opciones, Toma tu tiempo para reposar en la hogera mi compa;ero sin vida*/}
           </ul>
         </nav>
       </aside>
