@@ -32,12 +32,12 @@ const register = async (req, res) => {
       .json({ error: "Los campos de usuario y contraseña no pueden estar vacios!" });
     return;
   }
-  const salt = await bcrypt.genSalt(10); // Generar un salt para el hash de la contraseña
-  const hashedPassword = await bcrypt.hash(password, salt);// Hashear la contraseña
+  //const salt = await bcrypt.genSalt(10); // Generar un salt para el hash de la contraseña
+  //const hashedPassword = await bcrypt.hash(password, salt);// Hashear la contraseña
   const user = { // Crear un nuevo objeto de usuario unico con un id unico encryptado
-    userId: uuidv4(),
+    userId,
     username,
-    password: hashedPassword, // Guardar la contraseña hasheada
+    password,//: hashedPassword, // Guardar la contraseña hasheada
     role
   };
   try {
@@ -56,6 +56,9 @@ const register = async (req, res) => {
 
 const login = async (req, res) => { // Iniciar sesión
   const { username, password } = req.body; // Obtener el nombre de usuario y la contraseña del cuerpo de la solicitud
+  
+  console.log("Intento de login:", { username, password});
+  
   if (!username || !password) { // Validar que los campos no estén vacíos
     res
       .status(400)
@@ -66,6 +69,7 @@ const login = async (req, res) => { // Iniciar sesión
   try {
     const existingUser = await checkRecordExists("users", "username", username); // Verificar si el usuario existe en la base de datos
     
+    console.log("Usuario encontrado:", existingUser ? "Sí" : "No");
 
     if (existingUser) { // si el usuario existe verificar la contraseña
       if (!existingUser.password) {
@@ -73,18 +77,31 @@ const login = async (req, res) => { // Iniciar sesión
         return;
       }
 
-      const passwordMatch = await bcrypt.compare( // Comparar la contraseña proporcionada con la contraseña hasheada almacenada en la base de datos
+      async function compare(password, hashedPassword) { // Función para comparar la contraseña proporcionada con la contraseña hasheada
+        password === hashedPassword; // Comparar las contraseñas
+        return password === hashedPassword; // Devolver verdadero si las contraseñas coinciden, falso de lo contrario
+      }
+
+      const passwordMatch = await compare( // Comparar la contraseña proporcionada con la contraseña hasheada almacenada en la base de datos
         password,
         existingUser.password
       );
+      console.log("Contraseña proporcionada:", password);
+      console.log("Contraseña almacenada:", existingUser.password);
+      console.log("Contraseña coincide:", passwordMatch ? "Sí" : "No");
 
       if (passwordMatch) { // Si la contraseña coincide, devolver el token de acceso y los datos del usuario
-        res.status(200).json({ // GENERAR TOKEN DE ACCESO  -- JWT
+        const token = generateAccessToken(existingUser.userId);
+        const response = {
           userId: existingUser.userId,
           username: existingUser.username,
           role: existingUser.role,
-          access_token: generateAccessToken(existingUser.userId),
-        });
+          access_token: token,
+        };
+        
+        console.log("Respuesta de login:", { ...response, access_token: "******" });
+        
+        res.status(200).json(response);
       } else {
         res.status(401).json({ error: "Contraseña incorrecta" }); // Devolver el error 401 si la ccontraseña no coincide
       }
@@ -92,18 +109,18 @@ const login = async (req, res) => { // Iniciar sesión
       res.status(401).json({ error: "Nombre de usuario no registrado" }); // Devolver el error 401 si el nombre de usuario no esta registrado
     }
   } catch (error) {
+    console.error("Error en login:", error);
     res.status(500).json({ error: error.message }); // Devolver un error 500 si ocurre un problema al iniciar sesión
   }
 };
 
-// Obtener todos los usuarios
-const getAllUsers = async (req, res) => { // Obtener todos los usuarios de la base de datos
-  // Se requiere autenticación y rol de administrador para acceder a esta ruta
+// El resto del controlador queda igual...
+const getAllUsers = async (req, res) => { 
   let connection;
   try {
     connection = await getConnection();
     const [rows] = await connection.execute(
-      'SELECT userId, username, role FROM users' // Query para obtener todos los usuarios
+      'SELECT userId, username, role FROM users'
     );
     res.status(200).json(rows);
   } catch (error) {
@@ -113,8 +130,7 @@ const getAllUsers = async (req, res) => { // Obtener todos los usuarios de la ba
   }
 };
 
-// Obtener un usuario por ID
-const getUserById = async (req, res) => { // Obtener un usuario por su ID
+const getUserById = async (req, res) => {
   let connection;
   try {
     const { id } = req.params;
@@ -136,15 +152,13 @@ const getUserById = async (req, res) => { // Obtener un usuario por su ID
   }
 };
 
-// Actualizar un usuario
-const updateUser = async (req, res) => { // Actualizar un usuario existente en la base de datos
+const updateUser = async (req, res) => {
   let connection;
   try {
     const { id } = req.params;
     const { username, password, role } = req.body;
     connection = await getConnection();
 
-    // Verificar que el usuario existe
     const [checkRows] = await connection.execute(
       'SELECT * FROM users WHERE userId = ?',
       [id]
@@ -154,25 +168,22 @@ const updateUser = async (req, res) => { // Actualizar un usuario existente en l
       return res.status(404).json({ error: 'Usuario no encontrado' });
     }
 
-    // Si se proporciona una contraseña, hay que hashearla
     if (password) {
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, salt);
       
-      // Actualizar usuario con nueva contraseña
       await connection.execute(
         'UPDATE users SET username = ?, password = ?, role = ? WHERE userId = ?',
         [username, hashedPassword, role, id]
       );
     } else {
-      // Actualizar usuario sin cambiar la contraseña
       await connection.execute(
         'UPDATE users SET username = ?, role = ? WHERE userId = ?',
         [username, role, id]
       );
     }
 
-    res.status(200).json({ message: 'Usuario actualizado correctamente' }); // Mensaje de confirmaccion de que el usuario fue actualizado correctamente
+    res.status(200).json({ message: 'Usuario actualizado correctamente' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   } finally {
@@ -180,14 +191,12 @@ const updateUser = async (req, res) => { // Actualizar un usuario existente en l
   }
 };
 
-// Eliminar un usuario
 const deleteUser = async (req, res) => {
   let connection;
   try {
     const { id } = req.params;
     connection = await getConnection();
 
-    // Verificar que el usuario existe
     const [checkRows] = await connection.execute(
       'SELECT * FROM users WHERE userId = ?',
       [id]
@@ -197,7 +206,6 @@ const deleteUser = async (req, res) => {
       return res.status(404).json({ error: 'Usuario no encontrado' });
     }
 
-    // Eliminar el usuario
     await connection.execute(
       'DELETE FROM users WHERE userId = ?',
       [id]
@@ -210,7 +218,7 @@ const deleteUser = async (req, res) => {
     if (connection) await connection.end();
   }
 };
-// Exportar las  funciones para su uso en otras partes de Backend
+
 module.exports = {
   register,
   login,

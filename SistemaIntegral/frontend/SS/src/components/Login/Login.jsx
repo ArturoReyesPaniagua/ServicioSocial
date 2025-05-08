@@ -26,7 +26,11 @@ function Login() {
     
     setLoading(true);
     try {
+      console.log('Intentando iniciar sesión con:', { username, password: '********' });
+      
       const result = await login(username, password);
+      console.log('Resultado del login:', result);
+      
       if (result.success) {
         // Redirigir a la página principal después de iniciar sesión
         navigate('/oficios');

@@ -65,29 +65,32 @@ export function AuthProvider({ children }) {
         password
       });
 
-      console.log('Respuesta login:', response.data);
+      console.log('Respuesta del servidor:', response.data);
 
-      // Verifica la estructura de la respuesta según tu nueva base de datos
-      if (response.data && response.data.access_token) {
+      // Verificar la estructura de la respuesta según tu backend
+      if (response.data) {
         // Configurar el token para todas las solicitudes futuras
-        axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.access_token}`;
-        
-        // Guardar el token y los datos del usuario
-        localStorage.setItem('token', response.data.access_token);
-        
-        // Adapta estos campos según la estructura de tu nueva base de datos
-        const userData = {
-          userId: response.data.userId || response.data.id || response.data.user_id,
-          username: response.data.username,
-          role: response.data.role
-        };
-        
-        localStorage.setItem('user', JSON.stringify(userData));
-        
-        setUser(userData);
-        setIsAuthenticated(true);
-        
-        return { success: true };
+        const token = response.data.access_token;
+        if (token) {
+          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+          
+          // Guardar el token y los datos del usuario
+          localStorage.setItem('token', token);
+          
+          // Adapta estos campos según la estructura de respuesta del backend
+          const userData = {
+            userId: response.data.userId,
+            username: response.data.username,
+            role: response.data.role || 'user' // Valor por defecto por si no viene en la respuesta
+          };
+          
+          localStorage.setItem('user', JSON.stringify(userData));
+          
+          setUser(userData);
+          setIsAuthenticated(true);
+          
+          return { success: true };
+        }
       }
       return { success: false, message: 'Credenciales inválidas' };
     } catch (error) {

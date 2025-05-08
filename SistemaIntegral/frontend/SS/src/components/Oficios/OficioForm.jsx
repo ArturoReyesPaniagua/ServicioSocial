@@ -154,9 +154,10 @@ const OficioForm = ({ oficio, estados, onSave, onCancel }) => {
     if (!formData.asunto) newErrors.asunto = 'El asunto es obligatorio';
     if (!formData.id_responsable) newErrors.id_responsable = 'El responsable es obligatorio';
     if (!formData.id_area) newErrors.id_area = 'El área es obligatoria';
-    
+    console.log(formData);
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
+    
   };
 
   // Manejar envío del formulario

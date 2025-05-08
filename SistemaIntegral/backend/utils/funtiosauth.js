@@ -2,6 +2,7 @@
 // SistemaIntegral/backend/utils/funtiosauth.js
 // Este archivo contiene funciones para interactuar con la base de datos
 // relacionadas con la autenticación y gestión de usuarios
+
 const mysql = require("mysql2");
 const config = require("../db/config");
 const pool = mysql.createPool(config);
@@ -21,9 +22,6 @@ const createTable = (schema) => {
 
 const checkRecordExists = (tableName, column, value) => {
   return new Promise((resolve, reject) => {
-    // Verifica si un registro especifico existe en la tabla
-    // tableName: nombre de la tabla
-    // column: nombre de la columna a verificar
     const query = `SELECT * FROM ${tableName} WHERE ${column} = ?`;
 
     pool.query(query, [value], (err, results) => {
@@ -31,6 +29,9 @@ const checkRecordExists = (tableName, column, value) => {
         reject(err);
       } else {
         resolve(results.length ? results[0] : null);
+        console.log(results.length);
+        console.log(value);
+        console.log(results[0]);
       }
     });
   });

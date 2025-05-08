@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 
 const UserForm = ({ user, onSave, onCancel }) => {
-  const [formData, setFormData] = useState({ // Estado inicial del formulario
+  const [formData, setFormData] = useState({
     username: '',
     password: '',
     role: 'user'
@@ -23,22 +23,22 @@ const UserForm = ({ user, onSave, onCancel }) => {
       setFormData({
         userId: user.userId,
         username: user.username,
-        role: user.role,
-        password: '' // Contraseña vacía para edición se puede cambiar si se desea // PROBABLEMENTE NO SE DEBERIA DE MOSTRAR EN EL FORMULARIO PORUQE PUES LA GENTE NO ES MUY LISTA
+        role: user.role || 'user', // Valor por defecto en caso de que no venga role
+        password: '' // Contraseña vacía para edición
       });
     } else {
       // Si es nuevo usuario, resetear el formulario
       setFormData({
         username: '',
         password: '',
-        role: 'user' //USUARIO POR DEFECTO  
-      }); 
+        role: 'user'
+      });
     }
   }, [user]);
 
   // Manejar cambios en el formulario
   const handleChange = (e) => {
-    const { name, value } = e.target; // Obtener el nombre y valor del campo para mandarlo al estado
+    const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -57,18 +57,17 @@ const UserForm = ({ user, onSave, onCancel }) => {
     if (!formData.username) newErrors.username = 'El nombre de usuario es obligatorio';
     
     // Solo validar contraseña en creación o si se proporciona al editar
-    if (!user && !formData.password) { //verificar si se llenaron los campos de contraseña y nombre de usuario
+    if (!user && !formData.password) {
       newErrors.password = 'La contraseña es obligatoria para nuevos usuarios';
-    } else if (formData.password && formData.password.length < 6) { // aqui se pueden poner mas condiciones si se desea para la contraseña pero no es necesario 
-      newErrors.password = 'La contraseña debe tener al menos 6 caracteres'; 
+    } else if (formData.password && formData.password.length < 6) {
+      newErrors.password = 'La contraseña debe tener al menos 6 caracteres';
     }
     
-    if (!formData.role) newErrors.role = 'El rol es obligatorio';// aunque el rol se ajusta automaticamente al usuario no se puede dejar vacio *** el role auto asignado es user ***
+    if (!formData.role) newErrors.role = 'El rol es obligatorio';
     
     // Validar si está intentando cambiar su propio rol (si es administrador)
     if (user && user.userId === currentUser?.userId && user.role === 'admin' && formData.role !== 'admin') {
-      newErrors.role = 'No puede cambiar su propio rol de administrador'; // necesito evitar que todos se pongan usuarios y no exita un administrador // ya los conozco usuarios promedio
-      // si leen esto muchos de los mensajes que dejo para ustedes son creados en tiempos de aburrimiento
+      newErrors.role = 'No puede cambiar su propio rol de administrador';
     }
     
     setErrors(newErrors);
@@ -83,19 +82,34 @@ const UserForm = ({ user, onSave, onCancel }) => {
     
     setIsSubmitting(true);
     try {
-      // Si estamos editando y no se proporciona contraseña, la omitimos del envío ***Esto dejaria la misma contraseña que el usuario tenia***
+      console.log("Enviando datos del formulario:", {
+        ...formData,
+        password: formData.password ? '********' : '[sin cambios]'
+      });
+      
+      // Si estamos editando y no se proporciona contraseña, la omitimos del envío
       const submitData = {...formData};
       if (user && !submitData.password) {
         delete submitData.password;
       }
       
-      await onSave(submitData);// Llamar a la función de guardado proporcionada por el padre
+      await onSave(submitData);
+      // onSave maneja la redirección o cierre del modal
     } catch (error) {
       console.error('Error guardando usuario:', error);
-      // Si hay un mensaje de error del servidor, mostrarlo
-      if (error.response?.data?.error) {
-        setErrors(prev => ({ ...prev, submit: error.response.data.error }));
+      
+      // Mejorar el manejo de errores del servidor
+      let errorMessage = 'Error al guardar usuario';
+      
+      if (error.response) {
+        if (error.response.status === 409) {
+          errorMessage = 'El nombre de usuario ya está registrado';
+        } else if (error.response.data?.error) {
+          errorMessage = error.response.data.error;
+        }
       }
+      
+      setErrors(prev => ({ ...prev, submit: errorMessage }));
     } finally {
       setIsSubmitting(false);
     }
@@ -117,6 +131,8 @@ const UserForm = ({ user, onSave, onCancel }) => {
             <button
               onClick={onCancel}
               className="text-gray-600 hover:text-gray-900"
+              type="button"
+              aria-label="Cerrar"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -125,35 +141,38 @@ const UserForm = ({ user, onSave, onCancel }) => {
           </div>
 
           {errors.submit && (
-            <div className="mb-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4">
+            <div className="mb-6 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded" role="alert">
               <p>{errors.submit}</p>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Username */}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Campo de usuario */}
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
                 Nombre de Usuario *
               </label>
               <input
-                type="text"
                 id="username"
+                type="text"
                 name="username"
                 value={formData.username}
                 onChange={handleChange}
+                disabled={isSubmitting}
                 className={`mt-1 block w-full rounded-md shadow-sm p-2 border ${
                   errors.username ? 'border-red-500' : 'border-gray-300'
-                }`}
+                } focus:outline-none focus:ring-2 focus:ring-guinda focus:border-guinda`}
+                aria-invalid={errors.username ? "true" : "false"}
+                aria-describedby={errors.username ? "username-error" : undefined}
               />
               {errors.username && (
-                <p className="mt-1 text-sm text-red-600">{errors.username}</p>
+                <p className="mt-1 text-sm text-red-600" id="username-error">{errors.username}</p>
               )}
             </div>
 
-            {/* Password */}
+            {/* Campo de contraseña */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
                 {user ? 'Contraseña (dejar en blanco para mantener la actual)' : 'Contraseña *'}
               </label>
               <div className="relative">
@@ -163,14 +182,18 @@ const UserForm = ({ user, onSave, onCancel }) => {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
+                  disabled={isSubmitting}
                   className={`mt-1 block w-full rounded-md shadow-sm p-2 border ${
                     errors.password ? 'border-red-500' : 'border-gray-300'
-                  }`}
+                  } focus:outline-none focus:ring-2 focus:ring-guinda focus:border-guinda pr-10`}
+                  aria-invalid={errors.password ? "true" : "false"}
+                  aria-describedby={errors.password ? "password-error" : undefined}
                 />
                 <button
                   type="button"
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                   onClick={togglePasswordVisibility}
+                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                 >
                   {showPassword ? (
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -185,13 +208,13 @@ const UserForm = ({ user, onSave, onCancel }) => {
                 </button>
               </div>
               {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+                <p className="mt-1 text-sm text-red-600" id="password-error">{errors.password}</p>
               )}
             </div>
 
             {/* Role */}
             <div>
-              <label htmlFor="role" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">
                 Rol *
               </label>
               <select
@@ -199,16 +222,18 @@ const UserForm = ({ user, onSave, onCancel }) => {
                 name="role"
                 value={formData.role}
                 onChange={handleChange}
+                disabled={isSubmitting || (user?.userId === currentUser?.userId && user?.role === 'admin')}
                 className={`mt-1 block w-full rounded-md shadow-sm p-2 border ${
                   errors.role ? 'border-red-500' : 'border-gray-300'
-                }`}
-                disabled={user?.userId === currentUser?.userId && user?.role === 'admin'}
+                } focus:outline-none focus:ring-2 focus:ring-guinda focus:border-guinda`}
+                aria-invalid={errors.role ? "true" : "false"}
+                aria-describedby={errors.role ? "role-error" : undefined}
               >
                 <option value="user">Usuario</option>
                 <option value="admin">Administrador</option>
               </select>
               {errors.role && (
-                <p className="mt-1 text-sm text-red-600">{errors.role}</p>
+                <p className="mt-1 text-sm text-red-600" id="role-error">{errors.role}</p>
               )}
               {user?.userId === currentUser?.userId && user?.role === 'admin' && (
                 <p className="mt-1 text-xs text-gray-500">No puede cambiar su propio rol de administrador.</p>
@@ -219,16 +244,27 @@ const UserForm = ({ user, onSave, onCancel }) => {
               <button
                 type="button"
                 onClick={onCancel}
-                className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                disabled={isSubmitting}
+                className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-300"
+                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-300 disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? 'Guardando...' : user ? 'Actualizar' : 'Crear'}
+                {isSubmitting ? (
+                  <div className="flex items-center">
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    {user ? 'Actualizando...' : 'Creando...'}
+                  </div>
+                ) : (
+                  user ? 'Actualizar' : 'Crear'
+                )}
               </button>
             </div>
           </form>
