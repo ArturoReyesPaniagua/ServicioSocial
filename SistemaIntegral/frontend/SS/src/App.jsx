@@ -51,7 +51,7 @@ function App() {
           </ProtectedRoute>
         } />
         
-        {/* Mantener compatibilidad con rutas antiguas */}
+        {/* Ruta de reportes */}
         <Route path="/expedientes" element={
           <ProtectedRoute>
             <Navigate to="/oficios" />
@@ -61,6 +61,12 @@ function App() {
         <Route path="/Layout" element={
           <ProtectedRoute>
             <Navigate to="/oficios" />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/Reporte" element={
+          <ProtectedRoute>
+            <Navigate to="/Reporte" />
           </ProtectedRoute>
         } />
         

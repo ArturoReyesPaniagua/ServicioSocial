@@ -24,7 +24,7 @@ const generateAccessToken = (userId) => {
 };
 
 const register = async (req, res) => {
-  const { username, password, role = 'user' } = req.body; // se asigna automaticamente user  si el usuario no proporciona un rol
+  const { username, password, role = 'user', id_area  } = req.body; // se asigna automaticamente user  si el usuario no proporciona un rol
  
   if (!username || !password) { // Validar que los campos no estén vacíos
     res
@@ -38,7 +38,8 @@ const register = async (req, res) => {
     userId,
     username,
     password,//: hashedPassword, // Guardar la contraseña hasheada
-    role
+    role,
+    id_area: null, // Inicializar id_area como null
   };
   try {
     await createTable(userSchema); // Asegurarse de que la tabla existe
@@ -114,7 +115,7 @@ const login = async (req, res) => { // Iniciar sesión
   }
 };
 
-// El resto del controlador queda igual...
+
 const getAllUsers = async (req, res) => { 
   let connection;
   try {
@@ -136,7 +137,7 @@ const getUserById = async (req, res) => {
     const { id } = req.params;
     connection = await getConnection();
     const [rows] = await connection.execute(
-      'SELECT userId, username, role FROM users WHERE userId = ?',
+      'SELECT userId, username, role, id_area FROM users WHERE userId = ?',
       [id]
     );
 
@@ -156,7 +157,7 @@ const updateUser = async (req, res) => {
   let connection;
   try {
     const { id } = req.params;
-    const { username, password, role } = req.body;
+    const { username, password, role, id_area } = req.body;
     connection = await getConnection();
 
     const [checkRows] = await connection.execute(
@@ -169,17 +170,17 @@ const updateUser = async (req, res) => {
     }
 
     if (password) {
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password, salt);
+      //const salt = await bcrypt.genSalt(10);
+      //const hashedPassword = await bcrypt.hash(password, salt);
       
       await connection.execute(
-        'UPDATE users SET username = ?, password = ?, role = ? WHERE userId = ?',
+        'UPDATE users SET username = ?, password = ?, role = ?, id_area= ? WHERE userId = ?',
         [username, hashedPassword, role, id]
       );
     } else {
       await connection.execute(
-        'UPDATE users SET username = ?, role = ? WHERE userId = ?',
-        [username, role, id]
+        'UPDATE users SET username = ?, role = ?, id_area= ? WHERE userId = ?',
+        [username, role, id, id_area]
       );
     }
 

@@ -62,8 +62,10 @@ const UserList = ({
         // Truncar si el ID es muy largo
         return value ? 
           <span title={value} className="text-xs text-gray-500">
-            {value.substring(0, 8)}...
+            {value}
+            {console.log (value)}
           </span> : '';
+         
       },
     },
     {

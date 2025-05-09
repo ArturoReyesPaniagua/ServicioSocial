@@ -8,7 +8,8 @@ const UserForm = ({ user, onSave, onCancel }) => {
   const [formData, setFormData] = useState({
     username: '',
     password: '',
-    role: 'user'
+    role: 'user',
+    id_area: null // Inicializar id_area como null
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -24,14 +25,16 @@ const UserForm = ({ user, onSave, onCancel }) => {
         userId: user.userId,
         username: user.username,
         role: user.role || 'user', // Valor por defecto en caso de que no venga role
-        password: '' // Contraseña vacía para edición
+        password: '', // Contraseña vacía para edición
+        id_area: user.id_area || null // Asignar id_area si existe
       });
     } else {
       // Si es nuevo usuario, resetear el formulario
       setFormData({
         username: '',
         password: '',
-        role: 'user'
+        role: 'user',
+        id_area: "Sistemas" // Inicializar id_area como null
       });
     }
   }, [user]);
@@ -238,6 +241,33 @@ const UserForm = ({ user, onSave, onCancel }) => {
               {user?.userId === currentUser?.userId && user?.role === 'admin' && (
                 <p className="mt-1 text-xs text-gray-500">No puede cambiar su propio rol de administrador.</p>
               )}
+            </div>
+            {/* id area */}
+            <div>
+              <label htmlFor="area" className="block text-sm font-medium text-gray-700 mb-1">
+                  Area *
+                </label>
+                <select
+                  id="id_area"
+                  name="id_area"
+                  value={formData.id_area}
+                  onChange={handleChange}
+                  disabled={isSubmitting || (user?.userId === currentUser?.userId && user?.role === 'admin')}
+                  className={`mt-1 block w-full rounded-md shadow-sm p-2 border ${
+                    errors.role ? 'border-red-500' : 'border-gray-300'
+                  } focus:outline-none focus:ring-2 focus:ring-guinda focus:border-guinda`}
+                  aria-invalid={errors.role ? "true" : "false"}
+                  aria-describedby={errors.role ? "role-error" : undefined}
+                >
+                  <option value="Sistemas">Sistemas</option>
+                  <option value="Atencion">Atencion</option>
+                </select>
+                {errors.role && (
+                  <p className="mt-1 text-sm text-red-600" id="role-error">{errors.role}</p>
+                )}
+                {user?.userId === currentUser?.userId && user?.role === 'admin' && (
+                  <p className="mt-1 text-xs text-gray-500">No puede cambiar su propio rol de administrador.</p>
+                )}
             </div>
 
             <div className="flex justify-end space-x-3 mt-6">

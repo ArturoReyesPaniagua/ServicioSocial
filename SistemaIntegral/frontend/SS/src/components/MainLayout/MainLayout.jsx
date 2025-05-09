@@ -89,7 +89,7 @@ const MainLayout = ({ children }) => {
             </li>
             <li>
               <NavLink 
-                to="/oficios" 
+                to="/Reporte" 
                 className={({ isActive }) => 
                   isActive ? "bg-guinda-700" : ""
                 }
