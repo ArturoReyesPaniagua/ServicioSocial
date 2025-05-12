@@ -7,7 +7,7 @@ const oficioSchema = require('../schemas/oficiosSchema');
 const { createTable } = require('../utils/funtiosauth');
 const mysql = require('mysql2/promise');
 const config = require('../db/config');
-const oficioUtils = require('../utils/oficioUtils');
+//const oficioUtils = require('../utils/oficioUtils');
 
 // Obtener conexión a la base de datos
 const getConnection = async () => {

@@ -39,7 +39,7 @@ const register = async (req, res) => {
     username,
     password,//: hashedPassword, // Guardar la contraseña hasheada
     role,
-    id_area: null, // Inicializar id_area como null
+    id_area // Inicializar id_area 
   };
   try {
     await createTable(userSchema); // Asegurarse de que la tabla existe

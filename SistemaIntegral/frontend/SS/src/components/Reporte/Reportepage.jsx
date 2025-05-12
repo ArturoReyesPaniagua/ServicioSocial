@@ -18,10 +18,10 @@ return (
             <h1>Reportes</h1>
         </div>
         <div className="contenedor__reportes">
-            
-            <button className="btn btn-primary">Generar Reporte</button>
 
+            <button className="btn btn-primary"> Generar Reporte </button> 
 
+ 
         </div>
  
             

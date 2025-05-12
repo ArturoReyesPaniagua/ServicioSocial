@@ -9,7 +9,7 @@ const UserForm = ({ user, onSave, onCancel }) => {
     username: '',
     password: '',
     role: 'user',
-    id_area: null // Inicializar id_area como null
+    id_area: "" // Inicializar id_area como null
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -19,14 +19,14 @@ const UserForm = ({ user, onSave, onCancel }) => {
   // Inicializar el formulario con datos del usuario si existe
   useEffect(() => {
     if (user) {
-      // Al editar, no incluimos la contraseña ya que generalmente no deberia de ser visible
-      // y se espera que el usuario la ingrese nuevamente si desea cambiarla
+      // Al editar, no incluimos la contraseña
+      //se espera que el usuario la ingrese nuevamente la contrasena si desea cambiarla
       setFormData({
         userId: user.userId,
         username: user.username,
         role: user.role || 'user', // Valor por defecto en caso de que no venga role
         password: '', // Contraseña vacía para edición
-        id_area: user.id_area || null // Asignar id_area si existe
+        id_area: user.id_area // Asignar id_area si existe
       });
     } else {
       // Si es nuevo usuario, resetear el formulario
@@ -34,7 +34,7 @@ const UserForm = ({ user, onSave, onCancel }) => {
         username: '',
         password: '',
         role: 'user',
-        id_area: "Sistemas" // Inicializar id_area como null
+        id_area: "" // Inicializar id_area como null
       });
     }
   }, [user]);
