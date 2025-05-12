@@ -5,7 +5,7 @@
 const { v4: uuidv4 } = require("uuid");
 const jwt = require("jsonwebtoken");
 const userSchema = require("../schemas/userSchema");
-const bcrypt = require("bcryptjs");
+//const bcrypt = require("bcryptjs");
 const mysql = require("mysql2/promise");
 const config = require("../db/config");
 const {
