@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import axios from 'axios'; // vamos a usar peticiones para llamar las  areas a traves de el id 12/05/2025 
 
 const UserForm = ({ user, onSave, onCancel }) => {
   const [formData, setFormData] = useState({
@@ -14,7 +15,25 @@ const UserForm = ({ user, onSave, onCancel }) => {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [areas, setAreas] = useState([]);
   const { user: currentUser } = useAuth();
+
+  useEffect(() => {
+    const fetchAreas = async () => {
+      try {
+        const response = await axios.get('http://localhost:3001/api/areas');
+        if (response.data && response.data.length > 0) {
+          setAreas(response.data);
+        } else {
+          console.error('No se encontraron áreas disponibles');
+        }
+      } catch (error) {
+        console.error('Error al cargar áreas:', error);
+      }
+    };
+    fetchAreas();
+  }, []);
+  // Cargar áreas al montar el componente
 
   // Inicializar el formulario con datos del usuario si existe
   useEffect(() => {
@@ -252,22 +271,26 @@ const UserForm = ({ user, onSave, onCancel }) => {
                   name="id_area"
                   value={formData.id_area}
                   onChange={handleChange}
-                  disabled={isSubmitting || (user?.userId === currentUser?.userId && user?.role === 'admin')}
+                 // disabled={isSubmitting || (user?.userId === currentUser?.userId && user?.role === 'admin')}
                   className={`mt-1 block w-full rounded-md shadow-sm p-2 border ${
                     errors.role ? 'border-red-500' : 'border-gray-300'
                   } focus:outline-none focus:ring-2 focus:ring-guinda focus:border-guinda`}
                   aria-invalid={errors.role ? "true" : "false"}
                   aria-describedby={errors.role ? "role-error" : undefined}
                 >
-                  <option value="Sistemas">Sistemas</option>
-                  <option value="Atencion">Atencion</option>
+                  <option value="">Seleccione un área</option>
+                  {areas.map(area => (
+                    <option key={area.id_area} value={area.id_area}>
+                      {area.nombre_area}
+                    </option>
+                  ))}
                 </select>
                 {errors.role && (
                   <p className="mt-1 text-sm text-red-600" id="role-error">{errors.role}</p>
                 )}
-                {user?.userId === currentUser?.userId && user?.role === 'admin' && (
+                {/*user?.userId === currentUser?.userId && user?.role === 'admin' && (
                   <p className="mt-1 text-xs text-gray-500">No puede cambiar su propio rol de administrador.</p>
-                )}
+                )*/}
             </div>
 
             <div className="flex justify-end space-x-3 mt-6">

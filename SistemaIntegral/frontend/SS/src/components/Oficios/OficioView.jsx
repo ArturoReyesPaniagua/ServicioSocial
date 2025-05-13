@@ -37,7 +37,7 @@ const OficioView = ({ oficio, onClose, onEdit }) => {
 
   return (
     // Modal para mostrar los detalles del oficio
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex justify-center items-center p-4 z-50">
+    <div className="fixed top-[150px] left-0 right-0 bottom-0 bg-gray-600 bg-opacity-75 flex justify-center items-center p-1 z-50">
       <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
