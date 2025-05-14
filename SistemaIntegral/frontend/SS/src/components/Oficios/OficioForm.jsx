@@ -170,9 +170,7 @@ const OficioForm = ({ oficio, estados, onSave, onCancel }) => {
     e.preventDefault();
     
     if (!validateForm()) return;
-    formData.fecha_recepcion = format(new Date(formData.fecha_recepcion), 'yyyy-MM-dd');
-    formData.fecha_limite = formData.fecha_limite ? format(new Date(formData.fecha_limite), 'yyyy-MM-dd') : null;
-    formData.fecha_respuesta = formData.fecha_respuesta ? format(new Date(formData.fecha_respuesta), 'yyyy-MM-dd') : null;
+
     
     
     setIsSubmitting(true);

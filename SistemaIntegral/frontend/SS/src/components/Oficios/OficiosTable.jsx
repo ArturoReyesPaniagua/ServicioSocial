@@ -56,13 +56,17 @@ const OficiosTable = ({
 
   // Definir columnas
   const columns = useMemo(() => [
-    {
-      header: 'No. Oficio',
-      accessorKey: 'numero_de_oficio',
-      sorttingFn: 'basic',
-      cell: info => info.getValue() || '',
-
-    },
+{
+  header: 'No. Oficio',
+  accessorKey: 'numero_de_oficio',
+  sortingFn: (rowA, rowB, columnId) => {
+    const a = parseInt(rowA.getValue(columnId));
+    const b = parseInt(rowB.getValue(columnId));
+    return a - b;
+  },
+  cell: info => info.getValue() || '',
+}
+,
     {
       header: 'Estado',
       accessorKey: 'estado',
