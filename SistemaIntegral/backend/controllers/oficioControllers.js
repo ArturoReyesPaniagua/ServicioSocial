@@ -16,18 +16,21 @@ const getConnection = async () => {
 
 // Crear un nuevo oficio
 const createOficio = async (req, res) => {
+  console.log(req.body);
+  console.log('Creando oficio...');
   let connection;
   try {
     // Asegurar que la tabla exista
     await createTable(oficioSchema);
-
+    console.log('Tabla de oficio creada o ya existe');
+    console.log(req.body);
     const {
       estado = 'en proceso',
       numero_de_oficio,
       fecha_recepcion,
-      fecha_limite,
+      fecha_limite = null,
       archivado = false,
-      fecha_respuesta,
+      fecha_respuesta = null,
       id_solicitante,
       asunto,
       observaciones,
@@ -56,17 +59,18 @@ const createOficio = async (req, res) => {
       return res.status(400).json({ error: 'El área es requerida' });
     }
 
+
     // Crear oficio
     const oficioData = {
       estado,
       numero_de_oficio,
       fecha_recepcion,
-      fecha_limite,
+      fecha_limite: fecha_limite || null,
       archivado,
-      fecha_respuesta,
+      fecha_respuesta: fecha_respuesta || null,
       id_solicitante,
       asunto,
-      observaciones,
+      observaciones: observaciones || null,
       id_responsable,
       id_area
     };

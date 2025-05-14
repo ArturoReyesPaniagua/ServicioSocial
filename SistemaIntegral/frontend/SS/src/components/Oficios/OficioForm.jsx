@@ -55,16 +55,21 @@ const OficioForm = ({ oficio, estados, onSave, onCancel }) => {
     fetchRelatedData();
   }, []);
 
-  // Inicializar el formulario con datos del oficio si existe
+
   useEffect(() => {
     if (oficio) {
-      // Formatear fechas ISO a formato yyyy-MM-dd para inputs de tipo date
       const formattedOficio = {
         ...oficio,
-        fecha_recepcion: oficio.fecha_recepcion ? format(new Date(oficio.fecha_recepcion), 'yyyy-MM-dd') : '',
-        fecha_limite: oficio.fecha_limite ? format(new Date(oficio.fecha_limite), 'yyyy-MM-dd') : '',
-        fecha_respuesta: oficio.fecha_respuesta ? format(new Date(oficio.fecha_respuesta), 'yyyy-MM-dd') : '',
+        fecha_limite:
+          oficio.fecha_limite === '' ? null :
+          oficio.fecha_limite ? format(new Date(oficio.fecha_limite), 'yyyy-MM-dd') : '',
+        fecha_respuesta:
+          oficio.fecha_respuesta === '' ? null :
+          oficio.fecha_respuesta ? format(new Date(oficio.fecha_respuesta), 'yyyy-MM-dd') : '',
+        fecha_recepcion:
+          oficio.fecha_recepcion ? format(new Date(oficio.fecha_recepcion), 'yyyy-MM-dd') : '',
       };
+      console.log('Formatted Oficio:', formattedOficio);
       setFormData(formattedOficio);
     }
   }, [oficio]);
@@ -165,6 +170,10 @@ const OficioForm = ({ oficio, estados, onSave, onCancel }) => {
     e.preventDefault();
     
     if (!validateForm()) return;
+    formData.fecha_recepcion = format(new Date(formData.fecha_recepcion), 'yyyy-MM-dd');
+    formData.fecha_limite = formData.fecha_limite ? format(new Date(formData.fecha_limite), 'yyyy-MM-dd') : null;
+    formData.fecha_respuesta = formData.fecha_respuesta ? format(new Date(formData.fecha_respuesta), 'yyyy-MM-dd') : null;
+    
     
     setIsSubmitting(true);
     try {

@@ -10,6 +10,7 @@ import OficiosTable from './OficiosTable';
 import OficioForm from './OficioForm';
 import OficioView from './OficioView';
 import DeleteConfirmation from '../common/DeleteConfirmation';
+import {format} from 'date-fns';
 
 const OficiosPage = () => {
   const [oficios, setOficios] = useState([]);
@@ -81,6 +82,9 @@ const OficiosPage = () => {
   // Crear un nuevo oficio
   const handleCreateOficio = async (oficioData) => {
     try {
+    oficioData.fecha_recepcion = format(new Date(oficioData.fecha_recepcion), 'yyyy-MM-dd');
+    oficioData.fecha_limite = oficioData.fecha_limite ? format(new Date(oficioData.fecha_limite), 'yyyy-MM-dd') : null;
+    oficioData.fecha_respuesta = oficioData.fecha_respuesta ? format(new Date(oficioData.fecha_respuesta), 'yyyy-MM-dd') : null;
       await axios.post('http://localhost:3001/api/oficios', oficioData);
       toast.success('Oficio creado exitosamente');
       setFormVisible(false);
