@@ -2,7 +2,7 @@
 // SistemaIntegral/frontend/SS/src/components/userList/UserList.jsx
 // Este componente es una tabla que muestra una lista de usuarios y permite editar y eliminar usuarios
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   useReactTable,
   getCoreRowModel,
@@ -11,17 +11,38 @@ import {
   flexRender,
 } from '@tanstack/react-table';
 import { useAuth } from '../../context/AuthContext';
+import axios from 'axios';
 
 const UserList = ({  
   data = [], 
   onEdit, 
   onDelete, 
-  isLoading = false 
+  isLoading = false
 }) => {
+  const [areas, setAreas] = useState([]); // Lista de áreas para mostrar los nombres
   const [sorting, setSorting] = useState([]);
   const [globalFilter, setGlobalFilter] = useState('');
   const { user: currentUser } = useAuth();
 
+  useEffect(() => {
+    const fetchAreas = async () => {
+      try {
+        const response = await axios.get('http://localhost:3001/api/areas');
+        console.log('Áreas recibidas:', response.data); // Para debug
+        if (response.data && response.data.length > 0) {
+          setAreas(response.data);
+        } else {
+          console.error('No se encontraron áreas disponibles');
+        }
+      } catch (error) {
+        console.error('Error al cargar áreas:', error);
+      }
+    };
+    fetchAreas();
+  }, []);
+
+    
+  
   // Definir columnas
   const columns = useMemo(() => [
     {
@@ -54,19 +75,34 @@ const UserList = ({
         );
       },
     },
+  {
+    header: 'Área',
+    accessorKey: 'id_area',
+    cell: info => {
+      const areaId = info.getValue();
+      const area = areas.find(area => area.id_area === areaId); 
+      console.log('Área encontrada:', areaId); // Para debug
+      return area ? (
+        <span title={area.nombre_area} className="text-xs text-gray-500">
+          {area.nombre_area}
+        </span>
+      ) : (
+        "Error al cargar área" // Mensaje alternativo si no se encuentra el área
+      );
+    },
+  },
+
     {
       header: 'ID de Usuario',
       accessorKey: 'userId',
       cell: info => {
         const value = info.getValue();
-        // Truncar si el ID es muy largo
         return value ? 
           <span title={value} className="text-xs text-gray-500">
-             {value}
-            {console.log (value)}
-          </span> : '';
-         
-      },
+            {value}
+            
+          </span> : 'Problemas al cargar ID '; 
+        },
     },
     {
       header: 'Acciones',
@@ -94,7 +130,7 @@ const UserList = ({
               </button>
             )}
             
-            {/* Solo permitir eliminación a admin y solo de otros usuarios */}
+            
             {isAdmin && !isSelf && (
               <button
                 onClick={() => onDelete(row.original)}
@@ -110,7 +146,7 @@ const UserList = ({
         );
       },
     },
-  ], [onEdit, onDelete, currentUser]);
+  ], [onEdit, onDelete, currentUser, areas]);
 
   // Configurar tabla con TanStack
   const table = useReactTable({

@@ -12,17 +12,30 @@ import { useAuth } from '../../context/AuthContext';
 
 const UserPage = () => {
   const [users, setUsers] = useState([]);
+  const [areas, setAreas] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [formVisible, setFormVisible] = useState(false);
   const [deleteVisible, setDeleteVisible] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const { user: currentAuthUser } = useAuth();
 
-  // Cargar usuarios al montar el componente
+  // Cargar usuarios y áreas al montar el componente
   useEffect(() => {
     fetchUsers();
+    fetchAreas();
   }, []);
 
+  // Función para cargar la lista de áreas
+  const fetchAreas = async () => {
+    try {
+      const response = await axios.get('http://localhost:3001/api/areas');
+      console.log('Áreas cargadas:', response.data);
+      setAreas(response.data);
+    } catch (error) {
+      console.error('Error al cargar áreas:', error);
+      toast.error('Error al cargar las áreas. Por favor intente nuevamente.');
+    }
+  };  
   // Función para cargar la lista de usuarios
   const fetchUsers = async () => {
     setIsLoading(true);
@@ -263,6 +276,7 @@ const UserPage = () => {
       ) : (
         <UserList
           data={users}
+          areas={areas}
           onEdit={handleEdit}
           onDelete={handleDelete}
           isLoading={isLoading}

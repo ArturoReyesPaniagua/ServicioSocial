@@ -2,11 +2,13 @@
 // SistemaIntegral/backend/schemas/oficioSchema.js
 // Este archivo define el esquema de la tabla "Oficio" en la base de datos
 
+// Cambiar numero de oficio a int 
+
 const oficioSchema = `
   CREATE TABLE IF NOT EXISTS Oficio (
     id_oficio INT PRIMARY KEY AUTO_INCREMENT,
     estado ENUM('concluido', 'en proceso', 'cancelado') NOT NULL,
-    numero_de_oficio VARCHAR(255),
+    numero_de_oficio INT NOT NULL, 
     fecha_recepcion DATE,
     fecha_limite DATE,
     archivado BOOLEAN,

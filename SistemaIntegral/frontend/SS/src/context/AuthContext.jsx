@@ -29,7 +29,7 @@ export function AuthProvider({ children }) {
           // Configurar el token en los headers para todas las peticiones
           axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
           
-          // Opcionalmente, puedes verificar el token con el backend
+          //  verificar el token con el backend
           // const response = await axios.get(`${API_BASE_URL}/auth/verify`);
           // if (response.data.valid) {
           //   setUser(JSON.parse(storedUser));

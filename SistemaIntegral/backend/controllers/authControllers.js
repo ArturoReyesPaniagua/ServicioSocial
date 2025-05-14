@@ -5,7 +5,7 @@
 const { v4: uuidv4 } = require("uuid");
 const jwt = require("jsonwebtoken");
 const userSchema = require("../schemas/userSchema");
-//const bcrypt = require("bcryptjs");
+const bcrypt = require("bcryptjs");
 const mysql = require("mysql2/promise");
 const config = require("../db/config");
 const {
@@ -35,7 +35,6 @@ const register = async (req, res) => {
   //const salt = await bcrypt.genSalt(10); // Generar un salt para el hash de la contraseña
   //const hashedPassword = await bcrypt.hash(password, salt);// Hashear la contraseña
   const user = { // Crear un nuevo objeto de usuario unico con un id unico encryptado
-    userId,
     username,
     password,//: hashedPassword, // Guardar la contraseña hasheada
     role,
@@ -74,7 +73,7 @@ const login = async (req, res) => { // Iniciar sesión
 
     if (existingUser) { // si el usuario existe verificar la contraseña
       if (!existingUser.password) {
-        res.status(401).json({ error: "Invalid credentials" }); // Devolver el error 401 si la contraseña no es válida
+        res.status(401).json({ error: "Informacion invalida" }); // Devolver el error 401 si la contraseña no es válida
         return;
       }
 
@@ -121,7 +120,7 @@ const getAllUsers = async (req, res) => {
   try {
     connection = await getConnection();
     const [rows] = await connection.execute(
-      'SELECT userId, username, role FROM users'
+      'SELECT userId, username, role, id_area FROM users'
     );
     res.status(200).json(rows);
   } catch (error) {
@@ -157,7 +156,7 @@ const updateUser = async (req, res) => {
   let connection;
   try {
     const { id } = req.params;
-    const { username, password, role, id_area } = req.body;
+    const { username, password, role, id_area} = req.body;
     connection = await getConnection();
 
     const [checkRows] = await connection.execute(
@@ -175,7 +174,7 @@ const updateUser = async (req, res) => {
       
       await connection.execute(
         'UPDATE users SET username = ?, password = ?, role = ?, id_area= ? WHERE userId = ?',
-        [username, hashedPassword, role, id]
+        [username, password, role, id]
       );
     } else {
       await connection.execute(
@@ -192,6 +191,7 @@ const updateUser = async (req, res) => {
   }
 };
 
+// Eliminar un usuario de la base de datos
 const deleteUser = async (req, res) => {
   let connection;
   try {

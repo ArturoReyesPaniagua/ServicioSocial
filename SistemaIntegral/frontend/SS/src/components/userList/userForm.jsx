@@ -3,14 +3,14 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import axios from 'axios'; // vamos a usar peticiones para llamar las  areas a traves de el id 12/05/2025 
+import axios from 'axios';
 
 const UserForm = ({ user, onSave, onCancel }) => {
   const [formData, setFormData] = useState({
     username: '',
     password: '',
     role: 'user',
-    id_area: "" // Inicializar id_area como null
+    id_area: '' // Inicializar id_area como string vacío
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -33,19 +33,17 @@ const UserForm = ({ user, onSave, onCancel }) => {
     };
     fetchAreas();
   }, []);
-  // Cargar áreas al montar el componente
 
   // Inicializar el formulario con datos del usuario si existe
   useEffect(() => {
     if (user) {
       // Al editar, no incluimos la contraseña
-      //se espera que el usuario la ingrese nuevamente la contrasena si desea cambiarla
       setFormData({
         userId: user.userId,
         username: user.username,
         role: user.role || 'user', // Valor por defecto en caso de que no venga role
         password: '', // Contraseña vacía para edición
-        id_area: user.id_area // Asignar id_area si existe
+        id_area: user.id_area || '' // Asegurar que id_area sea string vacío si es null o undefined
       });
     } else {
       // Si es nuevo usuario, resetear el formulario
@@ -53,7 +51,7 @@ const UserForm = ({ user, onSave, onCancel }) => {
         username: '',
         password: '',
         role: 'user',
-        id_area: "" // Inicializar id_area como null
+        id_area: '' // Inicializar id_area como cadena vacía
       });
     }
   }, [user]);
@@ -86,6 +84,8 @@ const UserForm = ({ user, onSave, onCancel }) => {
     }
     
     if (!formData.role) newErrors.role = 'El rol es obligatorio';
+    
+    if (!formData.id_area) newErrors.id_area = 'El área es obligatoria';
     
     // Validar si está intentando cambiar su propio rol (si es administrador)
     if (user && user.userId === currentUser?.userId && user.role === 'admin' && formData.role !== 'admin') {
@@ -251,6 +251,7 @@ const UserForm = ({ user, onSave, onCancel }) => {
                 aria-invalid={errors.role ? "true" : "false"}
                 aria-describedby={errors.role ? "role-error" : undefined}
               >
+                <option value="">Seleccione un rol</option>
                 <option value="user">Usuario</option>
                 <option value="admin">Administrador</option>
               </select>
@@ -261,36 +262,33 @@ const UserForm = ({ user, onSave, onCancel }) => {
                 <p className="mt-1 text-xs text-gray-500">No puede cambiar su propio rol de administrador.</p>
               )}
             </div>
-            {/* id area */}
+
+            {/* id área */}
             <div>
-              <label htmlFor="area" className="block text-sm font-medium text-gray-700 mb-1">
-                  Area *
-                </label>
-                <select
-                  id="id_area"
-                  name="id_area"
-                  value={formData.id_area}
-                  onChange={handleChange}
-                 // disabled={isSubmitting || (user?.userId === currentUser?.userId && user?.role === 'admin')}
-                  className={`mt-1 block w-full rounded-md shadow-sm p-2 border ${
-                    errors.role ? 'border-red-500' : 'border-gray-300'
-                  } focus:outline-none focus:ring-2 focus:ring-guinda focus:border-guinda`}
-                  aria-invalid={errors.role ? "true" : "false"}
-                  aria-describedby={errors.role ? "role-error" : undefined}
-                >
-                  <option value="">Seleccione un área</option>
-                  {areas.map(area => (
-                    <option key={area.id_area} value={area.id_area}>
-                      {area.nombre_area}
-                    </option>
-                  ))}
-                </select>
-                {errors.role && (
-                  <p className="mt-1 text-sm text-red-600" id="role-error">{errors.role}</p>
-                )}
-                {/*user?.userId === currentUser?.userId && user?.role === 'admin' && (
-                  <p className="mt-1 text-xs text-gray-500">No puede cambiar su propio rol de administrador.</p>
-                )*/}
+              <label htmlFor="id_area" className="block text-sm font-medium text-gray-700 mb-1">
+                Área *
+              </label>
+              <select
+                id="id_area"
+                name="id_area"
+                value={formData.id_area}
+                onChange={handleChange}
+                className={`mt-1 block w-full rounded-md shadow-sm p-2 border ${
+                  errors.id_area ? 'border-red-500' : 'border-gray-300'
+                } focus:outline-none focus:ring-2 focus:ring-guinda focus:border-guinda`}
+                aria-invalid={errors.id_area ? "true" : "false"}
+                aria-describedby={errors.id_area ? "id_area-error" : undefined}
+              >
+                <option value="">Seleccione un área</option>
+                {areas.map(area => (
+                  <option key={area.id_area} value={area.id_area}>
+                    {area.nombre_area}
+                  </option>
+                ))}
+              </select>
+              {errors.id_area && (
+                <p className="mt-1 text-sm text-red-600" id="id_area-error">{errors.id_area}</p>
+              )}
             </div>
 
             <div className="flex justify-end space-x-3 mt-6">
