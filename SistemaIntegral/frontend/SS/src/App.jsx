@@ -1,4 +1,4 @@
-//App.jsx
+//App.jsx (actualizado)
 // SistemaIntegral/frontend/SS/src/App.jsx
 // Este archivo contiene la configuración de las rutas de la aplicación en React 
 
@@ -10,6 +10,7 @@ import MainLayout from './components/MainLayout/MainLayout';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import OficiosPage from './components/Oficios/OficiosPage';
 import UserPage from './components/userList/userPage';
+import Reportepage from './components/Reporte/ReportePage';
 import { useAuth } from './context/AuthContext';
 import './App.css';
 
@@ -52,6 +53,14 @@ function App() {
         } />
         
         {/* Ruta de reportes */}
+        <Route path="/Reporte" element={
+          <ProtectedRoute>
+            <MainLayout>
+              <Reportepage />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        
         <Route path="/expedientes" element={
           <ProtectedRoute>
             <Navigate to="/oficios" />
@@ -61,12 +70,6 @@ function App() {
         <Route path="/Layout" element={
           <ProtectedRoute>
             <Navigate to="/oficios" />
-          </ProtectedRoute>
-        } />
-
-        <Route path="/Reporte" element={
-          <ProtectedRoute>
-            <Navigate to="/Reporte" />
           </ProtectedRoute>
         } />
         
