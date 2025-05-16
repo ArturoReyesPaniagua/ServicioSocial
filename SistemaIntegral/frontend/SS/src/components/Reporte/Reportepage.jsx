@@ -17,7 +17,7 @@ const ReportePage = () => {
   const [filteredOficios, setFilteredOficios] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [solicitantes, setSolicitantes] = useState([]);
-  const [responsables, setResponsables] = useState([]);r
+  const [responsables, setResponsables] = useState([]);
   const [areas, setAreas] = useState([]);
   const [showPreview, setShowPreview] = useState(false);
   

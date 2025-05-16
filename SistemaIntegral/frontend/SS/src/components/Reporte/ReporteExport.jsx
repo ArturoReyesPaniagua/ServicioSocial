@@ -3,15 +3,16 @@
 // Este componente maneja la exportación de reportes en PDF y Excel
 
 import { useState, useEffect } from 'react';
-import { format } from 'date-fns';
+import { format as formatDate } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
+// Importación correcta de autoTable
+import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 
 const ReporteExport = ({ 
   oficios, 
-  format, 
+  format: exportFormat, // Renombrar el prop para evitar conflicto
   filters, 
   solicitantes, 
   responsables, 
@@ -29,9 +30,9 @@ const ReporteExport = ({
       try {
         setIsGenerating(true);
         
-        if (format === 'pdf') {
+        if (exportFormat === 'pdf') {
           generatePDF();
-        } else if (format === 'excel') {
+        } else if (exportFormat === 'excel') {
           generateExcel();
         } else {
           throw new Error('Formato de exportación no soportado');
@@ -44,15 +45,15 @@ const ReporteExport = ({
     };
     
     generateReport();
-  }, [format, oficios]);
+  }, [exportFormat, oficios]);
 
   // Función para formatear datos
-  const formatDate = (dateString) => {
+  const formatDateString = (dateString) => {
     if (!dateString) return '-';
     try {
       const date = new Date(dateString);
       return date instanceof Date && !isNaN(date) 
-        ? format(date, 'dd/MM/yyyy', { locale: es })
+        ? formatDate(date, 'dd/MM/yyyy', { locale: es })
         : '-';
     } catch (error) {
       return '-';
@@ -89,15 +90,15 @@ const ReporteExport = ({
       
       // Fecha de generación
       doc.setFontSize(10);
-      doc.text(`Generado: ${format(new Date(), 'dd/MM/yyyy HH:mm', { locale: es })}`, 14, 22);
+      doc.text(`Generado: ${formatDate(new Date(), 'dd/MM/yyyy HH:mm', { locale: es })}`, 14, 22);
       
       // Filtros aplicados
       let filtersText = 'Filtros aplicados: ';
       if (filters.estado) filtersText += `Estado: ${filters.estado} | `;
-      if (filters.fechaRecepcionDesde) filtersText += `Recepción desde: ${formatDate(filters.fechaRecepcionDesde)} | `;
-      if (filters.fechaRecepcionHasta) filtersText += `Recepción hasta: ${formatDate(filters.fechaRecepcionHasta)} | `;
-      if (filters.fechaLimiteDesde) filtersText += `Límite desde: ${formatDate(filters.fechaLimiteDesde)} | `;
-      if (filters.fechaLimiteHasta) filtersText += `Límite hasta: ${formatDate(filters.fechaLimiteHasta)} | `;
+      if (filters.fechaRecepcionDesde) filtersText += `Recepción desde: ${formatDateString(filters.fechaRecepcionDesde)} | `;
+      if (filters.fechaRecepcionHasta) filtersText += `Recepción hasta: ${formatDateString(filters.fechaRecepcionHasta)} | `;
+      if (filters.fechaLimiteDesde) filtersText += `Límite desde: ${formatDateString(filters.fechaLimiteDesde)} | `;
+      if (filters.fechaLimiteHasta) filtersText += `Límite hasta: ${formatDateString(filters.fechaLimiteHasta)} | `;
       
       // Truncar texto de filtros si es demasiado largo
       if (filtersText.length > 180) {
@@ -113,14 +114,14 @@ const ReporteExport = ({
         oficio.nombre_solicitante || getSolicitanteName(oficio.id_solicitante),
         oficio.nombre_responsable || getResponsableName(oficio.id_responsable),
         oficio.nombre_area || getAreaName(oficio.id_area),
-        formatDate(oficio.fecha_recepcion),
-        formatDate(oficio.fecha_limite),
-        formatDate(oficio.fecha_respuesta),
+        formatDateString(oficio.fecha_recepcion),
+        formatDateString(oficio.fecha_limite),
+        formatDateString(oficio.fecha_respuesta),
         oficio.archivado ? 'Sí' : 'No'
       ]);
       
-      // Generar tabla con autotable
-      doc.autoTable({
+      // Generar tabla con autoTable
+      autoTable(doc, {
         startY: 35,
         head: [['No. Oficio', 'Estado', 'Solicitante', 'Responsable', 'Área', 'Recepción', 'Límite', 'Respuesta', 'Archivado']],
         body: tableData,
@@ -149,7 +150,7 @@ const ReporteExport = ({
       }
       
       // Generar nombre de archivo
-      const fileName = `Reporte_Oficios_${format(new Date(), 'yyyyMMdd_HHmmss')}.pdf`;
+      const fileName = `Reporte_Oficios_${formatDate(new Date(), 'yyyyMMdd_HHmmss')}.pdf`;
       
       // Generar blob y URL para descarga
       const pdfBlob = doc.output('blob');
@@ -181,9 +182,9 @@ const ReporteExport = ({
         oficio.nombre_responsable || getResponsableName(oficio.id_responsable),
         oficio.nombre_area || getAreaName(oficio.id_area),
         oficio.asunto,
-        formatDate(oficio.fecha_recepcion),
-        formatDate(oficio.fecha_limite),
-        formatDate(oficio.fecha_respuesta),
+        formatDateString(oficio.fecha_recepcion),
+        formatDateString(oficio.fecha_limite),
+        formatDateString(oficio.fecha_respuesta),
         oficio.archivado ? 'Sí' : 'No',
         oficio.observaciones || ''
       ]);
@@ -191,17 +192,17 @@ const ReporteExport = ({
       // Información de filtros
       const filterRows = [
         ['Reporte de Oficios'],
-        [`Generado: ${format(new Date(), 'dd/MM/yyyy HH:mm', { locale: es })}`],
+        [`Generado: ${formatDate(new Date(), 'dd/MM/yyyy HH:mm', { locale: es })}`],
         [''],
         ['Filtros aplicados:']
       ];
       
       // Agregar filas de filtro solo si existen
       if (filters.estado) filterRows.push([`Estado: ${filters.estado}`]);
-      if (filters.fechaRecepcionDesde) filterRows.push([`Recepción desde: ${formatDate(filters.fechaRecepcionDesde)}`]);
-      if (filters.fechaRecepcionHasta) filterRows.push([`Recepción hasta: ${formatDate(filters.fechaRecepcionHasta)}`]);
-      if (filters.fechaLimiteDesde) filterRows.push([`Límite desde: ${formatDate(filters.fechaLimiteDesde)}`]);
-      if (filters.fechaLimiteHasta) filterRows.push([`Límite hasta: ${formatDate(filters.fechaLimiteHasta)}`]);
+      if (filters.fechaRecepcionDesde) filterRows.push([`Recepción desde: ${formatDateString(filters.fechaRecepcionDesde)}`]);
+      if (filters.fechaRecepcionHasta) filterRows.push([`Recepción hasta: ${formatDateString(filters.fechaRecepcionHasta)}`]);
+      if (filters.fechaLimiteDesde) filterRows.push([`Límite desde: ${formatDateString(filters.fechaLimiteDesde)}`]);
+      if (filters.fechaLimiteHasta) filterRows.push([`Límite hasta: ${formatDateString(filters.fechaLimiteHasta)}`]);
       
       // Agregar total de oficios
       filterRows.push(['']);
@@ -297,7 +298,7 @@ const ReporteExport = ({
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
         <div className="p-6">
           <h2 className="text-xl font-semibold mb-4">
-            {format === 'pdf' ? 'Exportar como PDF' : 'Exportar como Excel'}
+            {exportFormat === 'pdf' ? 'Exportar como PDF' : 'Exportar como Excel'}
           </h2>
           
           {isGenerating ? (

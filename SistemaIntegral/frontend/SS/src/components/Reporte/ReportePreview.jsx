@@ -1,9 +1,10 @@
+
 // File: ReportePreview.jsx
 // SistemaIntegral/frontend/SS/src/components/Reporte/ReportePreview.jsx
 // Este componente muestra una vista previa del reporte y permite exportarlo
 
 import { useState } from 'react';
-import { format, isValid, parseISO } from 'date-fns';
+import { format, isValid } from 'date-fns';
 import { es } from 'date-fns/locale';
 import ReporteExport from './ReporteExport';
 
