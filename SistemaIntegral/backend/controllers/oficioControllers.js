@@ -1,29 +1,20 @@
-// File: oficioControllers.js
 // SistemaIntegral/backend/controllers/oficioControllers.js
-// Este archivo contiene las funciones para la gestión de oficios
-// que interactúan con la base de datos y manejan las solicitudes HTTP relacionadas con los oficios
-
+const sql = require('mssql');
 const oficioSchema = require('../schemas/oficiosSchema');
-const { createTable } = require('../utils/funtiosauth');
-const mysql = require('mysql2/promise');
-const config = require('../db/config');
-//const oficioUtils = require('../utils/oficioUtils');
-
-// Obtener conexión a la base de datos
-const getConnection = async () => {
-  return await mysql.createConnection(config);
-};
+const { connectDB } = require('../db/db');
 
 // Crear un nuevo oficio
 const createOficio = async (req, res) => {
-  console.log(req.body);
-  console.log('Creando oficio...');
-  let connection;
   try {
-    // Asegurar que la tabla exista
-    await createTable(oficioSchema);
-    console.log('Tabla de oficio creada o ya existe');
     console.log(req.body);
+    console.log('Creando oficio...');
+    
+    // Asegurar que la tabla exista
+    const pool = await connectDB();
+    await pool.request().query(oficioSchema);
+    
+    console.log('Tabla de oficio creada o ya existe');
+    
     const {
       estado = 'en proceso',
       numero_de_oficio,
@@ -59,56 +50,36 @@ const createOficio = async (req, res) => {
       return res.status(400).json({ error: 'El área es requerida' });
     }
 
-
-    // Crear oficio
-    const oficioData = {
-      estado,
-      numero_de_oficio,
-      fecha_recepcion,
-      fecha_limite: fecha_limite || null,
-      archivado,
-      fecha_respuesta: fecha_respuesta || null,
-      id_solicitante,
-      asunto,
-      observaciones: observaciones || null,
-      id_responsable,
-      id_area
-    };
-
-    connection = await getConnection();
-    
     // Verificar que el solicitante existe
-    const [solicitanteRows] = await connection.execute(
-      'SELECT * FROM Solicitante WHERE id_solicitante = ?',
-      [id_solicitante]
-    );
+    const solicitanteCheck = await pool.request()
+      .input('id_solicitante', sql.Int, id_solicitante)
+      .query('SELECT * FROM Solicitante WHERE id_solicitante = @id_solicitante');
 
-    if (solicitanteRows.length === 0) {
+    if (solicitanteCheck.recordset.length === 0) {
       return res.status(404).json({ error: 'Solicitante no encontrado' });
     }
 
     // Verificar que el responsable existe
-    const [responsableRows] = await connection.execute(
-      'SELECT * FROM Responsable WHERE id_responsable = ?',
-      [id_responsable]
-    );
+    const responsableCheck = await pool.request()
+      .input('id_responsable', sql.Int, id_responsable)
+      .query('SELECT * FROM Responsable WHERE id_responsable = @id_responsable');
 
-    if (responsableRows.length === 0) {
+    if (responsableCheck.recordset.length === 0) {
       return res.status(404).json({ error: 'Responsable no encontrado' });
     }
 
     // Verificar que el área existe
-    const [areaRows] = await connection.execute(
-      'SELECT * FROM Area WHERE id_area = ?',
-      [id_area]
-    );
+    const areaCheck = await pool.request()
+      .input('id_area', sql.Int, id_area)
+      .query('SELECT * FROM Area WHERE id_area = @id_area');
 
-    if (areaRows.length === 0) {
+    if (areaCheck.recordset.length === 0) {
       return res.status(404).json({ error: 'Área no encontrada' });
     }
 
-    const [result] = await connection.execute(
-      `INSERT INTO Oficio (
+    // Crear oficio
+    const query = `
+      INSERT INTO Oficio (
         estado, 
         numero_de_oficio, 
         fecha_recepcion, 
@@ -120,41 +91,53 @@ const createOficio = async (req, res) => {
         observaciones, 
         id_responsable, 
         id_area
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        estado,
-        numero_de_oficio,
-        fecha_recepcion,
-        fecha_limite,
-        archivado,
-        fecha_respuesta,
-        id_solicitante,
-        asunto,
-        observaciones,
-        id_responsable,
-        id_area
-      ]
-    );
+      ) VALUES (
+        @estado,
+        @numero_de_oficio,
+        @fecha_recepcion,
+        @fecha_limite,
+        @archivado,
+        @fecha_respuesta,
+        @id_solicitante,
+        @asunto,
+        @observaciones,
+        @id_responsable,
+        @id_area
+      );
+      SELECT SCOPE_IDENTITY() AS id_oficio;
+    `;
+    
+    const result = await pool.request()
+      .input('estado', sql.NVarChar, estado)
+      .input('numero_de_oficio', sql.Int, numero_de_oficio)
+      .input('fecha_recepcion', sql.Date, fecha_recepcion ? new Date(fecha_recepcion) : null)
+      .input('fecha_limite', sql.Date, fecha_limite ? new Date(fecha_limite) : null)
+      .input('archivado', sql.Bit, archivado ? 1 : 0)
+      .input('fecha_respuesta', sql.Date, fecha_respuesta ? new Date(fecha_respuesta) : null)
+      .input('id_solicitante', sql.Int, id_solicitante)
+      .input('asunto', sql.NVarChar, asunto)
+      .input('observaciones', sql.NVarChar, observaciones || null)
+      .input('id_responsable', sql.Int, id_responsable)
+      .input('id_area', sql.Int, id_area)
+      .query(query);
 
     res.status(201).json({
       message: 'Oficio creado exitosamente',
-      id_oficio: result.insertId
+      id_oficio: result.recordset[0].id_oficio
     });
   } catch (error) {
+    console.error('Error al crear oficio:', error);
     res.status(500).json({ error: error.message });
-  } finally {
-    if (connection) await connection.end();
   }
 };
 
 // Obtener todos los oficios con información de las relaciones
 const getAllOficios = async (req, res) => {
-  let connection;
   try {
-    connection = await getConnection();
+    const pool = await connectDB();
     
     // Consulta con JOIN para obtener información de solicitante, responsable y área
-    const [rows] = await connection.execute(`
+    const query = `
       SELECT 
         o.*,
         s.nombre_solicitante,
@@ -168,25 +151,25 @@ const getAllOficios = async (req, res) => {
         Responsable r ON o.id_responsable = r.id_responsable
       LEFT JOIN 
         Area a ON o.id_area = a.id_area
-    `);
+    `;
     
-    res.status(200).json(rows);
+    const result = await pool.request().query(query);
+    
+    res.status(200).json(result.recordset);
   } catch (error) {
+    console.error('Error al obtener oficios:', error);
     res.status(500).json({ error: error.message });
-  } finally {
-    if (connection) await connection.end();
   }
 };
 
 // Obtener un oficio por ID con información de las relaciones
 const getOficioById = async (req, res) => {
-  let connection;
   try {
     const { id } = req.params;
-    connection = await getConnection();
+    const pool = await connectDB();
     
     // Consulta con JOIN para obtener información de solicitante, responsable y área
-    const [rows] = await connection.execute(`
+    const query = `
       SELECT 
         o.*,
         s.nombre_solicitante,
@@ -201,24 +184,26 @@ const getOficioById = async (req, res) => {
       LEFT JOIN 
         Area a ON o.id_area = a.id_area
       WHERE 
-        o.id_oficio = ?
-    `, [id]);
+        o.id_oficio = @id
+    `;
+    
+    const result = await pool.request()
+      .input('id', sql.Int, id)
+      .query(query);
 
-    if (rows.length === 0) {
+    if (result.recordset.length === 0) {
       return res.status(404).json({ message: 'Oficio no encontrado' });
     }
     
-    res.status(200).json(rows[0]);
+    res.status(200).json(result.recordset[0]);
   } catch (error) {
+    console.error('Error al obtener oficio por ID:', error);
     res.status(500).json({ error: error.message });
-  } finally {
-    if (connection) await connection.end();
   }
 };
 
 // Actualizar un oficio
 const updateOficio = async (req, res) => {
-  let connection;
   try {
     const { id } = req.params;
     const {
@@ -235,189 +220,169 @@ const updateOficio = async (req, res) => {
       id_area
     } = req.body;
 
-    connection = await getConnection();
+    const pool = await connectDB();
     
     // Verificar que el oficio existe
-    const [checkRows] = await connection.execute(
-      'SELECT * FROM Oficio WHERE id_oficio = ?',
-      [id]
-    );
+    const checkResult = await pool.request()
+      .input('id', sql.Int, id)
+      .query('SELECT * FROM Oficio WHERE id_oficio = @id');
 
-    if (checkRows.length === 0) {
+    if (checkResult.recordset.length === 0) {
       return res.status(404).json({ error: 'Oficio no encontrado' });
     }
 
     // Verificar relaciones si se proporcionan
     if (id_solicitante) {
-      const [solicitanteRows] = await connection.execute(
-        'SELECT * FROM Solicitante WHERE id_solicitante = ?',
-        [id_solicitante]
-      );
+      const solicitanteCheck = await pool.request()
+        .input('id_solicitante', sql.Int, id_solicitante)
+        .query('SELECT * FROM Solicitante WHERE id_solicitante = @id_solicitante');
 
-      if (solicitanteRows.length === 0) {
+      if (solicitanteCheck.recordset.length === 0) {
         return res.status(404).json({ error: 'Solicitante no encontrado' });
       }
     }
 
     if (id_responsable) {
-      const [responsableRows] = await connection.execute(
-        'SELECT * FROM Responsable WHERE id_responsable = ?',
-        [id_responsable]
-      );
+      const responsableCheck = await pool.request()
+        .input('id_responsable', sql.Int, id_responsable)
+        .query('SELECT * FROM Responsable WHERE id_responsable = @id_responsable');
 
-      if (responsableRows.length === 0) {
+      if (responsableCheck.recordset.length === 0) {
         return res.status(404).json({ error: 'Responsable no encontrado' });
       }
     }
 
     if (id_area) {
-      const [areaRows] = await connection.execute(
-        'SELECT * FROM Area WHERE id_area = ?',
-        [id_area]
-      );
+      const areaCheck = await pool.request()
+        .input('id_area', sql.Int, id_area)
+        .query('SELECT * FROM Area WHERE id_area = @id_area');
 
-      if (areaRows.length === 0) {
+      if (areaCheck.recordset.length === 0) {
         return res.status(404).json({ error: 'Área no encontrada' });
       }
     }
 
     // Construir la consulta dinámica para actualizar sólo los campos proporcionados
     let updateFields = [];
-    let updateValues = [];
+    const request = pool.request().input('id', sql.Int, id);
 
     if (estado !== undefined) {
-      updateFields.push('estado = ?');
-      updateValues.push(estado);
+      updateFields.push('estado = @estado');
+      request.input('estado', sql.NVarChar, estado);
     }
 
     if (numero_de_oficio !== undefined) {
-      updateFields.push('numero_de_oficio = ?');
-      updateValues.push(numero_de_oficio);
+      updateFields.push('numero_de_oficio = @numero_de_oficio');
+      request.input('numero_de_oficio', sql.Int, numero_de_oficio);
     }
 
     if (fecha_recepcion !== undefined) {
-      updateFields.push('fecha_recepcion = ?');
-      updateValues.push(fecha_recepcion);
+      updateFields.push('fecha_recepcion = @fecha_recepcion');
+      request.input('fecha_recepcion', sql.Date, fecha_recepcion ? new Date(fecha_recepcion) : null);
     }
 
     if (fecha_limite !== undefined) {
-      updateFields.push('fecha_limite = ?');
-      updateValues.push(fecha_limite);
+      updateFields.push('fecha_limite = @fecha_limite');
+      request.input('fecha_limite', sql.Date, fecha_limite ? new Date(fecha_limite) : null);
     }
 
     if (archivado !== undefined) {
-      updateFields.push('archivado = ?');
-      updateValues.push(archivado);
+      updateFields.push('archivado = @archivado');
+      request.input('archivado', sql.Bit, archivado ? 1 : 0);
     }
 
     if (fecha_respuesta !== undefined) {
-      updateFields.push('fecha_respuesta = ?');
-      updateValues.push(fecha_respuesta);
+      updateFields.push('fecha_respuesta = @fecha_respuesta');
+      request.input('fecha_respuesta', sql.Date, fecha_respuesta ? new Date(fecha_respuesta) : null);
     }
 
     if (id_solicitante !== undefined) {
-      updateFields.push('id_solicitante = ?');
-      updateValues.push(id_solicitante);
+      updateFields.push('id_solicitante = @id_solicitante');
+      request.input('id_solicitante', sql.Int, id_solicitante);
     }
 
     if (asunto !== undefined) {
-      updateFields.push('asunto = ?');
-      updateValues.push(asunto);
+      updateFields.push('asunto = @asunto');
+      request.input('asunto', sql.NVarChar, asunto);
     }
 
     if (observaciones !== undefined) {
-      updateFields.push('observaciones = ?');
-      updateValues.push(observaciones);
+      updateFields.push('observaciones = @observaciones');
+      request.input('observaciones', sql.NVarChar, observaciones);
     }
 
     if (id_responsable !== undefined) {
-      updateFields.push('id_responsable = ?');
-      updateValues.push(id_responsable);
+      updateFields.push('id_responsable = @id_responsable');
+      request.input('id_responsable', sql.Int, id_responsable);
     }
 
     if (id_area !== undefined) {
-      updateFields.push('id_area = ?');
-      updateValues.push(id_area);
+      updateFields.push('id_area = @id_area');
+      request.input('id_area', sql.Int, id_area);
     }
 
     if (updateFields.length === 0) {
       return res.status(400).json({ error: 'No se proporcionaron campos para actualizar' });
     }
 
-    // Agregar el ID al final del array de valores
-    updateValues.push(id);
-
     // Construir y ejecutar la consulta UPDATE
-    const updateQuery = `UPDATE Oficio SET ${updateFields.join(', ')} WHERE id_oficio = ?`;
-    await connection.execute(updateQuery, updateValues);
+    const updateQuery = `UPDATE Oficio SET ${updateFields.join(', ')} WHERE id_oficio = @id`;
+    await request.query(updateQuery);
 
     res.status(200).json({ message: 'Oficio actualizado exitosamente' });
   } catch (error) {
+    console.error('Error al actualizar oficio:', error);
     res.status(500).json({ error: error.message });
-  } finally {
-    if (connection) await connection.end();
   }
 };
 
 // Eliminar un oficio
 const deleteOficio = async (req, res) => {
-  let connection;
   try {
     const { id } = req.params;
-    connection = await getConnection();
+    const pool = await connectDB();
 
     // Verificar que el oficio existe
-    const [checkRows] = await connection.execute(
-      'SELECT * FROM Oficio WHERE id_oficio = ?',
-      [id]
-    );
+    const checkResult = await pool.request()
+      .input('id', sql.Int, id)
+      .query('SELECT * FROM Oficio WHERE id_oficio = @id');
 
-    if (checkRows.length === 0) {
+    if (checkResult.recordset.length === 0) {
       return res.status(404).json({ error: 'Oficio no encontrado' });
     }
 
     // Verificar si hay PDFs asociados
-    const [pdfRows] = await connection.execute(
-      'SELECT * FROM PDF WHERE id_oficio = ?',
-      [id]
-    );
+    const pdfResult = await pool.request()
+      .input('id', sql.Int, id)
+      .query('SELECT * FROM PDF WHERE id_oficio = @id');
 
-    if (pdfRows.length > 0) {
-      // Opción 1: Denegar la eliminación si hay PDFs asociados
-      // return res.status(400).json({ 
-      //   error: 'No se puede eliminar el oficio porque tiene archivos PDF asociados' 
-      // });
-
+    if (pdfResult.recordset.length > 0) {
       // Opción 2: Eliminar los PDFs asociados (cascada)
-      await connection.execute(
-        'DELETE FROM PDF WHERE id_oficio = ?',
-        [id]
-      );
+      await pool.request()
+        .input('id', sql.Int, id)
+        .query('DELETE FROM PDF WHERE id_oficio = @id');
     }
 
     // Eliminar el oficio
-    await connection.execute(
-      'DELETE FROM Oficio WHERE id_oficio = ?',
-      [id]
-    );
+    await pool.request()
+      .input('id', sql.Int, id)
+      .query('DELETE FROM Oficio WHERE id_oficio = @id');
 
     res.status(200).json({ message: 'Oficio eliminado correctamente' });
   } catch (error) {
+    console.error('Error al eliminar oficio:', error);
     res.status(500).json({ error: error.message });
-  } finally {
-    if (connection) await connection.end();
   }
 };
 
 // Buscar oficios por término de búsqueda
 const searchOficios = async (req, res) => {
-  let connection;
   try {
     const { term } = req.params;
-    connection = await getConnection();
+    const pool = await connectDB();
     
     // Buscar en múltiples campos con JOIN para obtener nombres relacionados
-    const [rows] = await connection.execute(`
+    const query = `
       SELECT 
         o.*,
         s.nombre_solicitante,
@@ -432,30 +397,32 @@ const searchOficios = async (req, res) => {
       LEFT JOIN 
         Area a ON o.id_area = a.id_area
       WHERE 
-        o.numero_de_oficio LIKE ? OR
-        o.asunto LIKE ? OR
-        s.nombre_solicitante LIKE ? OR
-        r.nombre_responsable LIKE ? OR
-        a.nombre_area LIKE ?
-    `, [`%${term}%`, `%${term}%`, `%${term}%`, `%${term}%`, `%${term}%`]);
+        CONVERT(VARCHAR, o.numero_de_oficio) LIKE @term OR
+        o.asunto LIKE @term OR
+        s.nombre_solicitante LIKE @term OR
+        r.nombre_responsable LIKE @term OR
+        a.nombre_area LIKE @term
+    `;
     
-    res.status(200).json(rows);
+    const result = await pool.request()
+      .input('term', sql.NVarChar, `%${term}%`)
+      .query(query);
+    
+    res.status(200).json(result.recordset);
   } catch (error) {
+    console.error('Error al buscar oficios:', error);
     res.status(500).json({ error: error.message });
-  } finally {
-    if (connection) await connection.end();
   }
 };
 
 // Filtrar oficios por estado
 const getOficiosByEstado = async (req, res) => {
-  let connection;
   try {
     const { estado } = req.params;
-    connection = await getConnection();
+    const pool = await connectDB();
     
     // Consulta con JOIN para obtener información de solicitante, responsable y área
-    const [rows] = await connection.execute(`
+    const query = `
       SELECT 
         o.*,
         s.nombre_solicitante,
@@ -470,27 +437,29 @@ const getOficiosByEstado = async (req, res) => {
       LEFT JOIN 
         Area a ON o.id_area = a.id_area
       WHERE 
-        o.estado = ?
-    `, [estado]);
+        o.estado = @estado
+    `;
     
-    res.status(200).json(rows);
+    const result = await pool.request()
+      .input('estado', sql.NVarChar, estado)
+      .query(query);
+    
+    res.status(200).json(result.recordset);
   } catch (error) {
+    console.error('Error al filtrar oficios por estado:', error);
     res.status(500).json({ error: error.message });
-  } finally {
-    if (connection) await connection.end();
   }
 };
 
 // Obtener oficios archivados
 const getOficiosArchivados = async (req, res) => {
-  let connection;
   try {
     const { archivado } = req.params;
-    const archivedValue = archivado === 'true';
-    connection = await getConnection();
+    const archivedValue = archivado === 'true' ? 1 : 0; // Convertir a 1/0 para SQL Server BIT
+    const pool = await connectDB();
     
     // Consulta con JOIN para obtener información de solicitante, responsable y área
-    const [rows] = await connection.execute(`
+    const query = `
       SELECT 
         o.*,
         s.nombre_solicitante,
@@ -505,14 +474,17 @@ const getOficiosArchivados = async (req, res) => {
       LEFT JOIN 
         Area a ON o.id_area = a.id_area
       WHERE 
-        o.archivado = ?
-    `, [archivedValue]);
+        o.archivado = @archivado
+    `;
     
-    res.status(200).json(rows);
+    const result = await pool.request()
+      .input('archivado', sql.Bit, archivedValue)
+      .query(query);
+    
+    res.status(200).json(result.recordset);
   } catch (error) {
+    console.error('Error al obtener oficios archivados:', error);
     res.status(500).json({ error: error.message });
-  } finally {
-    if (connection) await connection.end();
   }
 };
 

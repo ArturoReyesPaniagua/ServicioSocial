@@ -1,55 +1,47 @@
-//node create-admin.js
-
+// SistemaIntegral/backend/create-admin.js
 require('dotenv').config();
 const bcrypt = require('bcryptjs');
-const { v4: uuidv4 } = require('uuid');
-const mysql = require('mysql2/promise');
+const sql = require('mssql');
 const config = require('./db/config');
 
 async function createAdminUser() {
-  let connection;
+  let pool;
   try {
     // Conectar a la base de datos
-    connection = await mysql.createConnection(config);
+    pool = await sql.connect(config);
     
     // Verificar si el usuario admin ya existe
-    const [checkRows] = await connection.execute(
-      'SELECT * FROM users WHERE username = ?',
-      ['admin']
-    );
+    const checkResult = await pool.request()
+      .input('username', sql.NVarChar, 'administrador')
+      .query('SELECT * FROM users WHERE username = @username');
     
-    if (checkRows.length > 0) {
+    if (checkResult.recordset.length > 0) {
       console.log('El usuario admin ya existe. Si necesitas restablecer la contraseña, usa la opción de actualización.');
       return;
     }
     
-    // Crear contraseña hasheada
+    // Crear contraseña hasheada 
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash('admin123', salt); // Cambia 'admin123' por la contraseña que quieras
-    
-    // Datos del nuevo usuario admin
-    const admin = {
-      userId: uuidv4(),
-      username: 'administrador',
-      password: hashedPassword,
-      role: 'admin'
-    };
+    const hashedPassword = await bcrypt.hash('admin123', salt);
     
     // Insertar el usuario admin
-    await connection.execute(
-      'INSERT INTO users (username, password, role) VALUES (?, ?, ?, ?)',
-      [admin.username, admin.password, admin.role]
-    );
+    await pool.request()
+      .input('username', sql.NVarChar, 'administrador')
+      .input('password', sql.NVarChar, hashedPassword)
+      .input('role', sql.NVarChar, 'admin')
+      .query('INSERT INTO users (username, password, role) VALUES (@username, @password, @role)');
     
     console.log('¡Usuario admin creado con éxito!');
-    console.log('Usuario: admin');
+    console.log('Usuario: administrador');
     console.log('Contraseña: admin123'); // Muestra la contraseña que configuraste
     console.log('Rol: admin');
     
   } catch (error) {
     console.error('Error al crear el usuario admin:', error);
   } finally {
-    if (connection) await connection.end();
+    if (pool) {
+      await pool.close();
+    }
   }
 }
 

@@ -1,34 +1,25 @@
-// File:config.js
 // SistemaIntegral/backend/db/config.js
-// Configuración de la base de datos MySQL
-// La parte de abajo es para SQL Server, la de arriba es para MySQL
 
+// Configuración para SQL Server
+const dbconfig = { 
+  user: "sa",                    // Usuario de SQL Server (superadministrador)
+  password: "Polopolo123",       // Contraseña
+  server: "localhost",           // Nombre del servidor
+  port: 1433,                    // Puerto predeterminado de SQL Server
+  database: "ssdb",              // Base de datos (servicio social data base)
+  options: {
+    encrypt: false,              // Cambiar a true si usas Azure o requieres conexión cifrada
+    trustServerCertificate: true, // Para desarrollo local (evita errores de certificado)
+    enableArithAbort: true,      // Recomendado para consistencia
+    instanceName: "",            // Dejar vacío si no usas una instancia con nombre
+    connectTimeout: 30000,       // Tiempo de espera para la conexión (30 segundos)
+    requestTimeout: 30000        // Tiempo de espera para las solicitudes (30 segundos)
+  },
+  pool: {
+    max: 10,                     // Número máximo de conexiones en el pool
+    min: 0,                      // Número mínimo de conexiones en el pool
+    idleTimeoutMillis: 30000     // Tiempo máximo de inactividad para una conexión
+  }
+};
 
-
-const config = {
-  host: "127.0.0.1",
-  user: "root",
-  password: "Polopolo123",
-  database: "ssdb",
-
-  };
-  
-  module.exports = config;
-
-
-  /*
-  const dbconfig = { 
-    user: "sa",                    // aqui tienes que poner el usuario de tu base de datos en este caso puse sa de super administrador en sql server
-    password: "Polopolo123",      //aqui tienes que poner la contraseña de tu base de datos
-    server: "localhost",          
-    port: 1433,                   //puerto por defecto de sql server tcp/ip 
-    database: "ssdb",             // significa servicio social data base 
-    dialect: "mssql",
-    options: {
-      encrypt: false, // Cambia a true si usas Azure
-      trustServerCertificate: false, // Cambia a true si usas Azure
-      trustedConnection: false, // Cambia a true si usas Azure
-    },
 module.exports = dbconfig;
-
-  */

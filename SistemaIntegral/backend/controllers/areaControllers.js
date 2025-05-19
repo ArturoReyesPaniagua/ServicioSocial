@@ -1,24 +1,14 @@
-// File: areaControllers.js
 // SistemaIntegral/backend/controllers/areaControllers.js
-// Este archivo contiene las funciones para la gestión de áreas
-// que interactúan con la base de datos y manejan las solicitudes HTTP relacionadas con las áreas
-
+const sql = require('mssql');
 const areaSchema = require('../schemas/areaSchema');
-const { createTable } = require('../utils/funtiosauth');
-const mysql = require('mysql2/promise');
-const config = require('../db/config');
-
-// Obtener conexión a la base de datos
-const getConnection = async () => {
-  return await mysql.createConnection(config);
-};
+const { connectDB } = require('../db/db');
 
 // Crear una nueva área
 const createArea = async (req, res) => {
-  let connection;
   try {
-    // Asegurar que la tabla exista
-    await createTable(areaSchema);
+    // Asegurar que la tabla exista mediante la ejecución del schema
+    const pool = await connectDB();
+    await pool.request().query(areaSchema);
 
     const { nombre_area } = req.body;
     
@@ -26,63 +16,61 @@ const createArea = async (req, res) => {
       return res.status(400).json({ error: 'El nombre del área es requerido' });
     }
 
-    connection = await getConnection();
-    const [result] = await connection.execute(
-      'INSERT INTO Area (nombre_area) VALUES (?)',
-      [nombre_area]
-    );
+    // Insertar nueva área
+    const result = await pool.request()
+      .input('nombre_area', sql.NVarChar, nombre_area)
+      .query(`
+        INSERT INTO Area (nombre_area) 
+        VALUES (@nombre_area);
+        SELECT SCOPE_IDENTITY() AS id_area;
+      `);
 
     res.status(201).json({
       message: 'Área creada exitosamente',
-      id_area: result.insertId
+      id_area: result.recordset[0].id_area
     });
   } catch (error) {
+    console.error('Error al crear área:', error);
     res.status(500).json({ error: error.message });
-  } finally {
-    if (connection) await connection.end();
   }
 };
 
 // Obtener todas las áreas
 const getAllAreas = async (req, res) => {
-  let connection;
   try {
-    connection = await getConnection();
-    const [rows] = await connection.execute('SELECT * FROM Area');
-    res.status(200).json(rows);
+    const pool = await connectDB();
+    const result = await pool.request().query('SELECT * FROM Area');
+    
+    res.status(200).json(result.recordset);
   } catch (error) {
+    console.error('Error al obtener áreas:', error);
     res.status(500).json({ error: error.message });
-  } finally {
-    if (connection) await connection.end();
   }
 };
 
 // Obtener un área por ID
 const getAreaById = async (req, res) => {
-  let connection;
   try {
     const { id } = req.params;
-    connection = await getConnection();
-    const [rows] = await connection.execute(
-      'SELECT * FROM Area WHERE id_area = ?',
-      [id]
-    );
+    const pool = await connectDB();
+    
+    const result = await pool.request()
+      .input('id', sql.Int, id)
+      .query('SELECT * FROM Area WHERE id_area = @id');
 
-    if (rows.length === 0) {
+    if (result.recordset.length === 0) {
       return res.status(404).json({ error: 'Área no encontrada' });
     }
 
-    res.status(200).json(rows[0]);
+    res.status(200).json(result.recordset[0]);
   } catch (error) {
+    console.error('Error al obtener área por ID:', error);
     res.status(500).json({ error: error.message });
-  } finally {
-    if (connection) await connection.end();
   }
 };
 
 // Actualizar un área
 const updateArea = async (req, res) => {
-  let connection;
   try {
     const { id } = req.params;
     const { nombre_area } = req.body;
@@ -91,72 +79,65 @@ const updateArea = async (req, res) => {
       return res.status(400).json({ error: 'El nombre del área es requerido' });
     }
 
-    connection = await getConnection();
+    const pool = await connectDB();
     
     // Verificar que el área existe
-    const [checkRows] = await connection.execute(
-      'SELECT * FROM Area WHERE id_area = ?',
-      [id]
-    );
+    const checkResult = await pool.request()
+      .input('id', sql.Int, id)
+      .query('SELECT * FROM Area WHERE id_area = @id');
 
-    if (checkRows.length === 0) {
+    if (checkResult.recordset.length === 0) {
       return res.status(404).json({ error: 'Área no encontrada' });
     }
 
     // Actualizar el área
-    await connection.execute(
-      'UPDATE Area SET nombre_area = ? WHERE id_area = ?',
-      [nombre_area, id]
-    );
+    await pool.request()
+      .input('nombre_area', sql.NVarChar, nombre_area)
+      .input('id', sql.Int, id)
+      .query('UPDATE Area SET nombre_area = @nombre_area WHERE id_area = @id');
 
     res.status(200).json({ message: 'Área actualizada correctamente' });
   } catch (error) {
+    console.error('Error al actualizar área:', error);
     res.status(500).json({ error: error.message });
-  } finally {
-    if (connection) await connection.end();
   }
 };
 
 // Eliminar un área
 const deleteArea = async (req, res) => {
-  let connection;
   try {
     const { id } = req.params;
-    connection = await getConnection();
+    const pool = await connectDB();
 
     // Verificar que el área existe
-    const [checkRows] = await connection.execute(
-      'SELECT * FROM Area WHERE id_area = ?',
-      [id]
-    );
+    const checkResult = await pool.request()
+      .input('id', sql.Int, id)
+      .query('SELECT * FROM Area WHERE id_area = @id');
 
-    if (checkRows.length === 0) {
+    if (checkResult.recordset.length === 0) {
       return res.status(404).json({ error: 'Área no encontrada' });
     }
 
     // Verificar si el área está siendo utilizada en otras tablas
-    const [userRows] = await connection.execute(
-      'SELECT * FROM Usuarios WHERE id_area = ?',
-      [id]
-    );
+    const userResult = await pool.request()
+      .input('id', sql.Int, id)
+      .query('SELECT * FROM users WHERE id_area = @id');
 
-    if (userRows.length > 0) {
+    if (userResult.recordset.length > 0) {
       return res.status(400).json({ 
         error: 'No se puede eliminar el área porque está siendo utilizada por usuarios' 
       });
     }
 
     // Eliminar el área
-    await connection.execute(
-      'DELETE FROM Area WHERE id_area = ?',
-      [id]
-    );
+    await pool.request()
+      .input('id', sql.Int, id)
+      .query('DELETE FROM Area WHERE id_area = @id');
 
     res.status(200).json({ message: 'Área eliminada correctamente' });
   } catch (error) {
+    console.error('Error al eliminar área:', error);
     res.status(500).json({ error: error.message });
-  } finally {
-    if (connection) await connection.end();
   }
 };
 

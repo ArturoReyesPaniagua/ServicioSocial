@@ -1,7 +1,8 @@
+// SistemaIntegral/backend/server.js
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const connectDB = require('./db/db');
+const { connectDB } = require('./db/db');
 const oficioRoutes = require('./routes/oficioRoutes');
 const pdfRoutes = require('./routes/pdfRoutes');
 const authRoutes = require('./routes/authRoutes');
@@ -24,8 +25,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json({ limit: '150mb' }));
 app.use(bodyParser.urlencoded({ limit: '150mb', extended: true }));
 
-// Conectar a la base de datos
-connectDB();
+// Conectar a la base de datos - ahora usa el módulo actualizado
+// Iniciar conexión a SQL Server
+connectDB().catch(err => {
+  console.error("Error al conectar a la base de datos SQL Server: ", err);
+  process.exit(1);
+});
 
 // Rutas
 app.use('/api', oficioRoutes);
@@ -37,10 +42,24 @@ app.use('/api/auth', authRoutes);
 
 // Ruta de prueba
 app.get('/', (req, res) => {
-  res.send('API del Sistema Integral de Gestión de Oficios funcionando');
+  res.send('API del Sistema Integral de Gestión de Oficios funcionando con SQL Server');
 });
 
 // Iniciar servidor
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en el puerto ${PORT}`);
+});
+
+// Manejar cierre limpio
+process.on('SIGINT', async () => {
+  console.log('Cerrando la aplicación...');
+  try {
+    // Importar closePool desde db.js
+    const { closePool } = require('./db/db');
+    await closePool();
+    console.log('Conexión a la base de datos cerrada correctamente');
+  } catch (error) {
+    console.error('Error al cerrar la conexión a la base de datos:', error);
+  }
+  process.exit(0);
 });

@@ -1,22 +1,12 @@
-// middleware/authMiddleware.js 
-// Middleware para autenticación y autorización de usuarios
-// Este archivo contiene los middlewares para autenticar y verificar el rol de los usuarios
-
-
-
+// middleware/authMiddleware.js
 const jwt = require('jsonwebtoken');
-const mysql = require('mysql2/promise');
-const config = require('../db/config');
-
-// Función para obtener conexión a la base de datos
-const getConnection = async () => {
-  return await mysql.createConnection(config);
-};
+const sql = require('mssql');
+const connectDB = require('../db/db');
 
 // Middleware para verificar el token JWT
 const authenticateToken = async (req, res, next) => {
   const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN La traducción de la cadena de autorización a un token.
+  const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
   
   if (!token) {
     return res.status(401).json({ error: 'Acceso denegado, token no proporcionado' });
@@ -33,21 +23,23 @@ const authenticateToken = async (req, res, next) => {
 
 // Middleware para verificar rol de administrador
 const isAdmin = async (req, res, next) => {
-  let connection;
+  let pool;
   try {
     if (!req.user || !req.user.userId) {
       return res.status(401).json({ error: 'Usuario no autenticado' });
     }
     
     const { userId } = req.user;
-    connection = await getConnection();
     
-    const [rows] = await connection.execute(
-      'SELECT role FROM users WHERE userId = ?',  // Query para obtener el rol del usuario solicita el usuario del id
-      [userId]
-    );
+    // Conectar a la base de datos
+    pool = await sql.connect(require('../db/config'));
+    
+    // Consultar el rol del usuario
+    const result = await pool.request()
+      .input('userId', sql.Int, userId)
+      .query('SELECT role FROM users WHERE userId = @userId');
   
-    if (rows.length === 0 || rows[0].role !== 'admin') {
+    if (result.recordset.length === 0 || result.recordset[0].role !== 'admin') {
       return res.status(403).json({ error: 'Acceso denegado, se requiere rol de administrador' });
     }
     
@@ -56,7 +48,14 @@ const isAdmin = async (req, res, next) => {
     console.error('Error al verificar rol de administrador:', error);
     res.status(500).json({ error: error.message });
   } finally {
-    if (connection) await connection.end();
+    // Cerrar la conexión si está abierta
+    if (pool) {
+      try {
+        await pool.close();
+      } catch (err) {
+        console.error('Error al cerrar la conexión:', err);
+      }
+    }
   }
 };
 

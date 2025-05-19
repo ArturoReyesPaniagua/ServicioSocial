@@ -1,12 +1,12 @@
-// File: areaSchema.js
 // SistemaIntegral/backend/schemas/areaSchema.js
-// Este archivo define el esquema de la tabla "Area" en la base de datos
-
 const areaSchema = `
-  CREATE TABLE IF NOT EXISTS Area (
-    id_area INT PRIMARY KEY AUTO_INCREMENT,
-    nombre_area VARCHAR(255) NOT NULL
-  )
+  IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Area]') AND type in (N'U'))
+  BEGIN
+    CREATE TABLE [dbo].[Area] (
+      id_area INT IDENTITY(1,1) PRIMARY KEY,
+      nombre_area NVARCHAR(255) NOT NULL
+    )
+  END
 `;
 
 module.exports = areaSchema;

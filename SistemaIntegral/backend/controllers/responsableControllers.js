@@ -1,24 +1,14 @@
-// File: responsableControllers.js
 // SistemaIntegral/backend/controllers/responsableControllers.js
-// Este archivo contiene las funciones para la gestión de responsables
-// que interactúan con la base de datos y manejan las solicitudes HTTP relacionadas con los responsables
-
+const sql = require('mssql');
 const responsableSchema = require('../schemas/responsableSchema');
-const { createTable } = require('../utils/funtiosauth');
-const mysql = require('mysql2/promise');
-const config = require('../db/config');
-
-// Obtener conexión a la base de datos
-const getConnection = async () => {
-  return await mysql.createConnection(config);
-};
+const { connectDB } = require('../db/db');
 
 // Crear un nuevo responsable
 const createResponsable = async (req, res) => {
-  let connection;
   try {
     // Asegurar que la tabla exista
-    await createTable(responsableSchema);
+    const pool = await connectDB();
+    await pool.request().query(responsableSchema);
 
     const { nombre_responsable } = req.body;
     
@@ -26,63 +16,58 @@ const createResponsable = async (req, res) => {
       return res.status(400).json({ error: 'El nombre del responsable es requerido' });
     }
 
-    connection = await getConnection();
-    const [result] = await connection.execute(
-      'INSERT INTO Responsable (nombre_responsable) VALUES (?)',
-      [nombre_responsable]
-    );
+    const result = await pool.request()
+      .input('nombre_responsable', sql.NVarChar, nombre_responsable)
+      .query(`
+        INSERT INTO Responsable (nombre_responsable) 
+        VALUES (@nombre_responsable);
+        SELECT SCOPE_IDENTITY() AS id_responsable;
+      `);
 
     res.status(201).json({
       message: 'Responsable creado exitosamente',
-      id_responsable: result.insertId
+      id_responsable: result.recordset[0].id_responsable
     });
   } catch (error) {
+    console.error('Error al crear responsable:', error);
     res.status(500).json({ error: error.message });
-  } finally {
-    if (connection) await connection.end();
   }
 };
 
 // Obtener todos los responsables
 const getAllResponsables = async (req, res) => {
-  let connection;
   try {
-    connection = await getConnection();
-    const [rows] = await connection.execute('SELECT * FROM Responsable');
-    res.status(200).json(rows);
+    const pool = await connectDB();
+    const result = await pool.request().query('SELECT * FROM Responsable');
+    res.status(200).json(result.recordset);
   } catch (error) {
+    console.error('Error al obtener responsables:', error);
     res.status(500).json({ error: error.message });
-  } finally {
-    if (connection) await connection.end();
   }
 };
 
 // Obtener un responsable por ID
 const getResponsableById = async (req, res) => {
-  let connection;
   try {
     const { id } = req.params;
-    connection = await getConnection();
-    const [rows] = await connection.execute(
-      'SELECT * FROM Responsable WHERE id_responsable = ?',
-      [id]
-    );
+    const pool = await connectDB();
+    const result = await pool.request()
+      .input('id', sql.Int, id)
+      .query('SELECT * FROM Responsable WHERE id_responsable = @id');
 
-    if (rows.length === 0) {
+    if (result.recordset.length === 0) {
       return res.status(404).json({ error: 'Responsable no encontrado' });
     }
 
-    res.status(200).json(rows[0]);
+    res.status(200).json(result.recordset[0]);
   } catch (error) {
+    console.error('Error al obtener responsable por ID:', error);
     res.status(500).json({ error: error.message });
-  } finally {
-    if (connection) await connection.end();
   }
 };
 
 // Actualizar un responsable
 const updateResponsable = async (req, res) => {
-  let connection;
   try {
     const { id } = req.params;
     const { nombre_responsable } = req.body;
@@ -91,72 +76,65 @@ const updateResponsable = async (req, res) => {
       return res.status(400).json({ error: 'El nombre del responsable es requerido' });
     }
 
-    connection = await getConnection();
+    const pool = await connectDB();
     
     // Verificar que el responsable existe
-    const [checkRows] = await connection.execute(
-      'SELECT * FROM Responsable WHERE id_responsable = ?',
-      [id]
-    );
+    const checkResult = await pool.request()
+      .input('id', sql.Int, id)
+      .query('SELECT * FROM Responsable WHERE id_responsable = @id');
 
-    if (checkRows.length === 0) {
+    if (checkResult.recordset.length === 0) {
       return res.status(404).json({ error: 'Responsable no encontrado' });
     }
 
     // Actualizar el responsable
-    await connection.execute(
-      'UPDATE Responsable SET nombre_responsable = ? WHERE id_responsable = ?',
-      [nombre_responsable, id]
-    );
+    await pool.request()
+      .input('nombre_responsable', sql.NVarChar, nombre_responsable)
+      .input('id', sql.Int, id)
+      .query('UPDATE Responsable SET nombre_responsable = @nombre_responsable WHERE id_responsable = @id');
 
     res.status(200).json({ message: 'Responsable actualizado correctamente' });
   } catch (error) {
+    console.error('Error al actualizar responsable:', error);
     res.status(500).json({ error: error.message });
-  } finally {
-    if (connection) await connection.end();
   }
 };
 
 // Eliminar un responsable
 const deleteResponsable = async (req, res) => {
-  let connection;
   try {
     const { id } = req.params;
-    connection = await getConnection();
+    const pool = await connectDB();
 
     // Verificar que el responsable existe
-    const [checkRows] = await connection.execute(
-      'SELECT * FROM Responsable WHERE id_responsable = ?',
-      [id]
-    );
+    const checkResult = await pool.request()
+      .input('id', sql.Int, id)
+      .query('SELECT * FROM Responsable WHERE id_responsable = @id');
 
-    if (checkRows.length === 0) {
+    if (checkResult.recordset.length === 0) {
       return res.status(404).json({ error: 'Responsable no encontrado' });
     }
 
     // Verificar si el responsable está siendo utilizado en oficios
-    const [oficioRows] = await connection.execute(
-      'SELECT * FROM Oficio WHERE id_responsable = ?',
-      [id]
-    );
+    const oficioResult = await pool.request()
+      .input('id', sql.Int, id)
+      .query('SELECT * FROM Oficio WHERE id_responsable = @id');
 
-    if (oficioRows.length > 0) {
+    if (oficioResult.recordset.length > 0) {
       return res.status(400).json({ 
         error: 'No se puede eliminar el responsable porque está siendo utilizado en oficios' 
       });
     }
 
     // Eliminar el responsable
-    await connection.execute(
-      'DELETE FROM Responsable WHERE id_responsable = ?',
-      [id]
-    );
+    await pool.request()
+      .input('id', sql.Int, id)
+      .query('DELETE FROM Responsable WHERE id_responsable = @id');
 
     res.status(200).json({ message: 'Responsable eliminado correctamente' });
   } catch (error) {
+    console.error('Error al eliminar responsable:', error);
     res.status(500).json({ error: error.message });
-  } finally {
-    if (connection) await connection.end();
   }
 };
 
