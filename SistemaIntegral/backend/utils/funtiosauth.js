@@ -1,11 +1,10 @@
-// File funtiosauth.js
-// SistemaIntegral/backend/utils/funtiosauth.js
+// SistemaIntegral/backend/utils/funtiosauth.js - versión actualizada
 // Este archivo contiene funciones para interactuar con la base de datos
 // relacionadas con la autenticación y gestión de usuarios
 
 const mysql = require("mysql2");
-const config = require("../db/config");
-const pool = mysql.createPool(config);
+const config = require("../db/config");  // Usar la configuración centralizada
+const pool = mysql.createPool(config);   // Esto usará la config que toma los valores de .env
 
 const createTable = (schema) => {
   return new Promise((resolve, reject) => {

@@ -65,7 +65,7 @@ const login = async (req, res) => {
   try {
     const { username, password } = req.body;
     
-    console.log("Intento de login:", { username, password: "********" });
+    console.log("Intento de login:", { username, password});
     
     if (!username || !password) {
       return res.status(400).json({ error: "Los campos no pueden estar vacios!" });
@@ -77,22 +77,26 @@ const login = async (req, res) => {
     const userResult = await pool.request()
       .input('username', sql.NVarChar, username)
       .query('SELECT * FROM users WHERE username = @username');
+      console.log("Resultado de búsqueda de usuario:", userResult.recordset);
     
     if (userResult.recordset.length === 0) {
       return res.status(401).json({ error: "Nombre de usuario no registrado" });
     }
     
     const user = userResult.recordset[0];
-    console.log("Usuario encontrado:", user.username);
+    console.log("Usuario encontrado:", user.username, user.password);
     
     if (!user.password) {
       return res.status(401).json({ error: "Información inválida" });
     }
     
-    // En el código original hay una comparación directa, manteniéndola aquí
-    // Pero se recomienda usar bcrypt para comparar contraseñas de forma segura
-    const passwordMatch = password === user.password;
+    // Verificar la contraseña
+    const passwordMatch = await password === user.password;
+    console.log("Contraseña proporcionada", password  );
+    console.log("Contraseña almacenada", user.password);
+    // const passwordMatch = await bcrypt.compare(password, user.password);
     console.log("Contraseña coincide:", passwordMatch ? "Sí" : "No");
+    // Si la contraseña coincide, generar el token
     
     if (passwordMatch) {
       const token = generateAccessToken(user.userId);
