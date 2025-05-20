@@ -17,6 +17,8 @@ const UserForm = ({ user, onSave, onCancel }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [areas, setAreas] = useState([]);
   const { user: currentUser } = useAuth();
+  const [mostrarFormArea, setMostrarFormArea] = useState(false);
+  const [nuevaArea, setNuevaArea] = useState('');
 
   useEffect(() => {
     const fetchAreas = async () => {
@@ -67,6 +69,36 @@ const UserForm = ({ user, onSave, onCancel }) => {
     // Limpiar error del campo cuando se modifica
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  // Crear nueva área
+  const handleCreateArea = async () => {
+    if (!nuevaArea.trim()) {
+      return;
+    }
+    
+    try {
+      const response = await axios.post('http://localhost:3001/api/areas', {
+        nombre_area: nuevaArea
+      });
+      
+      const newArea = response.data;
+      setAreas(prev => [...prev, { 
+        id_area: newArea.id_area, 
+        nombre_area: nuevaArea 
+      }]);
+      
+      // Actualizar el formulario con la nueva área
+      setFormData(prev => ({
+        ...prev,
+        id_area: newArea.id_area
+      }));
+      
+      setNuevaArea('');
+      setMostrarFormArea(false);
+    } catch (error) {
+      console.error('Error al crear área:', error);
     }
   };
 
@@ -268,26 +300,67 @@ const UserForm = ({ user, onSave, onCancel }) => {
               <label htmlFor="id_area" className="block text-sm font-medium text-gray-700 mb-1">
                 Área *
               </label>
-              <select
-                id="id_area"
-                name="id_area"
-                value={formData.id_area}
-                onChange={handleChange}
-                className={`mt-1 block w-full rounded-md shadow-sm p-2 border ${
-                  errors.id_area ? 'border-red-500' : 'border-gray-300'
-                } focus:outline-none focus:ring-2 focus:ring-guinda focus:border-guinda`}
-                aria-invalid={errors.id_area ? "true" : "false"}
-                aria-describedby={errors.id_area ? "id_area-error" : undefined}
-              >
-                <option value="">Seleccione un área</option>
-                {areas.map(area => (
-                  <option key={area.id_area} value={area.id_area}>
-                    {area.nombre_area}
-                  </option>
-                ))}
-              </select>
+              <div className="flex gap-2">
+                <select
+                  id="id_area"
+                  name="id_area"
+                  value={formData.id_area}
+                  onChange={handleChange}
+                  className={`mt-1 block w-full rounded-md shadow-sm p-2 border ${
+                    errors.id_area ? 'border-red-500' : 'border-gray-300'
+                  } focus:outline-none focus:ring-2 focus:ring-guinda focus:border-guinda`}
+                  aria-invalid={errors.id_area ? "true" : "false"}
+                  aria-describedby={errors.id_area ? "id_area-error" : undefined}
+                >
+                  <option value="">Seleccione un área</option>
+                  {areas.map(area => (
+                    <option key={area.id_area} value={area.id_area}>
+                      {area.nombre_area}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={() => setMostrarFormArea(!mostrarFormArea)}
+                  className="mt-1 px-3 py-2 bg-e2e8f0 text-4a5568 border-none rounded hover:bg-cbd5e0 transition-colors"
+                  style={{
+                    backgroundColor: "#e2e8f0",
+                    color: "#4a5568"
+                  }}
+                >
+                  +
+                </button>
+              </div>
               {errors.id_area && (
                 <p className="mt-1 text-sm text-red-600" id="id_area-error">{errors.id_area}</p>
+              )}
+              
+              {/* Formulario para nueva área */}
+              {mostrarFormArea && (
+                <div className="mt-2 p-2 border border-e2e8f0 rounded">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={nuevaArea}
+                      onChange={(e) => setNuevaArea(e.target.value)}
+                      placeholder="Nombre de la nueva área"
+                      className="block w-full rounded-md shadow-sm p-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-guinda focus:border-guinda"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleCreateArea}
+                      className="px-3 py-2 rounded text-white"
+                      style={{
+                        backgroundColor: "#800020",
+                        transition: "background-color 0.2s"
+                      }}
+                      onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#600018"}
+                      onMouseOut={(e) => e.currentTarget.style.backgroundColor = "#800020"}
+                    >
+                      Agregar
+                    </button>
+                  </div>
+                </div>
               )}
             </div>
 
@@ -303,7 +376,13 @@ const UserForm = ({ user, onSave, onCancel }) => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-300 disabled:opacity-70 disabled:cursor-not-allowed"
+                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white disabled:opacity-70 disabled:cursor-not-allowed"
+                style={{
+                  backgroundColor: "#800020",
+                  transition: "background-color 0.2s"
+                }}
+                onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#600018"}
+                onMouseOut={(e) => e.currentTarget.style.backgroundColor = "#800020"}
               >
                 {isSubmitting ? (
                   <div className="flex items-center">
