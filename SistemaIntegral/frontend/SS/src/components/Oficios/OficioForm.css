@@ -222,7 +222,7 @@
   }
   
   .oficio-form-submit-btn:disabled {
-    background-color: var(--guinda-light);
+    background-color: var(--guinda-dark);
     opacity: 0.7;
     cursor: not-allowed;
   }

@@ -10,7 +10,8 @@ import OficiosTable from './OficiosTable';
 import OficioForm from './OficioForm';
 import OficioView from './OficioView';
 import DeleteConfirmation from '../common/DeleteConfirmation';
-import {format} from 'date-fns';
+import { format } from 'date-fns';
+import { useAuth } from '../../context/AuthContext'; // Importar el contexto de autenticación
 
 const OficiosPage = () => {
   const [oficios, setOficios] = useState([]);
@@ -21,6 +22,9 @@ const OficiosPage = () => {
   const [currentOficio, setCurrentOficio] = useState(null);
   const [filterType, setFilterType] = useState('all'); // 'all', 'archived', 'estado'
   const [selectedEstado, setSelectedEstado] = useState('');
+  const [areas, setAreas] = useState([]);
+  const [selectedArea, setSelectedArea] = useState('');
+  const { user } = useAuth(); // Obtener información del usuario actual
   
   // Estados disponibles
   const estadosDisponibles = [
@@ -62,7 +66,10 @@ const OficiosPage = () => {
       } else if (filterType === 'estado' && selectedEstado) {
         url = `http://localhost:3001/api/oficios/estado/${selectedEstado}`;
       }
-      
+      else if (filterType === 'area' && selectedArea && user.role === "admin") {
+        url = `http://localhost:3001/api/oficios/area/${selectedArea}`;
+      }
+
       const response = await axios.get(url);
       // Actualizar el estado con los oficios obtenidos
       setOficios(response.data);
@@ -74,17 +81,32 @@ const OficiosPage = () => {
     }
   };
 
+  // Filtrar oficios por área (solo para admin)
+  useEffect(() => {
+    fetchAreas();
+  }, []);
+  
+  const fetchAreas = async () => {
+    try {
+      const response = await axios.get('http://localhost:3001/api/areas');
+      setAreas(response.data);
+    } catch (error) {
+      console.error('Error cargando áreas:', error);
+      toast.error('Error al cargar áreas');
+    }
+  };
+
   // Filtrar cuando cambien los filtros
   useEffect(() => {
     fetchOficios();
-  }, [filterType, selectedEstado]);
+  }, [filterType, selectedEstado, selectedArea]);
 
   // Crear un nuevo oficio
   const handleCreateOficio = async (oficioData) => {
     try {
-    oficioData.fecha_recepcion = format(new Date(oficioData.fecha_recepcion), 'yyyy-MM-dd');
-    oficioData.fecha_limite = oficioData.fecha_limite ? format(new Date(oficioData.fecha_limite), 'yyyy-MM-dd') : null;
-    oficioData.fecha_respuesta = oficioData.fecha_respuesta ? format(new Date(oficioData.fecha_respuesta), 'yyyy-MM-dd') : null;
+      oficioData.fecha_recepcion = format(new Date(oficioData.fecha_recepcion), 'yyyy-MM-dd');
+      oficioData.fecha_limite = oficioData.fecha_limite ? format(new Date(oficioData.fecha_limite), 'yyyy-MM-dd') : null;
+      oficioData.fecha_respuesta = oficioData.fecha_respuesta ? format(new Date(oficioData.fecha_respuesta), 'yyyy-MM-dd') : null;
       await axios.post('http://localhost:3001/api/oficios', oficioData);
       toast.success('Oficio creado exitosamente');
       setFormVisible(false);
@@ -189,6 +211,7 @@ const OficiosPage = () => {
               <option value="active">Oficios activos</option>
               <option value="archived">Oficios archivados</option>
               <option value="estado">Filtrar por estado</option>
+              {user.role === "admin" && <option value="area">Filtrar por área</option>}
             </select>
             
             {filterType === 'estado' && (
@@ -201,6 +224,21 @@ const OficiosPage = () => {
                 {estadosDisponibles.map(estado => (
                   <option key={estado.value} value={estado.value}>
                     {estado.label}
+                  </option>
+                ))}
+              </select>
+            )}
+
+            {filterType === "area" && (
+              <select
+                className="p-2 border border-gray-300 rounded"
+                value={selectedArea}
+                onChange={(e) => setSelectedArea(e.target.value)}
+              > 
+                <option value="">Seleccione un área</option>
+                {areas.map(area => (
+                  <option key={area.id_area} value={area.id_area}>
+                    {area.nombre_area}
                   </option>
                 ))}
               </select>

@@ -8,10 +8,14 @@ import { format, isValid, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { useAuth } from '../../context/AuthContext';
 import ReportePreview from './ReportePreview';
 import ReporteExport from './ReporteExport';
 
 const ReportePage = () => {
+  // Obtener información del usuario autenticado
+  const { user } = useAuth();
+  
   // Estados para los datos y filtros
   const [oficios, setOficios] = useState([]);
   const [filteredOficios, setFilteredOficios] = useState([]);
@@ -20,6 +24,7 @@ const ReportePage = () => {
   const [responsables, setResponsables] = useState([]);
   const [areas, setAreas] = useState([]);
   const [showPreview, setShowPreview] = useState(false);
+  const [areaName, setAreaName] = useState('');
   
   // Estados para los filtros
   const [filters, setFilters] = useState({
@@ -52,6 +57,19 @@ const ReportePage = () => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
+        // Si el usuario es normal, preseleccionar su área
+        if (user && user.role !== 'admin' && user.id_area) {
+          setFilters(prev => ({
+            ...prev,
+            idArea: user.id_area.toString()
+          }));
+          
+          // Si tenemos el nombre del área, guardarlo
+          if (user.nombre_area) {
+            setAreaName(user.nombre_area);
+          }
+        }
+        
         // Cargar oficios
         await fetchOficios();
         
@@ -66,16 +84,39 @@ const ReportePage = () => {
     };
     
     fetchData();
-  }, []);
+  }, [user]);
 
   // Función para cargar los oficios
   const fetchOficios = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/api/oficios');
+      // Obtener el token para autorización
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        toast.error('Sesión expirada. Por favor inicie sesión nuevamente.');
+        return;
+      }
+      
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      };
+      
+      const response = await axios.get('http://localhost:3001/api/oficios', config);
+      
+      // El backend ya filtra por área para usuarios normales
       setOficios(response.data);
       setFilteredOficios(response.data);
     } catch (error) {
       console.error('Error cargando oficios:', error);
+      
+      if (error.response && error.response.status === 401) {
+        toast.error('Sesión expirada. Por favor inicie sesión nuevamente.');
+      } else {
+        toast.error('Error al cargar oficios. Por favor intente nuevamente.');
+      }
+      
       throw error;
     }
   };
@@ -83,17 +124,42 @@ const ReportePage = () => {
   // Función para cargar datos relacionados (solicitantes, responsables, áreas)
   const fetchRelatedData = async () => {
     try {
+      // Obtener token para autorización
+      const token = localStorage.getItem('token');
+      
+      if (!token) return;
+      
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      };
+      
       // Cargar solicitantes
-      const solicitantesResponse = await axios.get('http://localhost:3001/api/solicitantes');
+      const solicitantesResponse = await axios.get('http://localhost:3001/api/solicitantes', config);
       setSolicitantes(solicitantesResponse.data);
       
       // Cargar responsables
-      const responsablesResponse = await axios.get('http://localhost:3001/api/responsables');
+      const responsablesResponse = await axios.get('http://localhost:3001/api/responsables', config);
       setResponsables(responsablesResponse.data);
       
-      // Cargar áreas
-      const areasResponse = await axios.get('http://localhost:3001/api/areas');
-      setAreas(areasResponse.data);
+      // Cargar áreas (solo para administradores)
+      if (user.role === 'admin') {
+        const areasResponse = await axios.get('http://localhost:3001/api/areas', config);
+        setAreas(areasResponse.data);
+      } else if (user.id_area) {
+        // Para usuarios normales, si no tenemos el nombre del área, obtenerlo
+        if (!areaName && user.id_area) {
+          try {
+            const areaResponse = await axios.get(`http://localhost:3001/api/areas/${user.id_area}`, config);
+            if (areaResponse.data && areaResponse.data.nombre_area) {
+              setAreaName(areaResponse.data.nombre_area);
+            }
+          } catch (error) {
+            console.error('Error al obtener nombre del área:', error);
+          }
+        }
+      }
     } catch (error) {
       console.error('Error cargando datos relacionados:', error);
       throw error;
@@ -103,6 +169,12 @@ const ReportePage = () => {
   // Manejar cambios en los filtros
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
+    
+    // Para usuarios normales, no permitir cambiar el área
+    if (name === 'idArea' && user.role !== 'admin') {
+      return;
+    }
+    
     setFilters(prev => ({
       ...prev,
       [name]: value
@@ -111,17 +183,33 @@ const ReportePage = () => {
 
   // Limpiar todos los filtros
   const clearFilters = () => {
-    setFilters({
-      estado: '',
-      fechaRecepcionDesde: '',
-      fechaRecepcionHasta: '',
-      fechaLimiteDesde: '',
-      fechaLimiteHasta: '',
-      idSolicitante: '',
-      idResponsable: '',
-      idArea: '',
-      archivado: ''
-    });
+    // Para usuarios normales, mantener su área en los filtros
+    if (user.role !== 'admin') {
+      setFilters({
+        estado: '',
+        fechaRecepcionDesde: '',
+        fechaRecepcionHasta: '',
+        fechaLimiteDesde: '',
+        fechaLimiteHasta: '',
+        idSolicitante: '',
+        idResponsable: '',
+        idArea: user.id_area.toString(), // Mantener el área del usuario
+        archivado: ''
+      });
+    } else {
+      // Para administradores, limpiar todos los filtros
+      setFilters({
+        estado: '',
+        fechaRecepcionDesde: '',
+        fechaRecepcionHasta: '',
+        fechaLimiteDesde: '',
+        fechaLimiteHasta: '',
+        idSolicitante: '',
+        idResponsable: '',
+        idArea: '',
+        archivado: ''
+      });
+    }
     
     // Restaurar la lista completa
     setFilteredOficios(oficios);
@@ -198,8 +286,8 @@ const ReportePage = () => {
         );
       }
       
-      // Filtrar por área
-      if (filters.idArea) {
+      // Filtrar por área (solo para administradores)
+      if (user.role === 'admin' && filters.idArea) {
         result = result.filter(oficio => 
           oficio.id_area === parseInt(filters.idArea)
         );
@@ -242,6 +330,15 @@ const ReportePage = () => {
     <div className="container mx-auto p-4">
       <div className="mb-6">
         <h1 className="text-2xl font-bold mb-4">Generación de Reportes</h1>
+        
+        {user && user.role !== 'admin' && (
+          <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4">
+            <p className="text-sm text-blue-700">
+              Está generando reportes únicamente para los oficios de su área asignada: <strong>{areaName}</strong>.
+            </p>
+          </div>
+        )}
+        
         <p className="text-gray-600 mb-6">
           Aplique los filtros necesarios y genere reportes personalizados de los oficios.
         </p>
@@ -314,26 +411,43 @@ const ReportePage = () => {
               </select>
             </div>
             
-            {/* Filtro por área */}
-            <div>
-              <label htmlFor="idArea" className="block text-sm font-medium text-gray-700 mb-1">
-                Área
-              </label>
-              <select
-                id="idArea"
-                name="idArea"
-                value={filters.idArea}
-                onChange={handleFilterChange}
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-guinda focus:border-guinda"
-              >
-                <option value="">Todas las áreas</option>
-                {areas.map(area => (
-                  <option key={area.id_area} value={area.id_area}>
-                    {area.nombre_area}
-                  </option>
-                ))}
-              </select>
-            </div>
+            {/* Filtro por área - Solo visible para administradores */}
+            {user && user.role === 'admin' && (
+              <div>
+                <label htmlFor="idArea" className="block text-sm font-medium text-gray-700 mb-1">
+                  Área
+                </label>
+                <select
+                  id="idArea"
+                  name="idArea"
+                  value={filters.idArea}
+                  onChange={handleFilterChange}
+                  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-guinda focus:border-guinda"
+                >
+                  <option value="">Todas las áreas</option>
+                  {areas.map(area => (
+                    <option key={area.id_area} value={area.id_area}>
+                      {area.nombre_area}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+            
+            {/* Área preseleccionada para usuarios normales */}
+            {user && user.role !== 'admin' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Área
+                </label>
+                <div className="p-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600">
+                  {areaName || 'Cargando...'}
+                  <p className="text-xs text-gray-500 mt-1">
+                    El área está preseleccionada según su perfil
+                  </p>
+                </div>
+              </div>
+            )}
             
             {/* Filtro por fecha de recepción (desde) */}
             <div>

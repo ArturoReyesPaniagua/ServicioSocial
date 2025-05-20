@@ -15,6 +15,19 @@ const createOficio = async (req, res) => {
     
     console.log('Tabla de oficio creada o ya existe');
     
+    // Obtener el usuario actual
+    const userId = req.user.userId;
+    const userResult = await pool.request()
+      .input('userId', sql.Int, userId)
+      .query('SELECT role, id_area FROM users WHERE userId = @userId');
+    
+    if (userResult.recordset.length === 0) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+    
+    const userRole = userResult.recordset[0].role;
+    const userArea = userResult.recordset[0].id_area;
+    
     const {
       estado = 'en proceso',
       numero_de_oficio,
@@ -26,7 +39,7 @@ const createOficio = async (req, res) => {
       asunto,
       observaciones,
       id_responsable,
-      id_area
+      id_area // Este campo será ignorado para usuarios normales
     } = req.body;
 
     // Validar campos requeridos
@@ -46,7 +59,11 @@ const createOficio = async (req, res) => {
       return res.status(400).json({ error: 'El responsable es requerido' });
     }
 
-    if (!id_area) {
+    // Para usuarios normales, se usa su área automáticamente
+    // Para administradores, se permite especificar el área
+    const areaToUse = userRole === 'admin' ? id_area : userArea;
+    
+    if (!areaToUse) {
       return res.status(400).json({ error: 'El área es requerida' });
     }
 
@@ -70,7 +87,7 @@ const createOficio = async (req, res) => {
 
     // Verificar que el área existe
     const areaCheck = await pool.request()
-      .input('id_area', sql.Int, id_area)
+      .input('id_area', sql.Int, areaToUse)
       .query('SELECT * FROM Area WHERE id_area = @id_area');
 
     if (areaCheck.recordset.length === 0) {
@@ -118,7 +135,7 @@ const createOficio = async (req, res) => {
       .input('asunto', sql.NVarChar, asunto)
       .input('observaciones', sql.NVarChar, observaciones || null)
       .input('id_responsable', sql.Int, id_responsable)
-      .input('id_area', sql.Int, id_area)
+      .input('id_area', sql.Int, areaToUse)
       .query(query);
 
     res.status(201).json({
@@ -136,26 +153,70 @@ const getAllOficios = async (req, res) => {
   try {
     const pool = await connectDB();
     
-    // Consulta con JOIN para obtener información de solicitante, responsable y área
-    const query = `
-      SELECT 
-        o.*,
-        s.nombre_solicitante,
-        r.nombre_responsable,
-        a.nombre_area
-      FROM 
-        Oficio o
-      LEFT JOIN 
-        Solicitante s ON o.id_solicitante = s.id_solicitante
-      LEFT JOIN 
-        Responsable r ON o.id_responsable = r.id_responsable
-      LEFT JOIN 
-        Area a ON o.id_area = a.id_area
-    `;
+    // Obtener el usuario autenticado
+    const userId = req.user.userId;
     
-    const result = await pool.request().query(query);
+    // Obtener el rol y área del usuario
+    const userResult = await pool.request()
+      .input('userId', sql.Int, userId)
+      .query('SELECT role, id_area FROM users WHERE userId = @userId');
     
-    res.status(200).json(result.recordset);
+    if (userResult.recordset.length === 0) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+    
+    const userRole = userResult.recordset[0].role;
+    const userArea = userResult.recordset[0].id_area;
+    
+    // Construir la consulta según el rol
+    let query;
+    
+    if (userRole === 'admin') {
+      // Los administradores pueden ver todos los oficios
+      query = `
+        SELECT 
+          o.*,
+          s.nombre_solicitante,
+          r.nombre_responsable,
+          a.nombre_area
+        FROM 
+          Oficio o
+        LEFT JOIN 
+          Solicitante s ON o.id_solicitante = s.id_solicitante
+        LEFT JOIN 
+          Responsable r ON o.id_responsable = r.id_responsable
+        LEFT JOIN 
+          Area a ON o.id_area = a.id_area
+      `;
+      
+      const result = await pool.request().query(query);
+      res.status(200).json(result.recordset);
+    } else {
+      // Usuarios normales solo ven oficios de su área
+      query = `
+        SELECT 
+          o.*,
+          s.nombre_solicitante,
+          r.nombre_responsable,
+          a.nombre_area
+        FROM 
+          Oficio o
+        LEFT JOIN 
+          Solicitante s ON o.id_solicitante = s.id_solicitante
+        LEFT JOIN 
+          Responsable r ON o.id_responsable = r.id_responsable
+        LEFT JOIN 
+          Area a ON o.id_area = a.id_area
+        WHERE 
+          o.id_area = @userArea
+      `;
+      
+      const result = await pool.request()
+        .input('userArea', sql.Int, userArea)
+        .query(query);
+        
+      res.status(200).json(result.recordset);
+    }
   } catch (error) {
     console.error('Error al obtener oficios:', error);
     res.status(500).json({ error: error.message });
@@ -168,8 +229,23 @@ const getOficioById = async (req, res) => {
     const { id } = req.params;
     const pool = await connectDB();
     
-    // Consulta con JOIN para obtener información de solicitante, responsable y área
-    const query = `
+    // Obtener el usuario autenticado
+    const userId = req.user.userId;
+    
+    // Obtener el rol y área del usuario
+    const userResult = await pool.request()
+      .input('userId', sql.Int, userId)
+      .query('SELECT role, id_area FROM users WHERE userId = @userId');
+    
+    if (userResult.recordset.length === 0) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+    
+    const userRole = userResult.recordset[0].role;
+    const userArea = userResult.recordset[0].id_area;
+    
+    // Obtener el oficio
+    const oficioQuery = `
       SELECT 
         o.*,
         s.nombre_solicitante,
@@ -189,13 +265,22 @@ const getOficioById = async (req, res) => {
     
     const result = await pool.request()
       .input('id', sql.Int, id)
-      .query(query);
+      .query(oficioQuery);
 
     if (result.recordset.length === 0) {
       return res.status(404).json({ message: 'Oficio no encontrado' });
     }
     
-    res.status(200).json(result.recordset[0]);
+    const oficio = result.recordset[0];
+    
+    // Validar permisos - solo admin o usuario del mismo área puede ver
+    if (userRole !== 'admin' && oficio.id_area !== userArea) {
+      return res.status(403).json({ 
+        error: 'No tiene permiso para acceder a este oficio' 
+      });
+    }
+    
+    res.status(200).json(oficio);
   } catch (error) {
     console.error('Error al obtener oficio por ID:', error);
     res.status(500).json({ error: error.message });
@@ -206,6 +291,41 @@ const getOficioById = async (req, res) => {
 const updateOficio = async (req, res) => {
   try {
     const { id } = req.params;
+    const pool = await connectDB();
+    
+    // Obtener el usuario autenticado
+    const userId = req.user.userId;
+    
+    // Obtener el rol y área del usuario
+    const userResult = await pool.request()
+      .input('userId', sql.Int, userId)
+      .query('SELECT role, id_area FROM users WHERE userId = @userId');
+    
+    if (userResult.recordset.length === 0) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+    
+    const userRole = userResult.recordset[0].role;
+    const userArea = userResult.recordset[0].id_area;
+    
+    // Verificar que el oficio existe
+    const checkResult = await pool.request()
+      .input('id', sql.Int, id)
+      .query('SELECT * FROM Oficio WHERE id_oficio = @id');
+
+    if (checkResult.recordset.length === 0) {
+      return res.status(404).json({ error: 'Oficio no encontrado' });
+    }
+    
+    const oficio = checkResult.recordset[0];
+    
+    // Validar permisos - solo admin o usuario del mismo área puede editar
+    if (userRole !== 'admin' && oficio.id_area !== userArea) {
+      return res.status(403).json({ 
+        error: 'No tiene permiso para editar este oficio' 
+      });
+    }
+    
     const {
       estado,
       numero_de_oficio,
@@ -217,19 +337,8 @@ const updateOficio = async (req, res) => {
       asunto,
       observaciones,
       id_responsable,
-      id_area
+      id_area // Este campo será ignorado para usuarios normales
     } = req.body;
-
-    const pool = await connectDB();
-    
-    // Verificar que el oficio existe
-    const checkResult = await pool.request()
-      .input('id', sql.Int, id)
-      .query('SELECT * FROM Oficio WHERE id_oficio = @id');
-
-    if (checkResult.recordset.length === 0) {
-      return res.status(404).json({ error: 'Oficio no encontrado' });
-    }
 
     // Verificar relaciones si se proporcionan
     if (id_solicitante) {
@@ -252,9 +361,12 @@ const updateOficio = async (req, res) => {
       }
     }
 
-    if (id_area) {
+    // Para usuarios normales, no se permite cambiar el área
+    let areaToCheck = userRole === 'admin' && id_area ? id_area : oficio.id_area;
+
+    if (areaToCheck) {
       const areaCheck = await pool.request()
-        .input('id_area', sql.Int, id_area)
+        .input('id_area', sql.Int, areaToCheck)
         .query('SELECT * FROM Area WHERE id_area = @id_area');
 
       if (areaCheck.recordset.length === 0) {
@@ -316,7 +428,8 @@ const updateOficio = async (req, res) => {
       request.input('id_responsable', sql.Int, id_responsable);
     }
 
-    if (id_area !== undefined) {
+    // Para el área, solo permitir cambiarla si es admin
+    if (userRole === 'admin' && id_area !== undefined) {
       updateFields.push('id_area = @id_area');
       request.input('id_area', sql.Int, id_area);
     }
@@ -342,6 +455,21 @@ const deleteOficio = async (req, res) => {
     const { id } = req.params;
     const pool = await connectDB();
 
+    // Obtener el usuario autenticado
+    const userId = req.user.userId;
+    
+    // Obtener el rol y área del usuario
+    const userResult = await pool.request()
+      .input('userId', sql.Int, userId)
+      .query('SELECT role, id_area FROM users WHERE userId = @userId');
+    
+    if (userResult.recordset.length === 0) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+    
+    const userRole = userResult.recordset[0].role;
+    const userArea = userResult.recordset[0].id_area;
+    
     // Verificar que el oficio existe
     const checkResult = await pool.request()
       .input('id', sql.Int, id)
@@ -349,6 +477,15 @@ const deleteOficio = async (req, res) => {
 
     if (checkResult.recordset.length === 0) {
       return res.status(404).json({ error: 'Oficio no encontrado' });
+    }
+    
+    const oficio = checkResult.recordset[0];
+    
+    // Validar permisos - solo admin o usuario del mismo área puede eliminar
+    if (userRole !== 'admin' && oficio.id_area !== userArea) {
+      return res.status(403).json({ 
+        error: 'No tiene permiso para eliminar este oficio' 
+      });
     }
 
     // Verificar si hay PDFs asociados
@@ -381,34 +518,83 @@ const searchOficios = async (req, res) => {
     const { term } = req.params;
     const pool = await connectDB();
     
-    // Buscar en múltiples campos con JOIN para obtener nombres relacionados
-    const query = `
-      SELECT 
-        o.*,
-        s.nombre_solicitante,
-        r.nombre_responsable,
-        a.nombre_area
-      FROM 
-        Oficio o
-      LEFT JOIN 
-        Solicitante s ON o.id_solicitante = s.id_solicitante
-      LEFT JOIN 
-        Responsable r ON o.id_responsable = r.id_responsable
-      LEFT JOIN 
-        Area a ON o.id_area = a.id_area
-      WHERE 
-        CONVERT(VARCHAR, o.numero_de_oficio) LIKE @term OR
-        o.asunto LIKE @term OR
-        s.nombre_solicitante LIKE @term OR
-        r.nombre_responsable LIKE @term OR
-        a.nombre_area LIKE @term
-    `;
+    // Obtener el usuario autenticado
+    const userId = req.user.userId;
     
-    const result = await pool.request()
-      .input('term', sql.NVarChar, `%${term}%`)
-      .query(query);
+    // Obtener el rol y área del usuario
+    const userResult = await pool.request()
+      .input('userId', sql.Int, userId)
+      .query('SELECT role, id_area FROM users WHERE userId = @userId');
     
-    res.status(200).json(result.recordset);
+    if (userResult.recordset.length === 0) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+    
+    const userRole = userResult.recordset[0].role;
+    const userArea = userResult.recordset[0].id_area;
+    
+    // Construir la consulta según el rol
+    let query;
+    
+    if (userRole === 'admin') {
+      query = `
+        SELECT 
+          o.*,
+          s.nombre_solicitante,
+          r.nombre_responsable,
+          a.nombre_area
+        FROM 
+          Oficio o
+        LEFT JOIN 
+          Solicitante s ON o.id_solicitante = s.id_solicitante
+        LEFT JOIN 
+          Responsable r ON o.id_responsable = r.id_responsable
+        LEFT JOIN 
+          Area a ON o.id_area = a.id_area
+        WHERE 
+          CONVERT(VARCHAR, o.numero_de_oficio) LIKE @term OR
+          o.asunto LIKE @term OR
+          s.nombre_solicitante LIKE @term OR
+          r.nombre_responsable LIKE @term OR
+          a.nombre_area LIKE @term
+      `;
+      
+      const result = await pool.request()
+        .input('term', sql.NVarChar, `%${term}%`)
+        .query(query);
+      
+      res.status(200).json(result.recordset);
+    } else {
+      query = `
+        SELECT 
+          o.*,
+          s.nombre_solicitante,
+          r.nombre_responsable,
+          a.nombre_area
+        FROM 
+          Oficio o
+        LEFT JOIN 
+          Solicitante s ON o.id_solicitante = s.id_solicitante
+        LEFT JOIN 
+          Responsable r ON o.id_responsable = r.id_responsable
+        LEFT JOIN 
+          Area a ON o.id_area = a.id_area
+        WHERE 
+          (CONVERT(VARCHAR, o.numero_de_oficio) LIKE @term OR
+          o.asunto LIKE @term OR
+          s.nombre_solicitante LIKE @term OR
+          r.nombre_responsable LIKE @term OR
+          a.nombre_area LIKE @term)
+          AND o.id_area = @userArea
+      `;
+      
+      const result = await pool.request()
+        .input('term', sql.NVarChar, `%${term}%`)
+        .input('userArea', sql.Int, userArea)
+        .query(query);
+      
+      res.status(200).json(result.recordset);
+    }
   } catch (error) {
     console.error('Error al buscar oficios:', error);
     res.status(500).json({ error: error.message });
@@ -421,30 +607,75 @@ const getOficiosByEstado = async (req, res) => {
     const { estado } = req.params;
     const pool = await connectDB();
     
-    // Consulta con JOIN para obtener información de solicitante, responsable y área
-    const query = `
-      SELECT 
-        o.*,
-        s.nombre_solicitante,
-        r.nombre_responsable,
-        a.nombre_area
-      FROM 
-        Oficio o
-      LEFT JOIN 
-        Solicitante s ON o.id_solicitante = s.id_solicitante
-      LEFT JOIN 
-        Responsable r ON o.id_responsable = r.id_responsable
-      LEFT JOIN 
-        Area a ON o.id_area = a.id_area
-      WHERE 
-        o.estado = @estado
-    `;
+    // Obtener el usuario autenticado
+    const userId = req.user.userId;
     
-    const result = await pool.request()
-      .input('estado', sql.NVarChar, estado)
-      .query(query);
+    // Obtener el rol y área del usuario
+    const userResult = await pool.request()
+      .input('userId', sql.Int, userId)
+      .query('SELECT role, id_area FROM users WHERE userId = @userId');
     
-    res.status(200).json(result.recordset);
+    if (userResult.recordset.length === 0) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+    
+    const userRole = userResult.recordset[0].role;
+    const userArea = userResult.recordset[0].id_area;
+    
+    // Construir la consulta según el rol
+    let query;
+    
+    if (userRole === 'admin') {
+      query = `
+        SELECT 
+          o.*,
+          s.nombre_solicitante,
+          r.nombre_responsable,
+          a.nombre_area
+        FROM 
+          Oficio o
+        LEFT JOIN 
+          Solicitante s ON o.id_solicitante = s.id_solicitante
+        LEFT JOIN 
+          Responsable r ON o.id_responsable = r.id_responsable
+        LEFT JOIN 
+          Area a ON o.id_area = a.id_area
+        WHERE 
+          o.estado = @estado
+      `;
+      
+      const result = await pool.request()
+        .input('estado', sql.NVarChar, estado)
+        .query(query);
+      
+      res.status(200).json(result.recordset);
+    } else {
+      query = `
+        SELECT 
+          o.*,
+          s.nombre_solicitante,
+          r.nombre_responsable,
+          a.nombre_area
+        FROM 
+          Oficio o
+        LEFT JOIN 
+          Solicitante s ON o.id_solicitante = s.id_solicitante
+        LEFT JOIN 
+          Responsable r ON o.id_responsable = r.id_responsable
+        LEFT JOIN 
+          Area a ON o.id_area = a.id_area
+        WHERE 
+          o.estado = @estado
+          AND o.id_area = @userArea
+      `;
+      
+      const result = await pool.request()
+        .input('estado', sql.NVarChar, estado)
+        .input('userArea', sql.Int, userArea)
+        .query(query);
+      
+      res.status(200).json(result.recordset);
+    }
   } catch (error) {
     console.error('Error al filtrar oficios por estado:', error);
     res.status(500).json({ error: error.message });
@@ -452,36 +683,134 @@ const getOficiosByEstado = async (req, res) => {
 };
 
 // Obtener oficios archivados
-const getOficiosArchivados = async (req, res) => {
+const getOficiosByArea = async (req, res) => {
   try {
-    const { archivado } = req.params;
-    const archivedValue = archivado === 'true' ? 1 : 0; // Convertir a 1/0 para SQL Server BIT
+    const { id_area } = req.params;
     const pool = await connectDB();
-    
-    // Consulta con JOIN para obtener información de solicitante, responsable y área
+    const userId = req.user.userId;
+    const userResult = await pool.request()
+      .input('userId', sql.Int, userId)
+      .query('SELECT role, id_area FROM users WHERE userId = @userId');
+    if (userResult.recordset.length === 0) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+    const userRole = userResult.recordset[0].role;
+    const userArea = userResult.recordset[0].id_area;
+    // Validar permisos - solo admin o usuario del mismo área puede ver
+    if (userRole !== 'admin' && userArea !== id_area) {
+      return res.status(403).json({
+        error: 'No tiene permiso para acceder a los oficios de esta área'
+      });
+    }
+    // Obtener los oficios de la área especificada
     const query = `
-      SELECT 
+      SELECT
         o.*,
         s.nombre_solicitante,
         r.nombre_responsable,
         a.nombre_area
-      FROM 
+      FROM
         Oficio o
-      LEFT JOIN 
+      LEFT JOIN
         Solicitante s ON o.id_solicitante = s.id_solicitante
-      LEFT JOIN 
+      LEFT JOIN
         Responsable r ON o.id_responsable = r.id_responsable
-      LEFT JOIN 
+      LEFT JOIN
         Area a ON o.id_area = a.id_area
-      WHERE 
-        o.archivado = @archivado
+      WHERE
+        o.id_area = @id_area
     `;
-    
     const result = await pool.request()
-      .input('archivado', sql.Bit, archivedValue)
+      .input('id_area', sql.Int, id_area)
       .query(query);
-    
+    if (result.recordset.length === 0) {
+      return res.status(404).json({ message: 'No se encontraron oficios para esta área' });
+    }
     res.status(200).json(result.recordset);
+  } catch (error) {
+    console.error('Error al obtener oficios por área:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+// Obtener oficios archivados
+
+
+
+const getOficiosArchivados = async (req, res) => {
+  try {
+    const { archivado } = req.params;
+    const archivedValue = archivado === 'true' ? 1 : 0;
+    const pool = await connectDB();
+    
+    // Obtener el usuario autenticado
+    const userId = req.user.userId;
+    
+    // Obtener el rol y área del usuario
+    const userResult = await pool.request()
+      .input('userId', sql.Int, userId)
+      .query('SELECT role, id_area FROM users WHERE userId = @userId');
+    
+    if (userResult.recordset.length === 0) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+    
+    const userRole = userResult.recordset[0].role;
+    const userArea = userResult.recordset[0].id_area;
+    
+    // Construir la consulta según el rol
+    let query;
+    
+    if (userRole === 'admin') {
+      query = `
+        SELECT 
+          o.*,
+          s.nombre_solicitante,
+          r.nombre_responsable,
+          a.nombre_area
+        FROM 
+          Oficio o
+        LEFT JOIN 
+          Solicitante s ON o.id_solicitante = s.id_solicitante
+        LEFT JOIN 
+          Responsable r ON o.id_responsable = r.id_responsable
+        LEFT JOIN 
+          Area a ON o.id_area = a.id_area
+        WHERE 
+          o.archivado = @archivado
+      `;
+      
+      const result = await pool.request()
+        .input('archivado', sql.Bit, archivedValue)
+        .query(query);
+      
+      res.status(200).json(result.recordset);
+    } else {
+      query = `
+        SELECT 
+          o.*,
+          s.nombre_solicitante,
+          r.nombre_responsable,
+          a.nombre_area
+        FROM 
+          Oficio o
+        LEFT JOIN 
+          Solicitante s ON o.id_solicitante = s.id_solicitante
+        LEFT JOIN 
+          Responsable r ON o.id_responsable = r.id_responsable
+        LEFT JOIN 
+          Area a ON o.id_area = a.id_area
+        WHERE 
+          o.archivado = @archivado
+          AND o.id_area = @userArea
+      `;
+      
+      const result = await pool.request()
+        .input('archivado', sql.Bit, archivedValue)
+        .input('userArea', sql.Int, userArea)
+        .query(query);
+      
+      res.status(200).json(result.recordset);
+    }
   } catch (error) {
     console.error('Error al obtener oficios archivados:', error);
     res.status(500).json({ error: error.message });

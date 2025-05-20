@@ -5,6 +5,7 @@
 
 import { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import { id } from 'date-fns/locale';
 
 // Crear el contexto de autenticación
 const AuthContext = createContext(null);
@@ -40,7 +41,6 @@ export function AuthProvider({ children }) {
           //   localStorage.removeItem('user');
           // }
           
-          // Si no tienes un endpoint de verificación, simplemente usa el token almacenado
           setUser(JSON.parse(storedUser));
           setIsAuthenticated(true);
         } catch (error) {
@@ -70,6 +70,10 @@ export function AuthProvider({ children }) {
       // Verificar la estructura de la respuesta según tu backend
       if (response.data) {
         // Configurar el token para todas las solicitudes futuras
+        console.log("username", username);
+        console.log("password", password);
+        console.log("response", response.data);
+        console.log("nombre area", response.data.nombre_area);
         const token = response.data.access_token;
         if (token) {
           axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -77,13 +81,17 @@ export function AuthProvider({ children }) {
           // Guardar el token y los datos del usuario
           localStorage.setItem('token', token);
           
-          // Adapta estos campos según la estructura de respuesta del backend
+          // Guardar los datos del usuario en el localStorage
           const userData = {
             userId: response.data.userId,
             username: response.data.username,
-            role: response.data.role || 'user' // Valor por defecto por si no viene en la respuesta
+            role: response.data.role || 'user', // Valor por defecto por si no viene en la respuesta
+            nombre_area: response.data.nombre_area || 'Sin área asignada',
+            id_area: response.data.id_area || null
+
           };
-          
+          console.log("userData", userData);
+          // Guardar el usuario en el localStorage
           localStorage.setItem('user', JSON.stringify(userData));
           
           setUser(userData);

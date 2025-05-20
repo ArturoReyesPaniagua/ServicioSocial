@@ -60,6 +60,10 @@ const OficioView = ({ oficio, onClose, onEdit }) => {
                   <p className="text-base">{oficio.numero_de_oficio}</p>
                 </div>
                 <div>
+                  <span className="text-sm font-medium text-gray-500">Area del oficio:</span>
+                  <p className="text-base">{oficio.nombre_area}</p>
+                </div>
+                <div>
                   <span className="text-sm font-medium text-gray-500">Estado:</span>
                   <p>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${getEstadoColor(oficio.estado)}`}>
@@ -67,6 +71,7 @@ const OficioView = ({ oficio, onClose, onEdit }) => {
                     </span>
                   </p>
                 </div>
+                
                 <div>
                   <span className="text-sm font-medium text-gray-500">Fecha de Recepción:</span>
                   <p className="text-base">{formatDate(oficio.fecha_recepcion)}</p>

@@ -1,7 +1,7 @@
 // middleware/authMiddleware.js
 const jwt = require('jsonwebtoken');
 const sql = require('mssql');
-const connectDB = require('../db/db');
+const { connectDB } = require('../db/db');
 
 // Middleware para verificar el token JWT
 const authenticateToken = async (req, res, next) => {
@@ -23,16 +23,13 @@ const authenticateToken = async (req, res, next) => {
 
 // Middleware para verificar rol de administrador
 const isAdmin = async (req, res, next) => {
-  let pool;
   try {
     if (!req.user || !req.user.userId) {
       return res.status(401).json({ error: 'Usuario no autenticado' });
     }
     
     const { userId } = req.user;
-    
-    // Conectar a la base de datos
-    pool = await sql.connect(require('../db/config'));
+    const pool = await connectDB();
     
     // Consultar el rol del usuario
     const result = await pool.request()
@@ -47,15 +44,6 @@ const isAdmin = async (req, res, next) => {
   } catch (error) {
     console.error('Error al verificar rol de administrador:', error);
     res.status(500).json({ error: error.message });
-  } finally {
-    // Cerrar la conexión si está abierta
-    if (pool) {
-      try {
-        await pool.close();
-      } catch (err) {
-        console.error('Error al cerrar la conexión:', err);
-      }
-    }
   }
 };
 

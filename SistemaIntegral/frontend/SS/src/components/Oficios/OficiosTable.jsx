@@ -27,6 +27,7 @@ const OficiosTable = ({
   const [sorting, setSorting] = useState([]);
   const [globalFilter, setGlobalFilter] = useState('');
   const [oficiosWithFiles, setOficiosWithFiles] = useState({});
+  const [enrichedData, setEnrichedData] = useState([]);
 
   // Cargar información de archivos para oficios
   useEffect(() => {
@@ -54,19 +55,48 @@ const OficiosTable = ({
     fetchFilesInfo();
   }, [data]);
 
+  // Cargar información de áreas (separado del useEffect anterior)
+  useEffect(() => {
+    const fetchArea = async () => {
+      if (!data || !data.length) return;
+      try {
+        const response = await axios.get('http://localhost:3001/api/areas');
+        if (response && response.data) {
+          const areas = response.data.reduce((acc, area) => {
+            acc[area.id_area] = area.nombre_area;
+            return acc;
+          }, {});
+          const enriched = data.map(oficio => ({
+            ...oficio,
+            nombre_area: areas[oficio.id_area] || 'No definida',
+          }));
+          setEnrichedData(enriched);
+        }
+      } catch (error) {
+        console.error('Error al cargar información de áreas:', error);
+      }
+    };
+    
+    fetchArea();
+  }, [data]);
+
   // Definir columnas
   const columns = useMemo(() => [
-{
-  header: 'No. Oficio',
-  accessorKey: 'numero_de_oficio',
-  sortingFn: (rowA, rowB, columnId) => {
-    const a = parseInt(rowA.getValue(columnId));
-    const b = parseInt(rowB.getValue(columnId));
-    return a - b;
-  },
-  cell: info => info.getValue() || '',
-}
-,
+    {
+      header: 'No. Oficio',
+      accessorKey: 'numero_de_oficio',
+      sortingFn: (rowA, rowB, columnId) => {
+        const a = parseInt(rowA.getValue(columnId), 10);
+        const b = parseInt(rowB.getValue(columnId), 10);
+        return isNaN(a) || isNaN(b) ? 0 : a - b;
+      },
+      cell: info => info.getValue() || '',
+    },
+    {
+      header: 'Area',
+      accessorKey: 'nombre_area',
+      cell: info => info.getValue() || '',
+    },
     {
       header: 'Estado',
       accessorKey: 'estado',
@@ -215,7 +245,7 @@ const OficiosTable = ({
 
   // Configurar tabla con TanStack
   const table = useReactTable({
-    data: data || [],
+    data: enrichedData.length > 0 ? enrichedData : data,
     columns,
     state: {
       sorting,
