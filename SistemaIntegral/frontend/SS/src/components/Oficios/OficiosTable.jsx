@@ -76,9 +76,11 @@ const OficiosTable = ({
         console.error('Error al cargar información de áreas:', error);
       }
     };
+
     
     fetchArea();
   }, [data]);
+  
 
   // Definir columnas
   const columns = useMemo(() => [

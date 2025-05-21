@@ -1,4 +1,4 @@
-// SistemaIntegral/backend/schemas/oficiosSchema.js
+// SistemaIntegral/backend/schemas/oficiosSchema.js (modificado)
 const oficioSchema = `
   IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Oficio]') AND type in (N'U'))
   BEGIN
@@ -15,11 +15,32 @@ const oficioSchema = `
       observaciones NVARCHAR(255),
       id_responsable INT,
       id_area INT,
+      id_UPCYD INT,
+      oficios_relacionados NVARCHAR(MAX),
+      oficio_respuesta NVARCHAR(255),
       CONSTRAINT FK_Oficio_Solicitante FOREIGN KEY (id_solicitante) REFERENCES Solicitante(id_solicitante),
       CONSTRAINT FK_Oficio_Responsable FOREIGN KEY (id_responsable) REFERENCES Responsable(id_responsable),
-      CONSTRAINT FK_Oficio_Area FOREIGN KEY (id_area) REFERENCES Area(id_area)
+      CONSTRAINT FK_Oficio_Area FOREIGN KEY (id_area) REFERENCES Area(id_area),
+      CONSTRAINT FK_Oficio_UPCYD FOREIGN KEY (id_UPCYD) REFERENCES UPCYD(id_UPCYD) ON DELETE SET NULL
     )
-  END
+  END;
+
+  -- Verificar si las columnas existen y añadirlas si no
+  IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Oficio]') AND name = 'id_UPCYD')
+  BEGIN
+    ALTER TABLE [dbo].[Oficio] ADD id_UPCYD INT;
+    ALTER TABLE [dbo].[Oficio] ADD CONSTRAINT FK_Oficio_UPCYD FOREIGN KEY (id_UPCYD) REFERENCES UPCYD(id_UPCYD) ON DELETE SET NULL;
+  END;
+
+  IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Oficio]') AND name = 'oficios_relacionados')
+  BEGIN
+    ALTER TABLE [dbo].[Oficio] ADD oficios_relacionados NVARCHAR(MAX);
+  END;
+
+  IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Oficio]') AND name = 'oficio_respuesta')
+  BEGIN
+    ALTER TABLE [dbo].[Oficio] ADD oficio_respuesta NVARCHAR(255);
+  END;
 `;
 
 module.exports = oficioSchema;
