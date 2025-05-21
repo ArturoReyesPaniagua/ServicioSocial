@@ -247,3 +247,27 @@ const UPCYDPage = () => {
       )}
 
       {viewVisible && currentUPCYD && (
+        <UPCYDView
+          upcyd={currentUPCYD}
+          onClose={() => setViewVisible(false)}
+          onEdit={() => {
+            setViewVisible(false);
+            setFormVisible(true);
+          }}
+          onGenerateOficio={handleGenerateOficio}
+        />
+      )}
+
+      {deleteVisible && (
+        <DeleteConfirmation
+          title="Eliminar Registro UPCYD"
+          message={`¿Está seguro que desea eliminar el registro UPCYD ${currentUPCYD?.numero_UPCYD}? Esta acción no se puede deshacer.`}
+          onConfirm={handleDeleteUPCYD}
+          onCancel={() => setDeleteVisible(false)}
+        />
+      )}
+    </div>
+  );
+};
+
+export default UPCYDPage;

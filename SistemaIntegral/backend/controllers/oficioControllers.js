@@ -39,7 +39,10 @@ const createOficio = async (req, res) => {
       asunto,
       observaciones,
       id_responsable,
-      id_area // Este campo será ignorado para usuarios normales
+      id_area, // Este campo será ignorado para usuarios normales
+      id_UPCYD = null,
+      oficios_relacionados = null,
+      oficio_respuesta = null
     } = req.body;
 
     // Validar campos requeridos
@@ -94,6 +97,17 @@ const createOficio = async (req, res) => {
       return res.status(404).json({ error: 'Área no encontrada' });
     }
 
+    // Verificar que el UPCYD existe si se proporciona
+    if (id_UPCYD) {
+      const upcydCheck = await pool.request()
+        .input('id_UPCYD', sql.Int, id_UPCYD)
+        .query('SELECT * FROM UPCYD WHERE id_UPCYD = @id_UPCYD');
+        
+      if (upcydCheck.recordset.length === 0) {
+        return res.status(404).json({ error: 'UPCYD no encontrado' });
+      }
+    }
+
     // Crear oficio
     const query = `
       INSERT INTO Oficio (
@@ -107,7 +121,10 @@ const createOficio = async (req, res) => {
         asunto, 
         observaciones, 
         id_responsable, 
-        id_area
+        id_area,
+        id_UPCYD,
+        oficios_relacionados,
+        oficio_respuesta
       ) VALUES (
         @estado,
         @numero_de_oficio,
@@ -119,7 +136,10 @@ const createOficio = async (req, res) => {
         @asunto,
         @observaciones,
         @id_responsable,
-        @id_area
+        @id_area,
+        @id_UPCYD,
+        @oficios_relacionados,
+        @oficio_respuesta
       );
       SELECT SCOPE_IDENTITY() AS id_oficio;
     `;
@@ -136,6 +156,9 @@ const createOficio = async (req, res) => {
       .input('observaciones', sql.NVarChar, observaciones || null)
       .input('id_responsable', sql.Int, id_responsable)
       .input('id_area', sql.Int, areaToUse)
+      .input('id_UPCYD', sql.Int, id_UPCYD || null)
+      .input('oficios_relacionados', sql.NVarChar, oficios_relacionados || null)
+      .input('oficio_respuesta', sql.NVarChar, oficio_respuesta || null)
       .query(query);
 
     res.status(201).json({
@@ -337,7 +360,10 @@ const updateOficio = async (req, res) => {
       asunto,
       observaciones,
       id_responsable,
-      id_area // Este campo será ignorado para usuarios normales
+      id_area, // Este campo será ignorado para usuarios normales
+      id_UPCYD,
+      oficios_relacionados,
+      oficio_respuesta
     } = req.body;
 
     // Verificar relaciones si se proporcionan
@@ -371,6 +397,17 @@ const updateOficio = async (req, res) => {
 
       if (areaCheck.recordset.length === 0) {
         return res.status(404).json({ error: 'Área no encontrada' });
+      }
+    }
+
+    // Verificar UPCYD si se proporciona
+    if (id_UPCYD) {
+      const upcydCheck = await pool.request()
+        .input('id_UPCYD', sql.Int, id_UPCYD)
+        .query('SELECT * FROM UPCYD WHERE id_UPCYD = @id_UPCYD');
+
+      if (upcydCheck.recordset.length === 0) {
+        return res.status(404).json({ error: 'UPCYD no encontrado' });
       }
     }
 
@@ -432,6 +469,24 @@ const updateOficio = async (req, res) => {
     if (userRole === 'admin' && id_area !== undefined) {
       updateFields.push('id_area = @id_area');
       request.input('id_area', sql.Int, id_area);
+    }
+
+    // Actualizar UPCYD si se proporciona
+    if (id_UPCYD !== undefined) {
+      updateFields.push('id_UPCYD = @id_UPCYD');
+      request.input('id_UPCYD', sql.Int, id_UPCYD);
+    }
+
+    // Actualizar oficios relacionados si se proporciona
+    if (oficios_relacionados !== undefined) {
+      updateFields.push('oficios_relacionados = @oficios_relacionados');
+      request.input('oficios_relacionados', sql.NVarChar, oficios_relacionados);
+    }
+
+    // Actualizar oficio de respuesta si se proporciona
+    if (oficio_respuesta !== undefined) {
+      updateFields.push('oficio_respuesta = @oficio_respuesta');
+      request.input('oficio_respuesta', sql.NVarChar, oficio_respuesta);
     }
 
     if (updateFields.length === 0) {
@@ -682,7 +737,7 @@ const getOficiosByEstado = async (req, res) => {
   }
 };
 
-// Obtener oficios archivados
+// Obtener oficios por área
 const getOficiosByArea = async (req, res) => {
   try {
     const { id_area } = req.params;
@@ -697,7 +752,7 @@ const getOficiosByArea = async (req, res) => {
     const userRole = userResult.recordset[0].role;
     const userArea = userResult.recordset[0].id_area;
     // Validar permisos - solo admin o usuario del mismo área puede ver
-    if (userRole !== 'admin' && userArea !== id_area) {
+    if (userRole !== 'admin' && parseInt(userArea) !== parseInt(id_area)) {
       return res.status(403).json({
         error: 'No tiene permiso para acceder a los oficios de esta área'
       });
@@ -732,10 +787,8 @@ const getOficiosByArea = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 // Obtener oficios archivados
-
-
-
 const getOficiosArchivados = async (req, res) => {
   try {
     const { archivado } = req.params;
@@ -745,7 +798,7 @@ const getOficiosArchivados = async (req, res) => {
     // Obtener el usuario autenticado
     const userId = req.user.userId;
     
-    // Obtener el rol y área del usuario
+  // Obtener el rol y área del usuario
     const userResult = await pool.request()
       .input('userId', sql.Int, userId)
       .query('SELECT role, id_area FROM users WHERE userId = @userId');
@@ -817,6 +870,87 @@ const getOficiosArchivados = async (req, res) => {
   }
 };
 
+// Obtener oficios por UPCYD
+const getOficiosByUPCYD = async (req, res) => {
+  try {
+    const { id_UPCYD } = req.params;
+    const pool = await connectDB();
+    const userId = req.user.userId;
+    const userResult = await pool.request()
+      .input('userId', sql.Int, userId)
+      .query('SELECT role, id_area FROM users WHERE userId = @userId');
+    if (userResult.recordset.length === 0) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+    const userRole = userResult.recordset[0].role;
+    const userArea = userResult.recordset[0].id_area;
+    
+    // Construir la consulta según el rol
+    let query;
+    
+    if (userRole === 'admin') {
+      // Admins pueden ver todos los oficios del UPCYD
+      query = `
+        SELECT
+          o.*,
+          s.nombre_solicitante,
+          r.nombre_responsable,
+          a.nombre_area
+        FROM
+          Oficio o
+        LEFT JOIN
+          Solicitante s ON o.id_solicitante = s.id_solicitante
+        LEFT JOIN
+          Responsable r ON o.id_responsable = r.id_responsable
+        LEFT JOIN
+          Area a ON o.id_area = a.id_area
+        WHERE
+          o.id_UPCYD = @id_UPCYD
+        ORDER BY
+          o.fecha_recepcion DESC
+      `;
+      
+      const result = await pool.request()
+        .input('id_UPCYD', sql.Int, id_UPCYD)
+        .query(query);
+      
+      res.status(200).json(result.recordset);
+    } else {
+      // Usuarios normales solo ven oficios de su área
+      query = `
+        SELECT
+          o.*,
+          s.nombre_solicitante,
+          r.nombre_responsable,
+          a.nombre_area
+        FROM
+          Oficio o
+        LEFT JOIN
+          Solicitante s ON o.id_solicitante = s.id_solicitante
+        LEFT JOIN
+          Responsable r ON o.id_responsable = r.id_responsable
+        LEFT JOIN
+          Area a ON o.id_area = a.id_area
+        WHERE
+          o.id_UPCYD = @id_UPCYD
+          AND o.id_area = @userArea
+        ORDER BY
+          o.fecha_recepcion DESC
+      `;
+      
+      const result = await pool.request()
+        .input('id_UPCYD', sql.Int, id_UPCYD)
+        .input('userArea', sql.Int, userArea)
+        .query(query);
+      
+      res.status(200).json(result.recordset);
+    }
+  } catch (error) {
+    console.error('Error al obtener oficios por UPCYD:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   createOficio,
   getAllOficios,
@@ -825,5 +959,7 @@ module.exports = {
   deleteOficio,
   searchOficios,
   getOficiosByEstado,
-  getOficiosArchivados
+  getOficiosByArea,
+  getOficiosArchivados,
+  getOficiosByUPCYD
 };

@@ -114,11 +114,12 @@ const login = async (req, res) => {
       return res.status(401).json({ error: "Información inválida" });
     }
     
-    // Verificar la contraseña
-    const passwordMatch = await password === user.password;
+    // Verificar la contraseña - corregir uso de bcrypt.compare
     console.log("Contraseña proporcionada", password);
     console.log("Contraseña almacenada", user.password);
-    // const passwordMatch = await bcrypt.compare(password, user.password);
+    
+    // Usar bcrypt.compare correctamente
+    const passwordMatch = await bcrypt.compare(password, user.password);
     console.log("Contraseña coincide:", passwordMatch ? "Sí" : "No");
     
     if (passwordMatch) {
