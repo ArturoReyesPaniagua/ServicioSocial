@@ -28,6 +28,7 @@ const OficiosTable = ({
   const [globalFilter, setGlobalFilter] = useState('');
   const [oficiosWithFiles, setOficiosWithFiles] = useState({});
   const [enrichedData, setEnrichedData] = useState([]);
+  const [UPEyCEs, setUPEyCEs] = useState([]); // Nuevo estado para almacenar los UPEyCEs
 
   // Cargar información de archivos para oficios
   useEffect(() => {
@@ -55,7 +56,30 @@ const OficiosTable = ({
     fetchFilesInfo();
   }, [data]);
 
-  // Cargar información de áreas (separado del useEffect anterior)
+  // Cargar información de UPEyCEs
+  useEffect(() => {
+    const fetchUPEyCEs = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        };
+        
+        const response = await axios.get('http://localhost:3001/api/UPEyCE', config);
+        setUPEyCEs(response.data);
+      } catch (error) {
+        console.error('Error al cargar UPEyCEs:', error);
+      }
+    };
+    
+    fetchUPEyCEs();
+  }, []);
+
+  // Cargar información de áreas y enriquecer datos
   useEffect(() => {
     const fetchArea = async () => {
       if (!data || !data.length) return;
@@ -66,10 +90,18 @@ const OficiosTable = ({
             acc[area.id_area] = area.nombre_area;
             return acc;
           }, {});
-          const enriched = data.map(oficio => ({
-            ...oficio,
-            nombre_area: areas[oficio.id_area] || 'No definida',
-          }));
+          
+          const enriched = data.map(oficio => {
+            // Encontrar el UPEyCE correspondiente
+            const UPEyCE = UPEyCEs.find(u => u.id_UPEyCE === oficio.id_UPEyCE);
+            
+            return {
+              ...oficio,
+              nombre_area: areas[oficio.id_area] || 'No definida',
+              numero_UPEyCE: UPEyCE ? UPEyCE.numero_UPEyCE : null
+            };
+          });
+          
           setEnrichedData(enriched);
         }
       } catch (error) {
@@ -79,7 +111,7 @@ const OficiosTable = ({
 
     
     fetchArea();
-  }, [data]);
+  }, [data, UPEyCEs]); // Añadido UPEyCEs a las dependencias
   
 
   // Definir columnas
@@ -98,6 +130,19 @@ const OficiosTable = ({
       header: 'Area',
       accessorKey: 'nombre_area',
       cell: info => info.getValue() || '',
+    },
+    // Nueva columna para UPEyCE
+    {
+      header: 'UPEyCE',
+      accessorKey: 'numero_UPEyCE',
+      cell: info => {
+        const value = info.getValue();
+        return value ? (
+          <span className="px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+            {value}
+          </span>
+        ) : '';
+      },
     },
     {
       header: 'Estado',

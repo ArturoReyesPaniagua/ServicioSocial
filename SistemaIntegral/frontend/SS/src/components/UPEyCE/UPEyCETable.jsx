@@ -1,5 +1,5 @@
-// UPCYDTable.jsx
-// SistemaIntegral/frontend/SS/src/components/UPCYD/UPCYDTable.jsx
+// UPEyCETable.jsx
+// SistemaIntegral/frontend/SS/src/components/UPEyCE/UPEyCETable.jsx
 
 import { useState, useEffect, useMemo } from 'react';
 import {
@@ -12,8 +12,9 @@ import {
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useAuth } from '../../context/AuthContext';
+import axios from 'axios';
 
-const UPCYDTable = ({ 
+const UPEyCETable = ({ 
   data = [],
   onEdit,
   onDelete,
@@ -23,28 +24,61 @@ const UPCYDTable = ({
 }) => {
   const [sorting, setSorting] = useState([]);
   const [globalFilter, setGlobalFilter] = useState('');
+  const [oficiosCount, setOficiosCount] = useState({});
   const { user } = useAuth();
+
+  // Obtener conteo de oficios para cada UPEyCE
+  useEffect(() => {
+    const fetchOficiosCount = async () => {
+      if (!data || data.length === 0) return;
+      
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        };
+        
+        // Obtenemos todos los oficios
+        const response = await axios.get('http://localhost:3001/api/oficios', config);
+        
+        // Contamos los oficios por UPEyCE
+        const counts = {};
+        response.data.forEach(oficio => {
+          if (oficio.id_UPEyCE) {
+            counts[oficio.id_UPEyCE] = (counts[oficio.id_UPEyCE] || 0) + 1;
+          }
+        });
+        
+        setOficiosCount(counts);
+      } catch (error) {
+        console.error('Error al obtener conteo de oficios:', error);
+      }
+    };
+    
+    fetchOficiosCount();
+  }, [data]);
 
   // Definir columnas
   const columns = useMemo(() => [
     {
-      header: 'ID',
-      accessorKey: 'id_UPCYD',
-      cell: info => info.getValue() || '',
-    },
-    {
-      header: 'Número UPCYD',
-      accessorKey: 'numero_UPCYD',
-      cell: info => info.getValue() || '',
+      header: 'Número UPEyCE',
+      accessorKey: 'numero_UPEyCE',
+      cell: info => {
+        const value = info.getValue();
+        return (
+          <span className="font-medium text-blue-700">
+            {value || ''}
+          </span>
+        );
+      },
     },
     {
       header: 'Área',
       accessorKey: 'nombre_area',
-      cell: info => info.getValue() || '',
-    },
-    {
-      header: 'Usuario',
-      accessorKey: 'nombre_usuario',
       cell: info => info.getValue() || '',
     },
     {
@@ -53,10 +87,47 @@ const UPCYDTable = ({
       cell: info => {
         const value = info.getValue();
         try {
-          return value ? format(new Date(value), 'dd/MM/yyyy HH:mm', { locale: es }) : '';
+          return value ? format(new Date(value), 'dd/MM/yyyy', { locale: es }) : '';
         } catch (error) {
           return '';
         }
+      },
+    },
+    {
+      header: 'Creado por',
+      accessorKey: 'nombre_usuario',
+      cell: info => info.getValue() || '',
+    },
+    {
+      header: 'Descripción',
+      accessorKey: 'descripcion',
+      cell: info => {
+        const value = info.getValue();
+        if (!value) return '';
+        
+        return value.length > 50 
+          ? value.substring(0, 50) + '...' 
+          : value;
+      },
+    },
+    {
+      header: 'Oficios',
+      id: 'oficios_count',
+      cell: ({ row }) => {
+        const UPEyCEId = row.original?.id_UPEyCE;
+        if (!UPEyCEId) return '0';
+        
+        const count = oficiosCount[UPEyCEId] || 0;
+        
+        return (
+          <div className="flex items-center justify-center">
+            <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full ${
+              count > 0 ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-500'
+            } font-medium`}>
+              {count}
+            </span>
+          </div>
+        );
       },
     },
     {
@@ -93,11 +164,11 @@ const UPCYDTable = ({
               </button>
             )}
             
-            {/* Generar Oficio */}
+            {/* Asociar Oficio */}
             <button
               onClick={() => onGenerateOficio && onGenerateOficio(row.original)}
               className="p-1 text-green-600 hover:text-green-900"
-              title="Generar Oficio"
+              title="Asociar Oficio"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -120,7 +191,7 @@ const UPCYDTable = ({
         );
       },
     },
-  ], [onEdit, onDelete, onView, onGenerateOficio, user]);
+  ], [onEdit, onDelete, onView, onGenerateOficio, user, oficiosCount]);
 
   // Configurar tabla con TanStack Table
   const table = useReactTable({
@@ -144,7 +215,7 @@ const UPCYDTable = ({
           type="text"
           value={globalFilter || ''}
           onChange={e => setGlobalFilter(e.target.value)}
-          placeholder="Buscar en todas las columnas..."
+          placeholder="Buscar UPEyCE..."
           className="p-2 border border-gray-300 rounded w-full"
         />
       </div>
@@ -191,7 +262,7 @@ const UPCYDTable = ({
             ) : (
               <tr>
                 <td colSpan={columns.length} className="px-4 py-8 text-center text-gray-500">
-                  No se encontraron registros
+                  No se encontraron registros UPEyCE
                 </td>
               </tr>
             )}
@@ -202,4 +273,4 @@ const UPCYDTable = ({
   );
 };
 
-export default UPCYDTable;
+export default UPEyCETable;

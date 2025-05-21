@@ -14,7 +14,7 @@ const {
   getOficiosByEstado,
   getOficiosByArea,
   getOficiosArchivados,
-  getOficiosByUPCYD
+  getOficiosByUPEyCE
 } = require('../controllers/oficioControllers');
 const { authenticateToken } = require('../middleware/authMiddleware');
 
@@ -31,6 +31,6 @@ router.get('/oficios/search/:term', authenticateToken, searchOficios);
 router.get('/oficios/estado/:estado', authenticateToken, getOficiosByEstado);
 router.get('/oficios/area/:id_area', authenticateToken, getOficiosByArea);
 router.get('/oficios/archivado/:archivado', authenticateToken, getOficiosArchivados);
-router.get('/oficios/upcyd/:id_UPCYD', authenticateToken, getOficiosByUPCYD);
+router.get('/oficios/UPEyCE/:id_UPEyCE', authenticateToken, getOficiosByUPEyCE);
 
 module.exports = router;

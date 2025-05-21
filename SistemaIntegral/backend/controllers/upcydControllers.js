@@ -1,19 +1,19 @@
-// SistemaIntegral/backend/controllers/upcydControllers.js
+// SistemaIntegral/backend/controllers/UPEyCEControllers.js
 const sql = require('mssql');
-const upcydSchema = require('../db/upcydSchema');
+const UPEyCESchema = require('../db/UPEyCESchema');
 const { connectDB } = require('../db/db');
 
-// Crear un nuevo registro UPCYD
-const createUPCYD = async (req, res) => {
+// Crear un nuevo registro UPEyCE
+const createUPEyCE = async (req, res) => {
   try {
     // Asegurar que la tabla exista
     const pool = await connectDB();
-    await pool.request().query(upcydSchema);
+    await pool.request().query(UPEyCESchema);
 
-    const { numero_UPCYD, id_area } = req.body;
+    const { numero_UPEyCE, id_area } = req.body;
     
-    if (!numero_UPCYD) {
-      return res.status(400).json({ error: 'El número de UPCYD es requerido' });
+    if (!numero_UPEyCE) {
+      return res.status(400).json({ error: 'El número de UPEyCE es requerido' });
     }
 
     // Obtener el usuario desde el token de autenticación
@@ -31,27 +31,27 @@ const createUPCYD = async (req, res) => {
     }
 
     const result = await pool.request()
-      .input('numero_UPCYD', sql.NVarChar, numero_UPCYD)
+      .input('numero_UPEyCE', sql.NVarChar, numero_UPEyCE)
       .input('id_area', sql.Int, id_area || null)
       .input('id_usuario', sql.Int, userId)
       .query(`
-        INSERT INTO UPCYD (numero_UPCYD, id_area, id_usuario) 
-        VALUES (@numero_UPCYD, @id_area, @id_usuario);
-        SELECT SCOPE_IDENTITY() AS id_UPCYD;
+        INSERT INTO UPEyCE (numero_UPEyCE, id_area, id_usuario) 
+        VALUES (@numero_UPEyCE, @id_area, @id_usuario);
+        SELECT SCOPE_IDENTITY() AS id_UPEyCE;
       `);
 
     res.status(201).json({
-      message: 'Registro UPCYD creado exitosamente',
-      id_UPCYD: result.recordset[0].id_UPCYD
+      message: 'Registro UPEyCE creado exitosamente',
+      id_UPEyCE: result.recordset[0].id_UPEyCE
     });
   } catch (error) {
-    console.error('Error al crear registro UPCYD:', error);
+    console.error('Error al crear registro UPEyCE:', error);
     res.status(500).json({ error: error.message });
   }
 };
 
-// Obtener todos los registros UPCYD
-const getAllUPCYD = async (req, res) => {
+// Obtener todos los registros UPEyCE
+const getAllUPEyCE = async (req, res) => {
   try {
     const pool = await connectDB();
     
@@ -81,7 +81,7 @@ const getAllUPCYD = async (req, res) => {
           a.nombre_area,
           usr.username as nombre_usuario
         FROM 
-          UPCYD u
+          UPEyCE u
         LEFT JOIN 
           Area a ON u.id_area = a.id_area
         LEFT JOIN
@@ -100,7 +100,7 @@ const getAllUPCYD = async (req, res) => {
           a.nombre_area,
           usr.username as nombre_usuario
         FROM 
-          UPCYD u
+          UPEyCE u
         LEFT JOIN 
           Area a ON u.id_area = a.id_area
         LEFT JOIN
@@ -118,13 +118,13 @@ const getAllUPCYD = async (req, res) => {
       res.status(200).json(result.recordset);
     }
   } catch (error) {
-    console.error('Error al obtener registros UPCYD:', error);
+    console.error('Error al obtener registros UPEyCE:', error);
     res.status(500).json({ error: error.message });
   }
 };
 
-// Obtener un registro UPCYD por ID
-const getUPCYDById = async (req, res) => {
+// Obtener un registro UPEyCE por ID
+const getUPEyCEById = async (req, res) => {
   try {
     const { id } = req.params;
     const pool = await connectDB();
@@ -144,20 +144,20 @@ const getUPCYDById = async (req, res) => {
     const userRole = userResult.recordset[0].role;
     const userArea = userResult.recordset[0].id_area;
     
-    // Obtener el registro UPCYD
+    // Obtener el registro UPEyCE
     const query = `
       SELECT 
         u.*,
         a.nombre_area,
         usr.username as nombre_usuario
       FROM 
-        UPCYD u
+        UPEyCE u
       LEFT JOIN 
         Area a ON u.id_area = a.id_area
       LEFT JOIN
         users usr ON u.id_usuario = usr.userId
       WHERE 
-        u.id_UPCYD = @id
+        u.id_UPEyCE = @id
     `;
     
     const result = await pool.request()
@@ -165,30 +165,30 @@ const getUPCYDById = async (req, res) => {
       .query(query);
 
     if (result.recordset.length === 0) {
-      return res.status(404).json({ error: 'Registro UPCYD no encontrado' });
+      return res.status(404).json({ error: 'Registro UPEyCE no encontrado' });
     }
     
-    const upcyd = result.recordset[0];
+    const UPEyCE = result.recordset[0];
     
     // Validar permisos - solo admin o usuario del mismo área puede ver
-    if (userRole !== 'admin' && upcyd.id_area !== userArea) {
+    if (userRole !== 'admin' && UPEyCE.id_area !== userArea) {
       return res.status(403).json({ 
         error: 'No tiene permiso para acceder a este registro' 
       });
     }
     
-    res.status(200).json(upcyd);
+    res.status(200).json(UPEyCE);
   } catch (error) {
-    console.error('Error al obtener registro UPCYD por ID:', error);
+    console.error('Error al obtener registro UPEyCE por ID:', error);
     res.status(500).json({ error: error.message });
   }
 };
 
-// Actualizar un registro UPCYD
-const updateUPCYD = async (req, res) => {
+// Actualizar un registro UPEyCE
+const updateUPEyCE = async (req, res) => {
   try {
     const { id } = req.params;
-    const { numero_UPCYD, id_area } = req.body;
+    const { numero_UPEyCE, id_area } = req.body;
     const pool = await connectDB();
     
     // Obtener el usuario autenticado
@@ -209,16 +209,16 @@ const updateUPCYD = async (req, res) => {
     // Verificar que el registro existe
     const checkResult = await pool.request()
       .input('id', sql.Int, id)
-      .query('SELECT * FROM UPCYD WHERE id_UPCYD = @id');
+      .query('SELECT * FROM UPEyCE WHERE id_UPEyCE = @id');
 
     if (checkResult.recordset.length === 0) {
-      return res.status(404).json({ error: 'Registro UPCYD no encontrado' });
+      return res.status(404).json({ error: 'Registro UPEyCE no encontrado' });
     }
     
-    const upcyd = checkResult.recordset[0];
+    const UPEyCE = checkResult.recordset[0];
     
     // Validar permisos - solo admin o usuario del mismo área puede editar
-    if (userRole !== 'admin' && upcyd.id_area !== userArea) {
+    if (userRole !== 'admin' && UPEyCE.id_area !== userArea) {
       return res.status(403).json({ 
         error: 'No tiene permiso para editar este registro' 
       });
@@ -239,9 +239,9 @@ const updateUPCYD = async (req, res) => {
     let updateFields = [];
     const request = pool.request().input('id', sql.Int, id);
 
-    if (numero_UPCYD !== undefined) {
-      updateFields.push('numero_UPCYD = @numero_UPCYD');
-      request.input('numero_UPCYD', sql.NVarChar, numero_UPCYD);
+    if (numero_UPEyCE !== undefined) {
+      updateFields.push('numero_UPEyCE = @numero_UPEyCE');
+      request.input('numero_UPEyCE', sql.NVarChar, numero_UPEyCE);
     }
 
     // Para el área, solo permitir cambiarla si es admin
@@ -255,18 +255,18 @@ const updateUPCYD = async (req, res) => {
     }
 
     // Construir y ejecutar la consulta UPDATE
-    const updateQuery = `UPDATE UPCYD SET ${updateFields.join(', ')} WHERE id_UPCYD = @id`;
+    const updateQuery = `UPDATE UPEyCE SET ${updateFields.join(', ')} WHERE id_UPEyCE = @id`;
     await request.query(updateQuery);
 
-    res.status(200).json({ message: 'Registro UPCYD actualizado exitosamente' });
+    res.status(200).json({ message: 'Registro UPEyCE actualizado exitosamente' });
   } catch (error) {
-    console.error('Error al actualizar registro UPCYD:', error);
+    console.error('Error al actualizar registro UPEyCE:', error);
     res.status(500).json({ error: error.message });
   }
 };
 
-// Eliminar un registro UPCYD
-const deleteUPCYD = async (req, res) => {
+// Eliminar un registro UPEyCE
+const deleteUPEyCE = async (req, res) => {
   try {
     const { id } = req.params;
     const pool = await connectDB();
@@ -289,16 +289,16 @@ const deleteUPCYD = async (req, res) => {
     // Verificar que el registro existe
     const checkResult = await pool.request()
       .input('id', sql.Int, id)
-      .query('SELECT * FROM UPCYD WHERE id_UPCYD = @id');
+      .query('SELECT * FROM UPEyCE WHERE id_UPEyCE = @id');
 
     if (checkResult.recordset.length === 0) {
-      return res.status(404).json({ error: 'Registro UPCYD no encontrado' });
+      return res.status(404).json({ error: 'Registro UPEyCE no encontrado' });
     }
     
-    const upcyd = checkResult.recordset[0];
+    const UPEyCE = checkResult.recordset[0];
     
     // Validar permisos - solo admin o usuario del mismo área puede eliminar
-    if (userRole !== 'admin' && upcyd.id_area !== userArea) {
+    if (userRole !== 'admin' && UPEyCE.id_area !== userArea) {
       return res.status(403).json({ 
         error: 'No tiene permiso para eliminar este registro' 
       });
@@ -307,30 +307,30 @@ const deleteUPCYD = async (req, res) => {
     // Verificar si hay oficios asociados
     const oficioResult = await pool.request()
       .input('id', sql.Int, id)
-      .query('SELECT * FROM Oficio WHERE id_UPCYD = @id');
+      .query('SELECT * FROM Oficio WHERE id_UPEyCE = @id');
 
     if (oficioResult.recordset.length > 0) {
       return res.status(400).json({ 
-        error: 'No se puede eliminar el registro UPCYD porque está siendo utilizado en oficios' 
+        error: 'No se puede eliminar el registro UPEyCE porque está siendo utilizado en oficios' 
       });
     }
 
     // Eliminar el registro
     await pool.request()
       .input('id', sql.Int, id)
-      .query('DELETE FROM UPCYD WHERE id_UPCYD = @id');
+      .query('DELETE FROM UPEyCE WHERE id_UPEyCE = @id');
 
-    res.status(200).json({ message: 'Registro UPCYD eliminado correctamente' });
+    res.status(200).json({ message: 'Registro UPEyCE eliminado correctamente' });
   } catch (error) {
-    console.error('Error al eliminar registro UPCYD:', error);
+    console.error('Error al eliminar registro UPEyCE:', error);
     res.status(500).json({ error: error.message });
   }
 };
 
 module.exports = {
-  createUPCYD,
-  getAllUPCYD,
-  getUPCYDById,
-  updateUPCYD,
-  deleteUPCYD
+  createUPEyCE,
+  getAllUPEyCE,
+  getUPEyCEById,
+  updateUPEyCE,
+  deleteUPEyCE
 };

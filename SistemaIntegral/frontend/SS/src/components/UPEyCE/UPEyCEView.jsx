@@ -1,19 +1,19 @@
-// UPCYDView.jsx
-// SistemaIntegral/frontend/SS/src/components/UPCYD/UPCYDView.jsx
+// UPEyCEView.jsx
+// SistemaIntegral/frontend/SS/src/components/UPEyCE/UPEyCEView.jsx
 
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import axios from 'axios';
 
-const UPCYDView = ({ upcyd, onClose, onEdit, onGenerateOficio }) => {
+const UPEyCEView = ({ UPEyCE, onClose, onEdit, onGenerateOficio }) => {
   const [oficiosRelacionados, setOficiosRelacionados] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Cargar oficios relacionados con este UPCYD
+  // Cargar oficios relacionados con este UPEyCE
   useEffect(() => {
     const fetchRelatedOficios = async () => {
-      if (!upcyd || !upcyd.id_UPCYD) return;
+      if (!UPEyCE || !UPEyCE.id_UPEyCE) return;
       
       try {
         setIsLoading(true);
@@ -31,7 +31,7 @@ const UPCYDView = ({ upcyd, onClose, onEdit, onGenerateOficio }) => {
         };
         
         const response = await axios.get(
-          `http://localhost:3001/api/oficios/upcyd/${upcyd.id_UPCYD}`, 
+          `http://localhost:3001/api/oficios/UPEyCE/${UPEyCE.id_UPEyCE}`, 
           config
         );
         
@@ -44,7 +44,7 @@ const UPCYDView = ({ upcyd, onClose, onEdit, onGenerateOficio }) => {
     };
     
     fetchRelatedOficios();
-  }, [upcyd]);
+  }, [UPEyCE]);
 
   // Formatear fecha
   const formatDate = (dateString) => {
@@ -88,7 +88,7 @@ const UPCYDView = ({ upcyd, onClose, onEdit, onGenerateOficio }) => {
       <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-auto">
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold">Detalles del Registro UPCYD</h2>
+            <h2 className="text-2xl font-bold">Control Interno UPEyCE</h2>
             <button
               onClick={onClose}
               className="text-gray-600 hover:text-gray-900"
@@ -100,50 +100,60 @@ const UPCYDView = ({ upcyd, onClose, onEdit, onGenerateOficio }) => {
             </button>
           </div>
 
-          {/* Información del UPCYD */}
+          {/* Información del UPEyCE */}
           <div className="mb-8 bg-gray-50 p-4 rounded-lg">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <div>
-                  <span className="text-sm font-medium text-gray-500">ID UPCYD:</span>
-                  <p className="text-base">{upcyd?.id_UPCYD || 'No disponible'}</p>
+                  <span className="text-sm font-medium text-gray-500">Número UPEyCE:</span>
+                  <p className="text-base font-semibold">{UPEyCE?.numero_UPEyCE || 'No disponible'}</p>
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Número UPCYD:</span>
-                  <p className="text-base">{upcyd?.numero_UPCYD || 'No disponible'}</p>
+                  <span className="text-sm font-medium text-gray-500">Área:</span>
+                  <p className="text-base">{UPEyCE?.nombre_area || 'No disponible'}</p>
                 </div>
               </div>
               <div className="space-y-2">
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Área:</span>
-                  <p className="text-base">{upcyd?.nombre_area || 'No disponible'}</p>
+                  <span className="text-sm font-medium text-gray-500">Fecha de Creación:</span>
+                  <p className="text-base">{formatDate(UPEyCE?.fecha_creacion)}</p>
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Fecha de Creación:</span>
-                  <p className="text-base">{formatDate(upcyd?.fecha_creacion)}</p>
+                  <span className="text-sm font-medium text-gray-500">Creado por:</span>
+                  <p className="text-base">{UPEyCE?.nombre_usuario || 'No disponible'}</p>
                 </div>
               </div>
             </div>
-            <div className="mt-4 space-y-2">
-              <div>
-                <span className="text-sm font-medium text-gray-500">Creado por:</span>
-                <p className="text-base">{upcyd?.nombre_usuario || 'No disponible'}</p>
+            {UPEyCE?.descripcion && (
+              <div className="mt-4">
+                <span className="text-sm font-medium text-gray-500">Descripción:</span>
+                <p className="text-base mt-1 whitespace-pre-line">{UPEyCE.descripcion}</p>
               </div>
-            </div>
+            )}
+          </div>
+
+          {/* Sección informativa */}
+          <div className="mb-6 bg-blue-50 p-4 rounded-lg border-l-4 border-blue-400">
+            <h3 className="text-md font-semibold text-blue-800 mb-2">Control de Documentos</h3>
+            <p className="text-sm text-blue-700">
+              El número UPEyCE es un identificador interno que permite vincular documentos relacionados 
+              y facilitar su seguimiento. Cada UPEyCE puede tener asociados varios oficios que comparten 
+              un mismo tema o proceso administrativo.
+            </p>
           </div>
 
           {/* Sección para oficios relacionados */}
           <div>
             <div className="flex justify-between items-center mb-3">
-              <h3 className="text-lg font-semibold">Oficios Relacionados</h3>
+              <h3 className="text-lg font-semibold">Oficios Asociados</h3>
               <button
-                onClick={() => onGenerateOficio && onGenerateOficio(upcyd)}
+                onClick={() => onGenerateOficio && onGenerateOficio(UPEyCE)}
                 className="flex items-center text-sm text-white bg-green-600 hover:bg-green-700 px-3 py-1 rounded"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
-                Generar Nuevo Oficio
+                Asociar Nuevo Oficio
               </button>
             </div>
 
@@ -198,8 +208,8 @@ const UPCYDView = ({ upcyd, onClose, onEdit, onGenerateOficio }) => {
               </div>
             ) : (
               <div className="text-center py-4 bg-gray-50 rounded-lg">
-                <p className="text-gray-500">No hay oficios asociados a este registro UPCYD.</p>
-                <p className="text-sm text-gray-400 mt-1">Use el botón "Generar Nuevo Oficio" para crear uno.</p>
+                <p className="text-gray-500">No hay oficios asociados a este UPEyCE.</p>
+                <p className="text-sm text-gray-400 mt-1">Use el botón "Asociar Nuevo Oficio" para crear uno.</p>
               </div>
             )}
           </div>
@@ -213,7 +223,7 @@ const UPCYDView = ({ upcyd, onClose, onEdit, onGenerateOficio }) => {
               Cerrar
             </button>
             <button
-              onClick={() => onEdit && onEdit(upcyd)}
+              onClick={() => onEdit && onEdit(UPEyCE)}
               className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-guinda hover:bg-guinda-dark"
             >
               Editar
@@ -225,4 +235,4 @@ const UPCYDView = ({ upcyd, onClose, onEdit, onGenerateOficio }) => {
   );
 };
 
-export default UPCYDView;
+export default UPEyCEView;

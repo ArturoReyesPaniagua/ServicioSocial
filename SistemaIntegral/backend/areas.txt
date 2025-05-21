@@ -1,0 +1,26 @@
+
+        CREATE TABLE [dbo].[Area] (
+      id_area INT IDENTITY(1,1) PRIMARY KEY,
+      nombre_area NVARCHAR(255) NOT NULL
+    )
+
+    
+    CREATE TABLE [dbo].[users] (
+      userId INT IDENTITY(1,1) PRIMARY KEY,
+      username NVARCHAR(255) NOT NULL UNIQUE,
+      password NVARCHAR(255) NOT NULL,
+      role NVARCHAR(10) DEFAULT 'user' CHECK (role IN ('admin', 'user')),
+      id_area INT,
+      CONSTRAINT FK_User_Area FOREIGN KEY (id_area) REFERENCES Area(id_area) ON DELETE SET NULL
+    )
+
+        CREATE TABLE [dbo].[UPEyCE] (
+      id_UPEyCE INT IDENTITY(1,1) PRIMARY KEY,
+      numero_UPEyCE NVARCHAR(50) NOT NULL,
+      id_area INT NOT NULL,
+      id_usuario INT,
+      fecha_creacion DATETIME DEFAULT GETDATE(),
+      descripcion NVARCHAR(500),
+      CONSTRAINT FK_UPEyCE_Area FOREIGN KEY (id_area) REFERENCES Area(id_area),
+      CONSTRAINT FK_UPEyCE_Usuario FOREIGN KEY (id_usuario) REFERENCES users(userId) ON DELETE SET NULL
+    )

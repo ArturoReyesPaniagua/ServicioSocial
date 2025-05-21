@@ -40,7 +40,7 @@ const createOficio = async (req, res) => {
       observaciones,
       id_responsable,
       id_area, // Este campo será ignorado para usuarios normales
-      id_UPCYD = null,
+      id_UPEyCE = null,
       oficios_relacionados = null,
       oficio_respuesta = null
     } = req.body;
@@ -97,14 +97,14 @@ const createOficio = async (req, res) => {
       return res.status(404).json({ error: 'Área no encontrada' });
     }
 
-    // Verificar que el UPCYD existe si se proporciona
-    if (id_UPCYD) {
-      const upcydCheck = await pool.request()
-        .input('id_UPCYD', sql.Int, id_UPCYD)
-        .query('SELECT * FROM UPCYD WHERE id_UPCYD = @id_UPCYD');
+    // Verificar que el UPEyCE existe si se proporciona
+    if (id_UPEyCE) {
+      const UPEyCECheck = await pool.request()
+        .input('id_UPEyCE', sql.Int, id_UPEyCE)
+        .query('SELECT * FROM UPEyCE WHERE id_UPEyCE = @id_UPEyCE');
         
-      if (upcydCheck.recordset.length === 0) {
-        return res.status(404).json({ error: 'UPCYD no encontrado' });
+      if (UPEyCECheck.recordset.length === 0) {
+        return res.status(404).json({ error: 'UPEyCE no encontrado' });
       }
     }
 
@@ -122,7 +122,7 @@ const createOficio = async (req, res) => {
         observaciones, 
         id_responsable, 
         id_area,
-        id_UPCYD,
+        id_UPEyCE,
         oficios_relacionados,
         oficio_respuesta
       ) VALUES (
@@ -137,7 +137,7 @@ const createOficio = async (req, res) => {
         @observaciones,
         @id_responsable,
         @id_area,
-        @id_UPCYD,
+        @id_UPEyCE,
         @oficios_relacionados,
         @oficio_respuesta
       );
@@ -146,7 +146,7 @@ const createOficio = async (req, res) => {
     
     const result = await pool.request()
       .input('estado', sql.NVarChar, estado)
-      .input('numero_de_oficio', sql.Int, numero_de_oficio)
+      .input('numero_de_oficio', sql.NVarChar, numero_de_oficio)
       .input('fecha_recepcion', sql.Date, fecha_recepcion ? new Date(fecha_recepcion) : null)
       .input('fecha_limite', sql.Date, fecha_limite ? new Date(fecha_limite) : null)
       .input('archivado', sql.Bit, archivado ? 1 : 0)
@@ -156,7 +156,7 @@ const createOficio = async (req, res) => {
       .input('observaciones', sql.NVarChar, observaciones || null)
       .input('id_responsable', sql.Int, id_responsable)
       .input('id_area', sql.Int, areaToUse)
-      .input('id_UPCYD', sql.Int, id_UPCYD || null)
+      .input('id_UPEyCE', sql.Int, id_UPEyCE || null)
       .input('oficios_relacionados', sql.NVarChar, oficios_relacionados || null)
       .input('oficio_respuesta', sql.NVarChar, oficio_respuesta || null)
       .query(query);
@@ -361,7 +361,7 @@ const updateOficio = async (req, res) => {
       observaciones,
       id_responsable,
       id_area, // Este campo será ignorado para usuarios normales
-      id_UPCYD,
+      id_UPEyCE,
       oficios_relacionados,
       oficio_respuesta
     } = req.body;
@@ -400,14 +400,14 @@ const updateOficio = async (req, res) => {
       }
     }
 
-    // Verificar UPCYD si se proporciona
-    if (id_UPCYD) {
-      const upcydCheck = await pool.request()
-        .input('id_UPCYD', sql.Int, id_UPCYD)
-        .query('SELECT * FROM UPCYD WHERE id_UPCYD = @id_UPCYD');
+    // Verificar UPEyCE si se proporciona
+    if (id_UPEyCE) {
+      const UPEyCECheck = await pool.request()
+        .input('id_UPEyCE', sql.Int, id_UPEyCE)
+        .query('SELECT * FROM UPEyCE WHERE id_UPEyCE = @id_UPEyCE');
 
-      if (upcydCheck.recordset.length === 0) {
-        return res.status(404).json({ error: 'UPCYD no encontrado' });
+      if (UPEyCECheck.recordset.length === 0) {
+        return res.status(404).json({ error: 'UPEyCE no encontrado' });
       }
     }
 
@@ -422,7 +422,7 @@ const updateOficio = async (req, res) => {
 
     if (numero_de_oficio !== undefined) {
       updateFields.push('numero_de_oficio = @numero_de_oficio');
-      request.input('numero_de_oficio', sql.Int, numero_de_oficio);
+      request.input('numero_de_oficio', sql.NVarChar, numero_de_oficio);
     }
 
     if (fecha_recepcion !== undefined) {
@@ -471,10 +471,10 @@ const updateOficio = async (req, res) => {
       request.input('id_area', sql.Int, id_area);
     }
 
-    // Actualizar UPCYD si se proporciona
-    if (id_UPCYD !== undefined) {
-      updateFields.push('id_UPCYD = @id_UPCYD');
-      request.input('id_UPCYD', sql.Int, id_UPCYD);
+    // Actualizar UPEyCE si se proporciona
+    if (id_UPEyCE !== undefined) {
+      updateFields.push('id_UPEyCE = @id_UPEyCE');
+      request.input('id_UPEyCE', sql.Int, id_UPEyCE);
     }
 
     // Actualizar oficios relacionados si se proporciona
@@ -870,10 +870,10 @@ const getOficiosArchivados = async (req, res) => {
   }
 };
 
-// Obtener oficios por UPCYD
-const getOficiosByUPCYD = async (req, res) => {
+// Obtener oficios por UPEyCE
+const getOficiosByUPEyCE = async (req, res) => {
   try {
-    const { id_UPCYD } = req.params;
+    const { id_UPEyCE } = req.params;
     const pool = await connectDB();
     const userId = req.user.userId;
     const userResult = await pool.request()
@@ -889,7 +889,7 @@ const getOficiosByUPCYD = async (req, res) => {
     let query;
     
     if (userRole === 'admin') {
-      // Admins pueden ver todos los oficios del UPCYD
+      // Admins pueden ver todos los oficios del UPEyCE
       query = `
         SELECT
           o.*,
@@ -905,13 +905,13 @@ const getOficiosByUPCYD = async (req, res) => {
         LEFT JOIN
           Area a ON o.id_area = a.id_area
         WHERE
-          o.id_UPCYD = @id_UPCYD
+          o.id_UPEyCE = @id_UPEyCE
         ORDER BY
           o.fecha_recepcion DESC
       `;
       
       const result = await pool.request()
-        .input('id_UPCYD', sql.Int, id_UPCYD)
+        .input('id_UPEyCE', sql.Int, id_UPEyCE)
         .query(query);
       
       res.status(200).json(result.recordset);
@@ -932,21 +932,21 @@ const getOficiosByUPCYD = async (req, res) => {
         LEFT JOIN
           Area a ON o.id_area = a.id_area
         WHERE
-          o.id_UPCYD = @id_UPCYD
+          o.id_UPEyCE = @id_UPEyCE
           AND o.id_area = @userArea
         ORDER BY
           o.fecha_recepcion DESC
       `;
       
       const result = await pool.request()
-        .input('id_UPCYD', sql.Int, id_UPCYD)
+        .input('id_UPEyCE', sql.Int, id_UPEyCE)
         .input('userArea', sql.Int, userArea)
         .query(query);
       
       res.status(200).json(result.recordset);
     }
   } catch (error) {
-    console.error('Error al obtener oficios por UPCYD:', error);
+    console.error('Error al obtener oficios por UPEyCE:', error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -961,5 +961,5 @@ module.exports = {
   getOficiosByEstado,
   getOficiosByArea,
   getOficiosArchivados,
-  getOficiosByUPCYD
+  getOficiosByUPEyCE
 };

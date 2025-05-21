@@ -21,7 +21,10 @@ const OficioForm = ({ oficio, estados, onSave, onCancel }) => {
     asunto: '',
     observaciones: '',
     id_responsable: '',
-    id_area: ''
+    id_area: '',
+    id_UPEyCE: '',  // Añadido para integración UPEyCE
+    oficios_relacionados: '',  // Añadido para relacionar oficios
+    oficio_respuesta: ''       // Añadido para indicar oficio de respuesta
   });
   
   const [errors, setErrors] = useState({});
@@ -29,12 +32,19 @@ const OficioForm = ({ oficio, estados, onSave, onCancel }) => {
   const [solicitantes, setSolicitantes] = useState([]);
   const [responsables, setResponsables] = useState([]);
   const [areas, setAreas] = useState([]);
+  const [UPEyCEs, setUPEyCEs] = useState([]); // Estado para almacenar UPEyCEs
   const [nuevoSolicitante, setNuevoSolicitante] = useState('');
   const [nuevoResponsable, setNuevoResponsable] = useState('');
   const [mostrarFormSolicitante, setMostrarFormSolicitante] = useState(false);
   const [mostrarFormResponsable, setMostrarFormResponsable] = useState(false);
+  
+  // Estados para Oficios Relacionados
+  const [oficiosRelacionados, setOficiosRelacionados] = useState([]);
+  const [selectedRelatedOficios, setSelectedRelatedOficios] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
 
-  // Cargar datos relacionados (solicitantes, responsables, áreas)
+  // Cargar datos relacionados (solicitantes, responsables, áreas, UPEyCEs)
   useEffect(() => {
     const fetchRelatedData = async () => {
       try {
@@ -49,6 +59,23 @@ const OficioForm = ({ oficio, estados, onSave, onCancel }) => {
         // Cargar áreas
         const areasResponse = await axios.get('http://localhost:3001/api/areas');
         setAreas(areasResponse.data);
+        
+        // Cargar UPEyCEs
+        const token = localStorage.getItem('token');
+        if (token) {
+          const config = {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          };
+          
+          try {
+            const UPEyCEsResponse = await axios.get('http://localhost:3001/api/UPEyCE', config);
+            setUPEyCEs(UPEyCEsResponse.data);
+          } catch (error) {
+            console.error('Error al cargar UPEyCEs:', error);
+          }
+        }
  
         // preseleccionar su área
         if (user && user.role !== 'admin' && !oficio) {
@@ -68,6 +95,58 @@ const OficioForm = ({ oficio, estados, onSave, onCancel }) => {
     fetchRelatedData();
   }, [oficio, user]);
 
+  // Efecto para cargar oficios disponibles para relacionar
+  useEffect(() => {
+    const fetchOficios = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        };
+        
+        const response = await axios.get('http://localhost:3001/api/oficios', config);
+        // Filtrar el oficio actual si estamos editando
+        const availableOficios = oficio 
+          ? response.data.filter(o => o.id_oficio !== oficio.id_oficio) 
+          : response.data;
+        
+        setOficiosRelacionados(availableOficios);
+        
+        // Si estamos editando, inicializar los oficios relacionados seleccionados
+        if (oficio && oficio.oficios_relacionados) {
+          try {
+            // El campo oficios_relacionados puede estar almacenado como string (IDs separados por comas)
+            // o como array de IDs, dependiendo de cómo se maneje en el backend
+            const relacionadosIds = typeof oficio.oficios_relacionados === 'string'
+              ? oficio.oficios_relacionados.split(',').map(id => id.trim())
+              : oficio.oficios_relacionados;
+            
+            // Convertir a números si es necesario
+            const idsNumericos = relacionadosIds.map(id => 
+              typeof id === 'string' ? parseInt(id, 10) : id
+            ).filter(id => !isNaN(id));
+            
+            // Encontrar los oficios correspondientes
+            const oficiosSeleccionados = availableOficios.filter(of => 
+              idsNumericos.includes(of.id_oficio)
+            );
+            
+            setSelectedRelatedOficios(oficiosSeleccionados);
+          } catch (error) {
+            console.error('Error al parsear oficios relacionados:', error);
+          }
+        }
+      } catch (error) {
+        console.error('Error al cargar oficios:', error);
+      }
+    };
+    
+    fetchOficios();
+  }, [oficio]);
 
   useEffect(() => {
     if (oficio) {
@@ -175,6 +254,56 @@ const OficioForm = ({ oficio, estados, onSave, onCancel }) => {
     }
   };
 
+  // Función para manejar la búsqueda de oficios
+  const handleSearch = (e) => {
+    const term = e.target.value.toLowerCase();
+    setSearchTerm(term);
+    
+    if (!term.trim()) {
+      setSearchResults([]);
+      return;
+    }
+    
+    // Filtrar oficios que coincidan con el término de búsqueda
+    // y que no estén ya seleccionados
+    const selectedIds = selectedRelatedOficios.map(o => o.id_oficio);
+    const results = oficiosRelacionados.filter(oficio => 
+      !selectedIds.includes(oficio.id_oficio) && (
+        oficio.numero_de_oficio.toString().includes(term) ||
+        (oficio.asunto && oficio.asunto.toLowerCase().includes(term))
+      )
+    );
+    
+    setSearchResults(results.slice(0, 5)); // Limitar resultados para no sobrecargar la UI
+  };
+
+  // Función para agregar un oficio relacionado
+  const addRelatedOficio = (oficio) => {
+    setSelectedRelatedOficios(prev => [...prev, oficio]);
+    setSearchTerm('');
+    setSearchResults([]);
+    
+    // Actualizar el formData con los IDs de los oficios relacionados
+    const updatedIds = [...selectedRelatedOficios, oficio].map(o => o.id_oficio).join(',');
+    setFormData(prev => ({
+      ...prev,
+      oficios_relacionados: updatedIds
+    }));
+  };
+
+  // Función para eliminar un oficio relacionado
+  const removeRelatedOficio = (oficioId) => {
+    const updated = selectedRelatedOficios.filter(o => o.id_oficio !== oficioId);
+    setSelectedRelatedOficios(updated);
+    
+    // Actualizar el formData con los IDs actualizados
+    const updatedIds = updated.map(o => o.id_oficio).join(',');
+    setFormData(prev => ({
+      ...prev,
+      oficios_relacionados: updatedIds
+    }));
+  };
+
   // Validar formulario antes de enviar
   const validateForm = () => {
     const newErrors = {};
@@ -232,7 +361,6 @@ const OficioForm = ({ oficio, estados, onSave, onCancel }) => {
       setIsSubmitting(false);
     }
   };
-
   return (
     <div className="oficio-form-modal">
       <div className="oficio-form-container">
@@ -267,6 +395,8 @@ const OficioForm = ({ oficio, estados, onSave, onCancel }) => {
                 type="text"
                 id="numero_de_oficio"
                 name="numero_de_oficio"
+                autoComplete="off"
+                placeholder='Ej. 228010040300000L/0639/2025'
                 value={formData.numero_de_oficio}
                 onChange={handleChange}
                 className={`oficio-form-input ${
@@ -387,7 +517,7 @@ const OficioForm = ({ oficio, estados, onSave, onCancel }) => {
                     <button
                       type="button"
                       onClick={handleCreateSolicitante}
-                      className="oficio-form-submit-btn oficio-form-add-submit-btn"
+                      className="oficio-form-cancel-btn"
                     >
                       Agregar
                     </button>
@@ -444,7 +574,7 @@ const OficioForm = ({ oficio, estados, onSave, onCancel }) => {
                     <button
                       type="button"
                       onClick={handleCreateResponsable}
-                      className="oficio-form-submit-btn oficio-form-add-submit-btn"
+                      className="oficio-form-cancel-btn"
                     >
                       Agregar
                     </button>
@@ -493,6 +623,27 @@ const OficioForm = ({ oficio, estados, onSave, onCancel }) => {
               {errors.id_area && (
                 <p className="oficio-form-error">{errors.id_area}</p>
               )}
+            </div>
+
+            {/* UPEyCE (Campo nuevo) */}
+            <div className="oficio-form-field">
+              <label htmlFor="id_UPEyCE" className="oficio-form-label">
+                UPEyCE (opcional)
+              </label>
+              <select
+                id="id_UPEyCE"
+                name="id_UPEyCE"
+                value={formData.id_UPEyCE || ''}
+                onChange={handleChange}
+                className="oficio-form-select"
+              >
+                <option value="">Sin UPEyCE asignado</option>
+                {UPEyCEs.map(UPEyCE => (
+                  <option key={UPEyCE.id_UPEyCE} value={UPEyCE.id_UPEyCE}>
+                    {UPEyCE.numero_UPEyCE}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* Fecha de Respuesta */}
@@ -546,6 +697,123 @@ const OficioForm = ({ oficio, estados, onSave, onCancel }) => {
             />
           </div>
 
+          {/* Sección de Oficios Relacionados */}
+          <div className="oficio-form-field mt-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Oficios Relacionados</h3>
+            
+            {/* Buscador de oficios */}
+            <div className="mb-4">
+              <label htmlFor="searchOficios" className="block text-sm font-medium text-gray-700 mb-1">
+                Buscar oficios para relacionar
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  id="searchOficios"
+                  value={searchTerm}
+                  onChange={handleSearch}
+                  placeholder="Buscar por número o asunto"
+                  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-guinda focus:border-guinda"
+                />
+                
+                {/* Resultados de búsqueda */}
+                {searchResults.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-white shadow-lg rounded-md border border-gray-200 max-h-60 overflow-y-auto">
+                    {searchResults.map(oficio => (
+                      <div 
+                        key={oficio.id_oficio} 
+                        className="p-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 flex justify-between items-center"
+                        onClick={() => addRelatedOficio(oficio)}
+                      >
+                        <div>
+                          <span className="font-medium text-sm">Oficio #{oficio.numero_de_oficio}</span>
+                          <p className="text-xs text-gray-600 truncate">{oficio.asunto}</p>
+                        </div>
+                        <button 
+                          type="button"
+                          className="oficio-form-cancel-btn" 
+                        >
+                          Agregar
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            {/* Lista de oficios seleccionados */}
+            <div className="border border-gray-300 rounded-md p-2 bg-gray-50">
+              <h4 className="text-sm font-medium text-gray-700 mb-2">Oficios seleccionados:</h4>
+              
+              {selectedRelatedOficios.length > 0 ? (
+                <ul className="space-y-1">
+                  {selectedRelatedOficios.map(oficio => (
+                    <li 
+                      key={oficio.id_oficio}
+                      className="flex justify-between items-center bg-white p-2 rounded shadow-sm"
+                    >
+                      <div>
+                        <span className="text-sm font-medium">#{oficio.numero_de_oficio}</span>
+                        <p className="text-xs text-gray-600 truncate">{oficio.asunto}</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeRelatedOficio(oficio.id_oficio)}
+                        className="text-red-600 hover:text-red-800"
+                        title="Eliminar"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-sm text-gray-500 italic">No hay oficios relacionados seleccionados</p>
+              )}
+            </div>
+            
+            <p className="mt-1 text-xs text-gray-500">
+              Relacionar oficios permite agrupar documentación que pertenece al mismo tema o trámite.
+            </p>
+          </div>
+
+          {/* Oficio de Respuesta */}
+          <div className="oficio-form-field mt-4">
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Oficio de Respuesta</h3>
+            
+            <div className="mb-4">
+              <label htmlFor="oficio_respuesta" className="block text-sm font-medium text-gray-700 mb-1">
+                Número de oficio de respuesta (si aplica)
+              </label>
+              <input
+                type="text"
+                id="oficio_respuesta"
+                name="oficio_respuesta"
+                value={formData.oficio_respuesta || ''}
+                onChange={handleChange}
+                placeholder="Ej: 123/2025"
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-guinda focus:border-guinda"
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                Use este campo para indicar el número de oficio que da respuesta al presente.
+              </p>
+            </div>
+            
+            {/* Estado de respuesta */}
+            {formData.estado === 'concluido' && !formData.oficio_respuesta && (
+              <div className="p-3 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-700 text-sm rounded">
+                <p className="font-medium">Recomendación:</p>
+                <p>Este oficio está marcado como concluido. Considere agregar el número de oficio de respuesta o acuse para mejor seguimiento.</p>
+              </div>
+            )}
+          </div>
+
+          {/* Separador visual */}
+          <hr className="my-6 border-gray-200" />
+
           {/* Checkbox para archivado */}
           <div className="oficio-form-checkbox-container">
             <input
@@ -573,14 +841,10 @@ const OficioForm = ({ oficio, estados, onSave, onCancel }) => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="oficio-form-cancel-btn"
+              className="oficio-form-submit-btn"
             >
               {isSubmitting ? (
-                <span className="flex items-center justify-center">
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
+                <span className="oficio-form-submit-btn">
                   Guardando...
                 </span>
               ) : oficio ? 'Actualizar' : 'Crear'}

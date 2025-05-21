@@ -13,6 +13,7 @@ import UserPage from './components/userList/userPage';
 import Reportepage from './components/Reporte/ReportePage';
 import { useAuth } from './context/AuthContext';
 import './App.css';
+import UPEyCEPage from './components/UPEyCE/UPEyCEPage';
 
 function App() {
   const { isAuthenticated, loading } = useAuth();
@@ -72,7 +73,15 @@ function App() {
             <Navigate to="/oficios" />
           </ProtectedRoute>
         } />
-        
+
+        <Route path="/UPEyCE" element={
+          <ProtectedRoute>
+            <MainLayout>
+              <UPEyCEPage />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+              
         {/* Ruta para cualquier otra URL no definida */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>

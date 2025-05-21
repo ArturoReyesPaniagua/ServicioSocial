@@ -1,34 +1,34 @@
-// UPCYDPage.jsx
-// SistemaIntegral/frontend/SS/src/components/UPCYD/UPCYDPage.jsx
+// UPEyCEPage.jsx
+// SistemaIntegral/frontend/SS/src/components/UPEyCE/UPEyCEPage.jsx
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import UPCYDTable from './UPCYDTable';
-import UPCYDForm from './UPCYDForm';
-import UPCYDView from './UPCYDView';
+import UPEyCETable from './UPEyCETable';
+import UPEyCEForm from './UPEyCEForm';
+import UPEyCEView from './UPEyCEView';
 import DeleteConfirmation from '../common/DeleteConfirmation';
 import { useAuth } from '../../context/AuthContext';
 
-const UPCYDPage = () => {
+const UPEyCEPage = () => {
   const [registros, setRegistros] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [formVisible, setFormVisible] = useState(false);
   const [viewVisible, setViewVisible] = useState(false);
   const [deleteVisible, setDeleteVisible] = useState(false);
-  const [currentUPCYD, setCurrentUPCYD] = useState(null);
+  const [currentUPEyCE, setCurrentUPEyCE] = useState(null);
   const [oficioFormVisible, setOficioFormVisible] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Cargar registros UPCYD al iniciar
+  // Cargar registros UPEyCE al iniciar
   useEffect(() => {
-    fetchUPCYDs();
+    fetchUPEyCEs();
   }, []);
 
-  // Función para obtener los registros UPCYD
-  const fetchUPCYDs = async () => {
+  // Función para obtener los registros UPEyCE
+  const fetchUPEyCEs = async () => {
     try {
       setIsLoading(true);
       const token = localStorage.getItem('token');
@@ -44,23 +44,23 @@ const UPCYDPage = () => {
         }
       };
       
-      const response = await axios.get('http://localhost:3001/api/upcyd', config);
+      const response = await axios.get('http://localhost:3001/api/UPEyCE', config);
       setRegistros(response.data);
     } catch (error) {
-      console.error('Error al cargar registros UPCYD:', error);
+      console.error('Error al cargar registros UPEyCE:', error);
       
       if (error.response && error.response.status === 401) {
         toast.error('Sesión expirada. Por favor inicie sesión nuevamente.');
       } else {
-        toast.error('Error al cargar registros UPCYD. Por favor intente nuevamente.');
+        toast.error('Error al cargar registros UPEyCE. Por favor intente nuevamente.');
       }
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Función para crear un nuevo registro UPCYD
-  const handleCreateUPCYD = async (data) => {
+  // Función para crear un nuevo registro UPEyCE
+  const handleCreateUPEyCE = async (data) => {
     try {
       const token = localStorage.getItem('token');
       
@@ -75,17 +75,17 @@ const UPCYDPage = () => {
         }
       };
       
-      const response = await axios.post('http://localhost:3001/api/upcyd', data, config);
+      const response = await axios.post('http://localhost:3001/api/UPEyCE', data, config);
       
-      toast.success('Registro UPCYD creado exitosamente');
+      toast.success('Control UPEyCE creado exitosamente');
       setFormVisible(false);
-      fetchUPCYDs();
+      fetchUPEyCEs();
       
       return response.data;
     } catch (error) {
-      console.error('Error al crear registro UPCYD:', error);
+      console.error('Error al crear registro UPEyCE:', error);
       
-      let errorMessage = 'Error al crear registro UPCYD';
+      let errorMessage = 'Error al crear registro UPEyCE';
       
       if (error.response && error.response.data && error.response.data.error) {
         errorMessage = error.response.data.error;
@@ -96,8 +96,8 @@ const UPCYDPage = () => {
     }
   };
 
-  // Función para actualizar un registro UPCYD existente
-  const handleUpdateUPCYD = async (data) => {
+  // Función para actualizar un registro UPEyCE existente
+  const handleUpdateUPEyCE = async (data) => {
     try {
       const token = localStorage.getItem('token');
       
@@ -113,20 +113,20 @@ const UPCYDPage = () => {
       };
       
       const response = await axios.put(
-        `http://localhost:3001/api/upcyd/${data.id_UPCYD}`, 
+        `http://localhost:3001/api/UPEyCE/${data.id_UPEyCE}`, 
         data, 
         config
       );
       
-      toast.success('Registro UPCYD actualizado exitosamente');
+      toast.success('Control UPEyCE actualizado exitosamente');
       setFormVisible(false);
-      fetchUPCYDs();
+      fetchUPEyCEs();
       
       return response.data;
     } catch (error) {
-      console.error('Error al actualizar registro UPCYD:', error);
+      console.error('Error al actualizar registro UPEyCE:', error);
       
-      let errorMessage = 'Error al actualizar registro UPCYD';
+      let errorMessage = 'Error al actualizar registro UPEyCE';
       
       if (error.response && error.response.data && error.response.data.error) {
         errorMessage = error.response.data.error;
@@ -137,9 +137,9 @@ const UPCYDPage = () => {
     }
   };
 
-  // Función para eliminar un registro UPCYD
-  const handleDeleteUPCYD = async () => {
-    if (!currentUPCYD) return;
+  // Función para eliminar un registro UPEyCE
+  const handleDeleteUPEyCE = async () => {
+    if (!currentUPEyCE) return;
     
     try {
       const token = localStorage.getItem('token');
@@ -155,16 +155,16 @@ const UPCYDPage = () => {
         }
       };
       
-      await axios.delete(`http://localhost:3001/api/upcyd/${currentUPCYD.id_UPCYD}`, config);
+      await axios.delete(`http://localhost:3001/api/UPEyCE/${currentUPEyCE.id_UPEyCE}`, config);
       
-      toast.success('Registro UPCYD eliminado exitosamente');
+      toast.success('Control UPEyCE eliminado exitosamente');
       setDeleteVisible(false);
-      setCurrentUPCYD(null);
-      fetchUPCYDs();
+      setCurrentUPEyCE(null);
+      fetchUPEyCEs();
     } catch (error) {
-      console.error('Error al eliminar registro UPCYD:', error);
+      console.error('Error al eliminar registro UPEyCE:', error);
       
-      let errorMessage = 'Error al eliminar registro UPCYD';
+      let errorMessage = 'Error al eliminar registro UPEyCE';
       
       if (error.response && error.response.data && error.response.data.error) {
         errorMessage = error.response.data.error;
@@ -174,62 +174,53 @@ const UPCYDPage = () => {
     }
   };
 
-  // Función para generar un nuevo oficio a partir de un UPCYD
-  const handleGenerateOficio = (upcyd) => {
-    // Almacenar el UPCYD seleccionado en sessionStorage para usarlo en la página de oficios
-    sessionStorage.setItem('selectedUPCYD', JSON.stringify(upcyd));
+  // Función para generar un nuevo oficio a partir de un UPEyCE
+  const handleGenerateOficio = (UPEyCE) => {
+    // Almacenar el UPEyCE seleccionado en sessionStorage para usarlo en la página de oficios
+    sessionStorage.setItem('selectedUPEyCE', JSON.stringify(UPEyCE));
     
     // Navegar a la página de oficios con un parámetro para indicar que se está creando un nuevo oficio
-    navigate('/oficios?action=create&upcyd=' + upcyd.id_UPCYD);
+    navigate('/oficios?action=create&UPEyCE=' + UPEyCE.id_UPEyCE);
   };
 
   // Manejadores para editar, ver, eliminar
-  const handleEdit = (upcyd) => {
-    setCurrentUPCYD(upcyd);
+  const handleEdit = (UPEyCE) => {
+    setCurrentUPEyCE(UPEyCE);
     setFormVisible(true);
   };
 
-  const handleView = (upcyd) => {
-    setCurrentUPCYD(upcyd);
+  const handleView = (UPEyCE) => {
+    setCurrentUPEyCE(UPEyCE);
     setViewVisible(true);
   };
 
-  const handleDelete = (upcyd) => {
-    setCurrentUPCYD(upcyd);
+  const handleDelete = (UPEyCE) => {
+    setCurrentUPEyCE(UPEyCE);
     setDeleteVisible(true);
   };
 
   // Función para mostrar formulario de creación
   const handleShowCreateForm = () => {
-    setCurrentUPCYD(null);
+    setCurrentUPEyCE(null);
     setFormVisible(true);
   };
 
   return (
     <div className="container mx-auto p-4">
       <div className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center">
-        <h1 className="text-2xl font-bold mb-4 md:mb-0">Gestión de UPCYD</h1>
+        <h1 className="text-2xl font-bold mb-4 md:mb-0">Control de documentos UPEyCE</h1>
         
         <button
           onClick={handleShowCreateForm}
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
         >
-          Nuevo Registro UPCYD
+          Nuevo Control UPEyCE
         </button>
       </div>
 
-      <div className="bg-white p-4 rounded-lg shadow mb-6">
-        <p className="text-gray-700 mb-2">
-          <strong>Sobre UPCYD:</strong> Los registros UPCYD permiten agrupar y gestionar oficios relacionados con una misma temática o proyecto.
-        </p>
-        <ul className="list-disc ml-5 text-gray-600 text-sm">
-          <li>Cada número UPCYD puede tener múltiples oficios asociados</li>
-          <li>Los oficios relacionados pueden ser visualizados desde la vista detallada</li>
-          <li>Use el botón "Generar Oficio" para crear nuevos oficios asociados a un UPCYD</li>
-        </ul>
-      </div>
+  
 
-      <UPCYDTable
+      <UPEyCETable
         data={registros}
         onEdit={handleEdit}
         onDelete={handleDelete}
@@ -239,16 +230,16 @@ const UPCYDPage = () => {
       />
 
       {formVisible && (
-        <UPCYDForm
-          upcyd={currentUPCYD}
-          onSave={currentUPCYD ? handleUpdateUPCYD : handleCreateUPCYD}
+        <UPEyCEForm
+          UPEyCE={currentUPEyCE}
+          onSave={currentUPEyCE ? handleUpdateUPEyCE : handleCreateUPEyCE}
           onCancel={() => setFormVisible(false)}
         />
       )}
 
-      {viewVisible && currentUPCYD && (
-        <UPCYDView
-          upcyd={currentUPCYD}
+      {viewVisible && currentUPEyCE && (
+        <UPEyCEView
+          UPEyCE={currentUPEyCE}
           onClose={() => setViewVisible(false)}
           onEdit={() => {
             setViewVisible(false);
@@ -260,9 +251,9 @@ const UPCYDPage = () => {
 
       {deleteVisible && (
         <DeleteConfirmation
-          title="Eliminar Registro UPCYD"
-          message={`¿Está seguro que desea eliminar el registro UPCYD ${currentUPCYD?.numero_UPCYD}? Esta acción no se puede deshacer.`}
-          onConfirm={handleDeleteUPCYD}
+          title="Eliminar Control UPEyCE"
+          message={`¿Está seguro que desea eliminar el control UPEyCE ${currentUPEyCE?.numero_UPEyCE}? Esta acción no se puede deshacer.`}
+          onConfirm={handleDeleteUPEyCE}
           onCancel={() => setDeleteVisible(false)}
         />
       )}
@@ -270,4 +261,4 @@ const UPCYDPage = () => {
   );
 };
 
-export default UPCYDPage;
+export default UPEyCEPage;

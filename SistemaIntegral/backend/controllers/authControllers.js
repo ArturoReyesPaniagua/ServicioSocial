@@ -50,9 +50,9 @@ const register = async (req, res) => {
       return res.status(404).json({ error: "El área seleccionada no existe" });
     }
     
-    // Crear hash de la contraseña (desactivado en el código original, pero incluido aquí para seguridad)
-    // const salt = await bcrypt.genSalt(10);
-    // const hashedPassword = await bcrypt.hash(password, salt);
+    // Crear hash de la contraseña 
+    //const salt = await bcrypt.genSalt(10);
+   // const hashedPassword = await bcrypt.hash(password, salt);
     
     // Insertar el nuevo usuario
     const insertQuery = `
@@ -63,7 +63,7 @@ const register = async (req, res) => {
     
     const result = await pool.request()
       .input('username', sql.NVarChar, username)
-      .input('password', sql.NVarChar, password) // Usar hashedPassword para mayor seguridad
+      .input('password', sql.NVarChar, password) 
       .input('role', sql.NVarChar, role)
       .input('id_area', sql.Int, id_area)
       .query(insertQuery);
@@ -83,7 +83,8 @@ const login = async (req, res) => {
   try {
     const { username, password } = req.body;
     
-    console.log("Intento de login:", { username, password: '********'});
+    console.log("Intento de login:", { username, password});
+    console.log("Body de la solicitud:", req.body);
     
     if (!username || !password) {
       return res.status(400).json({ error: "Los campos no pueden estar vacios!" });
@@ -117,9 +118,11 @@ const login = async (req, res) => {
     // Verificar la contraseña - corregir uso de bcrypt.compare
     console.log("Contraseña proporcionada", password);
     console.log("Contraseña almacenada", user.password);
-    
-    // Usar bcrypt.compare correctamente
     const passwordMatch = await bcrypt.compare(password, user.password);
+    console.log("Contraseña coincide:", passwordMatch ? "Sí" : "No");
+    
+    // Verificar directamente si las contraseñas coinciden (sin bcrypt)
+    //const passwordMatch = password === user.password;
     console.log("Contraseña coincide:", passwordMatch ? "Sí" : "No");
     
     if (passwordMatch) {

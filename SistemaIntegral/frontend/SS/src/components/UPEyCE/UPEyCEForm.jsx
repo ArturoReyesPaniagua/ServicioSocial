@@ -1,14 +1,15 @@
-// UPCYDForm.jsx
-// SistemaIntegral/frontend/SS/src/components/UPCYD/UPCYDForm.jsx
+// UPEyCEForm.jsx
+// SistemaIntegral/frontend/SS/src/components/UPEyCE/UPEyCEForm.jsx
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
 
-const UPCYDForm = ({ upcyd, onSave, onCancel }) => {
+const UPEyCEForm = ({ UPEyCE, onSave, onCancel }) => {
   const [formData, setFormData] = useState({
-    numero_UPCYD: '',
-    id_area: ''
+    numero_UPEyCE: '',
+    id_area: '',
+    descripcion: ''  // Campo adicional para describir el propósito del UPEyCE
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -30,10 +31,11 @@ const UPCYDForm = ({ upcyd, onSave, onCancel }) => {
 
   // Inicializar el formulario con datos si se está editando
   useEffect(() => {
-    if (upcyd) {
+    if (UPEyCE) {
       setFormData({
-        numero_UPCYD: upcyd.numero_UPCYD,
-        id_area: upcyd.id_area.toString()
+        numero_UPEyCE: UPEyCE.numero_UPEyCE,
+        id_area: UPEyCE.id_area.toString(),
+        descripcion: UPEyCE.descripcion || ''
       });
     } else {
       // Para nuevos registros, preseleccionar el área del usuario si no es admin
@@ -44,7 +46,7 @@ const UPCYDForm = ({ upcyd, onSave, onCancel }) => {
         }));
       }
     }
-  }, [upcyd, user]);
+  }, [UPEyCE, user]);
 
   // Manejar cambios en el formulario
   const handleChange = (e) => {
@@ -64,8 +66,8 @@ const UPCYDForm = ({ upcyd, onSave, onCancel }) => {
   const validateForm = () => {
     const newErrors = {};
     
-    if (!formData.numero_UPCYD) {
-      newErrors.numero_UPCYD = 'El número UPCYD es obligatorio';
+    if (!formData.numero_UPEyCE) {
+      newErrors.numero_UPEyCE = 'El número UPEyCE es obligatorio';
     }
     
     if (!formData.id_area) {
@@ -96,10 +98,10 @@ const UPCYDForm = ({ upcyd, onSave, onCancel }) => {
       
       await onSave(dataToSend, config);
     } catch (error) {
-      console.error('Error guardando registro UPCYD:', error);
+      console.error('Error guardando registro UPEyCE:', error);
       setErrors(prev => ({
         ...prev,
-        submit: error.response?.data?.error || 'Error al guardar el registro UPCYD'
+        submit: error.response?.data?.error || 'Error al guardar el registro UPEyCE'
       }));
     } finally {
       setIsSubmitting(false);
@@ -112,7 +114,7 @@ const UPCYDForm = ({ upcyd, onSave, onCancel }) => {
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold">
-              {upcyd ? 'Editar Registro UPCYD' : 'Nuevo Registro UPCYD'}
+              {UPEyCE ? 'Editar Registro UPEyCE' : 'Nuevo Registro UPEyCE'}
             </h2>
             <button
               onClick={onCancel}
@@ -132,24 +134,28 @@ const UPCYDForm = ({ upcyd, onSave, onCancel }) => {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Número UPCYD */}
+            {/* Número UPEyCE */}
             <div>
-              <label htmlFor="numero_UPCYD" className="block text-sm font-medium text-gray-700 mb-1">
-                Número UPCYD *
+              <label htmlFor="numero_UPEyCE" className="block text-sm font-medium text-gray-700 mb-1">
+                Número UPEyCE *
               </label>
               <input
                 type="text"
-                id="numero_UPCYD"
-                name="numero_UPCYD"
-                value={formData.numero_UPCYD}
+                id="numero_UPEyCE"
+                name="numero_UPEyCE"
+                value={formData.numero_UPEyCE}
                 onChange={handleChange}
+                placeholder="Ej: UPEyCE-2023-001"
                 className={`w-full p-2 border ${
-                  errors.numero_UPCYD ? 'border-red-500' : 'border-gray-300'
+                  errors.numero_UPEyCE ? 'border-red-500' : 'border-gray-300'
                 } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-guinda focus:border-guinda`}
               />
-              {errors.numero_UPCYD && (
-                <p className="mt-1 text-sm text-red-600">{errors.numero_UPCYD}</p>
+              {errors.numero_UPEyCE && (
+                <p className="mt-1 text-sm text-red-600">{errors.numero_UPEyCE}</p>
               )}
+              <p className="mt-1 text-xs text-gray-500">
+                Código de control interno para el seguimiento de documentos.
+              </p>
             </div>
 
             {/* Área - Solo visible/editable para administradores */}
@@ -194,6 +200,25 @@ const UPCYDForm = ({ upcyd, onSave, onCancel }) => {
               )}
             </div>
 
+            {/* Descripción (nuevo campo) */}
+            <div>
+              <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700 mb-1">
+                Descripción
+              </label>
+              <textarea
+                id="descripcion"
+                name="descripcion"
+                rows="3"
+                value={formData.descripcion || ''}
+                onChange={handleChange}
+                placeholder="Describe el propósito o contenido de este UPEyCE"
+                className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-guinda focus:border-guinda"
+              ></textarea>
+              <p className="mt-1 text-xs text-gray-500">
+                Opcional: Añade información adicional sobre este UPEyCE.
+              </p>
+            </div>
+
             <div className="flex justify-end space-x-3 mt-6">
               <button
                 type="button"
@@ -214,10 +239,10 @@ const UPCYDForm = ({ upcyd, onSave, onCancel }) => {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    {upcyd ? 'Actualizando...' : 'Creando...'}
+                    {UPEyCE ? 'Actualizando...' : 'Creando...'}
                   </div>
                 ) : (
-                  upcyd ? 'Actualizar' : 'Crear'
+                  UPEyCE ? 'Actualizar' : 'Crear'
                 )}
               </button>
             </div>
@@ -228,4 +253,4 @@ const UPCYDForm = ({ upcyd, onSave, onCancel }) => {
   );
 };
 
-export default UPCYDForm;
+export default UPEyCEForm;

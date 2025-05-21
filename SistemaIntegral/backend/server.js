@@ -9,7 +9,7 @@ const authRoutes = require('./routes/authRoutes');
 const areaRoutes = require('./routes/areaRoutes');
 const responsableRoutes = require('./routes/responsableRoutes');
 const solicitanteRoutes = require('./routes/solicitanteRoutes');
-const upcydRoutes = require('./routes/upcydRoutes'); // Nueva importación para UPCYD
+const UPEyCERoutes = require('./routes/UPEyCERoutes'); // Nueva importación para UPEyCE
 require('dotenv').config();
 
 const app = express();
@@ -39,7 +39,7 @@ app.use('/api', pdfRoutes);
 app.use('/api', areaRoutes);
 app.use('/api', responsableRoutes);
 app.use('/api', solicitanteRoutes);
-app.use('/api', upcydRoutes); // Nueva ruta para UPCYD
+app.use('/api', UPEyCERoutes); // Nueva ruta para UPEyCE
 app.use('/api/auth', authRoutes);
 
 // Ruta de prueba

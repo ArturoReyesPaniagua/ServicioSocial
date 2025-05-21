@@ -152,7 +152,22 @@ const MainLayout = ({ children }) => {
                 )}
               </NavLink>
             </li>
-
+          {user?.role === 'admin' && (
+            <li>
+              <NavLink 
+                to="/UPEyCE" 
+                className={({ isActive }) => 
+                  isActive ? "bg-guinda-700" : ""
+                }
+              >
+                {({ isActive }) => (
+                  <button className={isActive ? "bg-guinda-700" : ""}>
+                    Gestión UPEyCE
+                  </button>
+                )}
+              </NavLink>
+            </li>
+          )}
             {user?.role === 'admin' && (
               <li>
                 <NavLink 
