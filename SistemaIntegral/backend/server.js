@@ -65,8 +65,9 @@ connectDB()
 // CONFIGURACIÓN DE RUTAS
 // ========================================
 
-// Ruta de prueba/salud del servidor
+// Ruta de prueba
 app.get('/', (req, res) => {
+  /*
   res.json({
     message: 'API del Sistema Integral de Gestión de Oficios funcionando correctamente',
     version: '1.0.0',
@@ -81,8 +82,9 @@ app.get('/', (req, res) => {
       upeyc: '/api/UPEyCE/*',
       solicitudes: '/api/solicitudes-upeyc/*',
       notificaciones: '/api/notificaciones/*'
-    }
+      }
   });
+*/
 });
 
 // Ruta de health check
@@ -183,6 +185,7 @@ app.use((error, req, res, next) => {
 // ========================================
 
 // Iniciar el servidor
+/*
 const server = app.listen(PORT, () => {
   console.log('\n🚀 ========================================');
   console.log('   SISTEMA INTEGRAL DE GESTIÓN DE OFICIOS');
@@ -214,7 +217,7 @@ const server = app.listen(PORT, () => {
   console.log('   🔔 Notificaciones: /api/notificaciones/*');
   console.log('========================================\n');
 });
-
+*/
 // ========================================
 // MANEJO DE SEÑALES DE CIERRE
 // ========================================

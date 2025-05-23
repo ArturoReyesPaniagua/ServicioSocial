@@ -183,6 +183,7 @@ const MainLayout = ({ children }) => {
                 }
               >
                 {({ isActive }) => (
+                    {/*
                   <button className={isActive ? "bg-guinda-700" : ""}>
                     <div className="flex items-center justify-between w-full">
                       <span>📝 Solicitar UPEyCE</span>
@@ -193,6 +194,7 @@ const MainLayout = ({ children }) => {
                       )}
                     </div>
                   </button>
+                  */}
                 )}
               </NavLink>
             </li>
@@ -208,9 +210,11 @@ const MainLayout = ({ children }) => {
                     }
                   >
                     {({ isActive }) => (
+                    {/*
                       <button className={isActive ? "bg-guinda-700" : ""}>
                         🗂️ Gestión UPEyCE
                       </button>
+                    */}
                     )}
                   </NavLink>
                 </li>
@@ -223,9 +227,13 @@ const MainLayout = ({ children }) => {
                     }
                   >
                     {({ isActive }) => (
+                      {/*
                       <button className={isActive ? "bg-guinda-700" : ""}>
                         ⚙️ Aprobar Solicitudes
                       </button>
+
+                      */}
+                   
                     )}
                   </NavLink>
                 </li>
