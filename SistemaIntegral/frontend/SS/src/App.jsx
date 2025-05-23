@@ -11,9 +11,11 @@ import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import OficiosPage from './components/Oficios/OficiosPage';
 import UserPage from './components/userList/userPage';
 import Reportepage from './components/Reporte/ReportePage';
+import UPEyCEPage from './components/UPEyCE/UPEyCEPage';
+import SolicitarUPEyCEPage from './components/SolicitarUPEyCE/SolicitarUPEyCEPage';
+import AdminSolicitudesPage from './components/SolicitarUPEyCE/AdminSolicitudesPage';
 import { useAuth } from './context/AuthContext';
 import './App.css';
-import UPEyCEPage from './components/UPEyCE/UPEyCEPage';
 
 function App() {
   const { isAuthenticated, loading } = useAuth();
@@ -62,6 +64,33 @@ function App() {
           </ProtectedRoute>
         } />
         
+        {/* Ruta de gestión UPEyCE (solo admin) */}
+        <Route path="/UPEyCE" element={
+          <ProtectedRoute>
+            <MainLayout>
+              <UPEyCEPage />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        
+        {/* Ruta para solicitar UPEyCE (todos los usuarios) */}
+        <Route path="/SolicitarUPEyCE" element={
+          <ProtectedRoute>
+            <MainLayout>
+              <SolicitarUPEyCEPage />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        
+        {/* Ruta para administrar solicitudes UPEyCE (solo admin) */}
+        <Route path="/AdminSolicitudes" element={
+          <ProtectedRoute>
+            <MainLayout>
+              <AdminSolicitudesPage />
+            </MainLayout>
+          </ProtectedRoute>
+        } />
+        
         <Route path="/expedientes" element={
           <ProtectedRoute>
             <Navigate to="/oficios" />
@@ -71,14 +100,6 @@ function App() {
         <Route path="/Layout" element={
           <ProtectedRoute>
             <Navigate to="/oficios" />
-          </ProtectedRoute>
-        } />
-
-        <Route path="/UPEyCE" element={
-          <ProtectedRoute>
-            <MainLayout>
-              <UPEyCEPage />
-            </MainLayout>
           </ProtectedRoute>
         } />
               

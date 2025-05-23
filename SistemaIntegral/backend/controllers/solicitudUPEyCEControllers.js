@@ -2,8 +2,9 @@
 // Controladores para el manejo de solicitudes de UPEyCE
 
 const sql = require('mssql');
-const solicitudUPEyCESchema = require('../schemas/solicitudUPEyCESchema');
+const solicitudUPEyCESchema = require('../schemas/SolicitudUPEyCE');
 const UPEyCESchema = require('../schemas/UPEyCESchema');
+const notificacionesHistorialSchema = require('../schemas/notificacionesHistorialSchema');
 const { connectDB } = require('../db/db');
 
 // Función auxiliar para crear notificación
@@ -47,7 +48,9 @@ const registrarHistorial = async (pool, solicitudId, estadoAnterior, estadoNuevo
 const createSolicitudUPEyCE = async (req, res) => {
   try {
     const pool = await connectDB();
+    // Asegurar que todas las tablas existan
     await pool.request().query(solicitudUPEyCESchema);
+    await pool.request().query(notificacionesHistorialSchema);
 
     const { numero_UPEyCE_solicitado, justificacion, descripcion, prioridad = 'normal' } = req.body;
     const userId = req.user.userId;

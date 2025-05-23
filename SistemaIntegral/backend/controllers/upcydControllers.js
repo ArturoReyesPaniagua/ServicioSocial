@@ -1,6 +1,6 @@
-// SistemaIntegral/backend/controllers/UPEyCEControllers.js
+// SistemaIntegral/backend/controllers/upcydControllers.js (corregido)
 const sql = require('mssql');
-const UPEyCESchema = require('../db/UPEyCESchema');
+const UPEyCESchema = require('../schemas/UPEyCESchema'); // Referencia corregida
 const { connectDB } = require('../db/db');
 
 // Crear un nuevo registro UPEyCE
@@ -10,7 +10,7 @@ const createUPEyCE = async (req, res) => {
     const pool = await connectDB();
     await pool.request().query(UPEyCESchema);
 
-    const { numero_UPEyCE, id_area } = req.body;
+    const { numero_UPEyCE, id_area, descripcion } = req.body;
     
     if (!numero_UPEyCE) {
       return res.status(400).json({ error: 'El número de UPEyCE es requerido' });
@@ -33,10 +33,11 @@ const createUPEyCE = async (req, res) => {
     const result = await pool.request()
       .input('numero_UPEyCE', sql.NVarChar, numero_UPEyCE)
       .input('id_area', sql.Int, id_area || null)
-      .input('id_usuario', sql.Int, userId)
+      .input('id_usuario_solicita', sql.Int, userId)
+      .input('descripcion', sql.NVarChar, descripcion || null)
       .query(`
-        INSERT INTO UPEyCE (numero_UPEyCE, id_area, id_usuario) 
-        VALUES (@numero_UPEyCE, @id_area, @id_usuario);
+        INSERT INTO UPEyCE (numero_UPEyCE, id_area, id_usuario_solicita, descripcion) 
+        VALUES (@numero_UPEyCE, @id_area, @id_usuario_solicita, @descripcion);
         SELECT SCOPE_IDENTITY() AS id_UPEyCE;
       `);
 
@@ -85,7 +86,7 @@ const getAllUPEyCE = async (req, res) => {
         LEFT JOIN 
           Area a ON u.id_area = a.id_area
         LEFT JOIN
-          users usr ON u.id_usuario = usr.userId
+          users usr ON u.id_usuario_solicita = usr.userId
         ORDER BY
           u.fecha_creacion DESC
       `;
@@ -104,7 +105,7 @@ const getAllUPEyCE = async (req, res) => {
         LEFT JOIN 
           Area a ON u.id_area = a.id_area
         LEFT JOIN
-          users usr ON u.id_usuario = usr.userId
+          users usr ON u.id_usuario_solicita = usr.userId
         WHERE 
           u.id_area = @userArea
         ORDER BY
@@ -155,7 +156,7 @@ const getUPEyCEById = async (req, res) => {
       LEFT JOIN 
         Area a ON u.id_area = a.id_area
       LEFT JOIN
-        users usr ON u.id_usuario = usr.userId
+        users usr ON u.id_usuario_solicita = usr.userId
       WHERE 
         u.id_UPEyCE = @id
     `;
@@ -188,7 +189,7 @@ const getUPEyCEById = async (req, res) => {
 const updateUPEyCE = async (req, res) => {
   try {
     const { id } = req.params;
-    const { numero_UPEyCE, id_area } = req.body;
+    const { numero_UPEyCE, id_area, descripcion } = req.body;
     const pool = await connectDB();
     
     // Obtener el usuario autenticado
@@ -242,6 +243,11 @@ const updateUPEyCE = async (req, res) => {
     if (numero_UPEyCE !== undefined) {
       updateFields.push('numero_UPEyCE = @numero_UPEyCE');
       request.input('numero_UPEyCE', sql.NVarChar, numero_UPEyCE);
+    }
+
+    if (descripcion !== undefined) {
+      updateFields.push('descripcion = @descripcion');
+      request.input('descripcion', sql.NVarChar, descripcion);
     }
 
     // Para el área, solo permitir cambiarla si es admin

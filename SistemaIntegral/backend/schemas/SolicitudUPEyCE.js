@@ -1,5 +1,6 @@
-// SistemaIntegral/backend/schemas/solicitudUPEyCESchema.js
+// SistemaIntegral/backend/schemas/solicitudUPEyCESchema.js (actualizado)
 const solicitudUPEyCESchema = `
+  -- Crear tabla SolicitudUPEyCE si no existe
   IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[SolicitudUPEyCE]') AND type in (N'U'))
   BEGIN
     CREATE TABLE [dbo].[SolicitudUPEyCE] (
@@ -7,7 +8,8 @@ const solicitudUPEyCESchema = `
       
       -- Información de la solicitud
       numero_UPEyCE_solicitado NVARCHAR(50) NOT NULL,
-      justificacion NVARCHAR(500) NOT NULL,
+      justificacion NVARCHAR(1000) NOT NULL,
+      descripcion NVARCHAR(500),
       prioridad NVARCHAR(20) DEFAULT 'normal' CHECK (prioridad IN ('baja', 'normal', 'alta', 'urgente')),
       
       -- Usuario y área que solicita
@@ -16,7 +18,7 @@ const solicitudUPEyCESchema = `
       fecha_solicitud DATETIME DEFAULT GETDATE(),
       
       -- Estado de la solicitud
-      estado NVARCHAR(20) DEFAULT 'pendiente' CHECK (estado IN ('pendiente', 'aprobado', 'rechazado')),
+      estado NVARCHAR(20) DEFAULT 'pendiente' CHECK (estado IN ('pendiente', 'aprobado', 'rechazado', 'cancelado')),
       
       -- Información de respuesta (cuando admin responde)
       id_usuario_responde INT,
@@ -35,6 +37,17 @@ const solicitudUPEyCESchema = `
       CONSTRAINT FK_SolicitudUPEyCE_UsuarioResponde FOREIGN KEY (id_usuario_responde) REFERENCES users(userId) ON DELETE SET NULL,
       CONSTRAINT FK_SolicitudUPEyCE_UPEyCE FOREIGN KEY (id_UPEyCE_generado) REFERENCES UPEyCE(id_UPEyCE) ON DELETE SET NULL
     );
+  END
+
+  -- Agregar campos que puedan faltar en versiones anteriores
+  IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[SolicitudUPEyCE]') AND name = 'descripcion')
+  BEGIN
+    ALTER TABLE [dbo].[SolicitudUPEyCE] ADD descripcion NVARCHAR(500);
+  END
+
+  IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[SolicitudUPEyCE]') AND name = 'fecha_actualizacion')
+  BEGIN
+    ALTER TABLE [dbo].[SolicitudUPEyCE] ADD fecha_actualizacion DATETIME DEFAULT GETDATE();
   END
 
   -- Crear índices si no existen
@@ -73,6 +86,12 @@ const solicitudUPEyCESchema = `
         INNER JOIN inserted i ON s.id_solicitud = i.id_solicitud;
     END
     ');
+  END
+
+  -- Índice compuesto para evitar duplicados de número UPEyCE por área
+  IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_SolicitudUPEyCE_NumeroArea')
+  BEGIN
+    CREATE INDEX IX_SolicitudUPEyCE_NumeroArea ON SolicitudUPEyCE(numero_UPEyCE_solicitado, id_area, estado);
   END
 `;
 

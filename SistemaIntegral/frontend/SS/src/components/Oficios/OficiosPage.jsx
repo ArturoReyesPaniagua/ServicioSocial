@@ -101,6 +101,43 @@ const OficiosPage = () => {
     fetchOficios();
   }, [filterType, selectedEstado, selectedArea]);
 
+  // Función para obtener un oficio por ID
+  const getOficioById = async (oficioId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      };
+      
+      const response = await axios.get(`http://localhost:3001/api/oficios/${oficioId}`, config);
+      return response.data;
+    } catch (error) {
+      console.error('Error al obtener oficio por ID:', error);
+      toast.error('Error al cargar el oficio solicitado');
+      return null;
+    }
+  };
+
+  // Función para navegar a un oficio relacionado
+  const handleNavigateToOficio = async (oficioRelacionado) => {
+    try {
+      // Obtener los datos completos del oficio
+      const oficioCompleto = await getOficioById(oficioRelacionado.id_oficio);
+      
+      if (oficioCompleto) {
+        // Cambiar el oficio actual al relacionado
+        setCurrentOficio(oficioCompleto);
+        // Mantener la vista abierta para mostrar el nuevo oficio
+        setViewVisible(true);
+      }
+    } catch (error) {
+      console.error('Error al navegar al oficio relacionado:', error);
+      toast.error('Error al cargar el oficio relacionado');
+    }
+  };
+
   // Crear un nuevo oficio
   const handleCreateOficio = async (oficioData) => {
     try {
@@ -125,6 +162,14 @@ const OficiosPage = () => {
       toast.success('Oficio actualizado exitosamente');
       setFormVisible(false);
       fetchOficios();
+      
+      // Si estamos viendo el oficio actualizado, actualizar la vista
+      if (currentOficio && currentOficio.id_oficio === oficioData.id_oficio) {
+        const oficioActualizado = await getOficioById(oficioData.id_oficio);
+        if (oficioActualizado) {
+          setCurrentOficio(oficioActualizado);
+        }
+      }
     } catch (error) {
       console.error('Error actualizando oficio:', error);
       toast.error('Error al actualizar el oficio');
@@ -179,9 +224,13 @@ const OficiosPage = () => {
     setFormVisible(true);
   };
 
-  const handleView = (oficio) => {
-    setCurrentOficio(oficio);
-    setViewVisible(true);
+  const handleView = async (oficio) => {
+    // Obtener datos completos del oficio
+    const oficioCompleto = await getOficioById(oficio.id_oficio);
+    if (oficioCompleto) {
+      setCurrentOficio(oficioCompleto);
+      setViewVisible(true);
+    }
   };
 
   const handleDelete = (oficio) => {
@@ -280,6 +329,7 @@ const OficiosPage = () => {
             setViewVisible(false);
             setFormVisible(true);
           }}
+          onNavigateToOficio={handleNavigateToOficio}
         />
       )}
 
