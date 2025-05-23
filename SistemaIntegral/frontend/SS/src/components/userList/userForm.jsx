@@ -209,6 +209,7 @@ const UserForm = ({ user, onSave, onCancel }) => {
               <input
                 id="username"
                 type="text"
+                autoComplete="off"
                 name="username"
                 value={formData.username}
                 onChange={handleChange}
@@ -233,6 +234,7 @@ const UserForm = ({ user, onSave, onCancel }) => {
                 <input
                   type={showPassword ? "text" : "password"}
                   id="password"
+                  autoComplete="off"
                   name="password"
                   value={formData.password}
                   onChange={handleChange}

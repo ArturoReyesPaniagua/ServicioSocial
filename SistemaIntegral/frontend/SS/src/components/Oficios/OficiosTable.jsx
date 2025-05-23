@@ -159,7 +159,7 @@ const OficiosTable = ({
           case 'en proceso':
             bgColor = 'bg-yellow-100 text-yellow-800';
             break;
-          case 'cancelado':
+          case 'urgencia':
             bgColor = 'bg-red-100 text-red-800';
             break;
           default:
@@ -195,7 +195,7 @@ const OficiosTable = ({
         try {
           const date = new Date(value);
           const today = new Date();
-          const isOverdue = date < today;
+          const isOverdue = date < today && (info.row.original.estado === 'en proceso' || info.row.original.estado === 'urgencia');
           
           return (
             <span className={isOverdue ? 'text-red-600 font-medium' : ''}>

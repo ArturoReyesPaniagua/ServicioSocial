@@ -21,13 +21,13 @@ async function createAdminUser() {
     }
     
     // Crear contraseña hasheada 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash('admin123', salt);
+    // const salt = await bcrypt.genSalt(10);
+    // const hashedPassword = await bcrypt.hash('admin123', salt);
     
     // Insertar el usuario admin
     await pool.request()
       .input('username', sql.NVarChar, 'administrador')
-      .input('password', sql.NVarChar, hashedPassword)
+      .input('password', sql.NVarChar, "admin123") // Cambia esto por hashedPassword si usas bcrypt
       .input('role', sql.NVarChar, 'admin')
       .query('INSERT INTO users (username, password, role) VALUES (@username, @password, @role)');
     

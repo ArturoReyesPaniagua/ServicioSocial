@@ -4,11 +4,12 @@ const oficioSchema = `
   BEGIN
     CREATE TABLE [dbo].[Oficio] (
       id_oficio INT IDENTITY(1,1) PRIMARY KEY,
-      estado NVARCHAR(20) CHECK (estado IN ('concluido', 'en proceso', 'cancelado')) NOT NULL,
+      estado NVARCHAR(20) CHECK (estado IN ('concluido', 'en proceso', 'urgencia')) NOT NULL,
       numero_de_oficio NVARCHAR(25) NOT NULL,
       fecha_recepcion DATE,
       fecha_limite DATE,
-      archivado BIT DEFAULT 0,
+      archivado NVARCHAR(30),
+      expediente NVARCHAR(30),
       fecha_respuesta DATE,
       id_solicitante INT,
       asunto NVARCHAR(255),

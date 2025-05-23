@@ -30,7 +30,7 @@ const OficiosPage = () => {
   const estadosDisponibles = [
     { value: 'concluido', label: 'Concluido' },
     { value: 'en proceso', label: 'En proceso' },
-    { value: 'cancelado', label: 'Cancelado' }
+    { value: 'urgencia', label: 'urgencia' }
   ];
 
   // Fetch oficios al cargar

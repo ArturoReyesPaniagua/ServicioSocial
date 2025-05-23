@@ -20,7 +20,7 @@ const OficioView = ({ oficio, onClose, onEdit }) => {
         return 'bg-green-100 text-green-800';
       case 'en proceso':
         return 'bg-yellow-100 text-yellow-800';
-      case 'cancelado':
+      case 'urgencia':
         return 'bg-red-100 text-red-800';
       default:
         return 'bg-gray-100 text-gray-800';
@@ -81,9 +81,11 @@ const OficioView = ({ oficio, onClose, onEdit }) => {
               <div className="space-y-2">
                 <div>
                   <span className="text-sm font-medium text-gray-500">Fecha Límite:</span>
-                  <p className={`text-base ${isOverdue() ? 'text-red-600 font-medium' : ''}`}>
+                  <p className={`text-base ${isOverdue() && oficio.estado === 'proceso' ? 'text-red-600 font-medium' : ''}`}>
                     {formatDate(oficio.fecha_limite)}
-                    {isOverdue() && <span className="ml-2 text-red-600 text-xs">(Vencida)</span>}
+                    {isOverdue() && (oficio.estado === 'proceso' || oficio.estado == "urgencia" ) && (
+                      <span className="ml-2 text-red-600 text-xs">(Vencida)</span>
+                    )}
                   </p>
                 </div>
                 <div>
@@ -127,6 +129,15 @@ const OficioView = ({ oficio, onClose, onEdit }) => {
           <PDFManager oficioId={oficio.id_oficio} />
 
           <div className="flex justify-end mt-6">
+            <button
+              onClick={onClose}
+              className="mr-2 flex items-center px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-md shadow-sm"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              Cerrar
+            </button>
             <button
               onClick={onEdit}
               className="flex items-center px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md shadow-sm"

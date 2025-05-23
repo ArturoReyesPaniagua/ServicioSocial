@@ -152,6 +152,7 @@ const MainLayout = ({ children }) => {
                 )}
               </NavLink>
             </li>
+
           {user?.role === 'admin' && (
             <li>
               <NavLink 
@@ -168,6 +169,22 @@ const MainLayout = ({ children }) => {
               </NavLink>
             </li>
           )}
+
+            <li>
+              <NavLink 
+                to="/SolicitarUPEyCE" 
+                className={({ isActive }) => 
+                  isActive ? "bg-guinda-700" : ""
+                }
+              >
+                {({ isActive }) => (
+                  <button className={isActive ? "bg-guinda-700" : ""}>
+                    Solicitar UPEyCE
+                  </button>
+                )}
+              </NavLink>
+            </li>
+
             {user?.role === 'admin' && (
               <li>
                 <NavLink 

@@ -1,11 +1,20 @@
-
-        CREATE TABLE [dbo].[Area] (
+CREATE TABLE [dbo].[Area] (
       id_area INT IDENTITY(1,1) PRIMARY KEY,
       nombre_area NVARCHAR(255) NOT NULL
     )
 
-    
-    CREATE TABLE [dbo].[users] (
+	    CREATE TABLE [dbo].[Responsable] (
+      id_responsable INT IDENTITY(1,1) PRIMARY KEY,
+      nombre_responsable NVARCHAR(255) NOT NULL
+    )
+
+
+	    CREATE TABLE [dbo].[Solicitante] (
+      id_solicitante INT IDENTITY(1,1) PRIMARY KEY,
+      nombre_solicitante NVARCHAR(255) NOT NULL
+    )
+
+	CREATE TABLE [dbo].[users] (
       userId INT IDENTITY(1,1) PRIMARY KEY,
       username NVARCHAR(255) NOT NULL UNIQUE,
       password NVARCHAR(255) NOT NULL,
@@ -14,13 +23,41 @@
       CONSTRAINT FK_User_Area FOREIGN KEY (id_area) REFERENCES Area(id_area) ON DELETE SET NULL
     )
 
-        CREATE TABLE [dbo].[UPEyCE] (
-      id_UPEyCE INT IDENTITY(1,1) PRIMARY KEY,
-      numero_UPEyCE NVARCHAR(50) NOT NULL,
-      id_area INT NOT NULL,
-      id_usuario INT,
-      fecha_creacion DATETIME DEFAULT GETDATE(),
-      descripcion NVARCHAR(500),
-      CONSTRAINT FK_UPEyCE_Area FOREIGN KEY (id_area) REFERENCES Area(id_area),
-      CONSTRAINT FK_UPEyCE_Usuario FOREIGN KEY (id_usuario) REFERENCES users(userId) ON DELETE SET NULL
+
+	CREATE TABLE [dbo].[UPEyCE] (
+  id_UPEyCE INT IDENTITY(1,1) PRIMARY KEY,
+  numero_UPEyCE NVARCHAR(50) NOT NULL,
+  id_area INT NOT NULL,
+  id_usuario_solicita INT,
+  id_usuario_resuelve INT,
+  fecha_creacion DATETIME DEFAULT GETDATE(),
+  descripcion NVARCHAR(500),
+
+  CONSTRAINT FK_UPEyCE_Area FOREIGN KEY (id_area) REFERENCES Area(id_area),
+  CONSTRAINT FK_UPEyCE_UsuarioSolicita FOREIGN KEY (id_usuario_solicita) REFERENCES users(userId) ON DELETE SET NULL,
+  CONSTRAINT FK_UPEyCE_UsuarioResuelve FOREIGN KEY (id_usuario_resuelve) REFERENCES users(userId) ON DELETE SET NULL
+)
+
+  CREATE TABLE [dbo].[Oficio] (
+      id_oficio INT IDENTITY(1,1) PRIMARY KEY,
+      estado NVARCHAR(20) CHECK (estado IN ('concluido', 'en proceso', 'urgencia')) NOT NULL,
+      numero_de_oficio NVARCHAR(25) NOT NULL,
+      fecha_recepcion DATE,
+      fecha_limite DATE,
+      archivado NVARCHAR(30),
+      expediente NVARCHAR(30),
+      fecha_respuesta DATE,
+      id_solicitante INT,
+      asunto NVARCHAR(255),
+      observaciones NVARCHAR(255),
+      id_responsable INT,
+      id_area INT,
+      id_UPEyCE INT,
+      oficios_relacionados NVARCHAR(MAX),
+      oficio_respuesta NVARCHAR(255),
+      CONSTRAINT FK_Oficio_Solicitante FOREIGN KEY (id_solicitante) REFERENCES Solicitante(id_solicitante),
+      CONSTRAINT FK_Oficio_Responsable FOREIGN KEY (id_responsable) REFERENCES Responsable(id_responsable),
+      CONSTRAINT FK_Oficio_Area FOREIGN KEY (id_area) REFERENCES Area(id_area),
+      CONSTRAINT FK_Oficio_UPEyCE FOREIGN KEY (id_UPEyCE) REFERENCES UPEyCE(id_UPEyCE) ON DELETE SET NULL
     )
+

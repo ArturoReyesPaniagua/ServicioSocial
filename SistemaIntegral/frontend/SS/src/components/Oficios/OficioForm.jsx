@@ -395,7 +395,7 @@ const OficioForm = ({ oficio, estados, onSave, onCancel }) => {
                 type="text"
                 id="numero_de_oficio"
                 name="numero_de_oficio"
-                autoComplete="off"
+                 autoComplete="off"
                 placeholder='Ej. 228010040300000L/0639/2025'
                 value={formData.numero_de_oficio}
                 onChange={handleChange}
@@ -515,10 +515,16 @@ const OficioForm = ({ oficio, estados, onSave, onCancel }) => {
                       className="oficio-form-input"
                     />
                     <button
-                      type="button"
+                      type="submit"
                       onClick={handleCreateSolicitante}
-                      className="oficio-form-cancel-btn"
-                    >
+                      className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white disabled:opacity-70 disabled:cursor-not-allowed"
+                      style={{
+                        backgroundColor: "#800020",
+                        transition: "background-color 0.2s"
+                      }}
+                      onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#600018"}
+                      onMouseOut={(e) => e.currentTarget.style.backgroundColor = "#800020"}
+                    > 
                       Agregar
                     </button>
                   </div>
@@ -572,10 +578,16 @@ const OficioForm = ({ oficio, estados, onSave, onCancel }) => {
                       className="oficio-form-input"
                     />
                     <button
-                      type="button"
+                      type="submit"
                       onClick={handleCreateResponsable}
-                      className="oficio-form-cancel-btn"
-                    >
+                      className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white disabled:opacity-70 disabled:cursor-not-allowed"
+                    style={{
+                      backgroundColor: "#800020",
+                      transition: "background-color 0.2s"
+                    }}
+                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#600018"}
+                    onMouseOut={(e) => e.currentTarget.style.backgroundColor = "#800020"}
+                  >
                       Agregar
                     </button>
                   </div>
@@ -625,7 +637,7 @@ const OficioForm = ({ oficio, estados, onSave, onCancel }) => {
               )}
             </div>
 
-            {/* UPEyCE (Campo nuevo) */}
+            {/* UPEyCE */}
             <div className="oficio-form-field">
               <label htmlFor="id_UPEyCE" className="oficio-form-label">
                 UPEyCE (opcional)
@@ -670,6 +682,7 @@ const OficioForm = ({ oficio, estados, onSave, onCancel }) => {
             <input
               type="text"
               id="asunto"
+              autocomplete="off"
               name="asunto"
               value={formData.asunto}
               onChange={handleChange}
@@ -806,7 +819,7 @@ const OficioForm = ({ oficio, estados, onSave, onCancel }) => {
             {formData.estado === 'concluido' && !formData.oficio_respuesta && (
               <div className="p-3 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-700 text-sm rounded">
                 <p className="font-medium">Recomendación:</p>
-                <p>Este oficio está marcado como concluido. Considere agregar el número de oficio de respuesta o acuse para mejor seguimiento.</p>
+                <p>Este oficio está marcado como concluido. Considere agregar el número de  acuse para mejor seguimiento.</p>
               </div>
             )}
           </div>
@@ -841,8 +854,14 @@ const OficioForm = ({ oficio, estados, onSave, onCancel }) => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="oficio-form-submit-btn"
-            >
+              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white disabled:opacity-70 disabled:cursor-not-allowed"
+                style={{
+                  backgroundColor: "#800020",
+                  transition: "background-color 0.2s"
+                }}
+                onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#600018"}
+                onMouseOut={(e) => e.currentTarget.style.backgroundColor = "#800020"}
+              >
               {isSubmitting ? (
                 <span className="oficio-form-submit-btn">
                   Guardando...
