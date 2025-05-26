@@ -36,7 +36,7 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
       };
 
       const response = await axios.post(
-        'http://localhost:3001/api/verificar-numero-upeyc',
+        'http://localhost:3001/api/verificar-numero-UPEyCE',
         { numero_UPEyCE: numero },
         config
       );
@@ -133,7 +133,7 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
       };
       
       const response = await axios.post(
-        'http://localhost:3001/api/solicitudes-upeyc',
+        'http://localhost:3001/api/solicitudes-UPEyCE',
         formData,
         config
       );
@@ -178,7 +178,7 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Solicitar Nuevo UPEyCE</h2>
         <p className="text-gray-600">
           Complete el formulario para solicitar un nuevo folio UPEyCE. 
-          Su solicitud será revisada por un administrador.
+          Su solicitud será revisada por un administrador en la medida de lo posible.
         </p>
         
         {user && user.nombre_area && (
@@ -207,9 +207,10 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
               type="text"
               id="numero_UPEyCE_solicitado"
               name="numero_UPEyCE_solicitado"
+              autoComplete='off'
               value={formData.numero_UPEyCE_solicitado}
               onChange={handleChange}
-              placeholder="Ej: UPEyCE-2025-001"
+              placeholder="Recordatorio de que UPEyCE es UPEyCE + 1" 
               className={`w-full p-3 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-guinda focus:border-guinda ${
                 errors.numero_UPEyCE_solicitado ? 'border-red-500' : 'border-gray-300'
               }`}
@@ -241,7 +242,7 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
           )}
           
           <p className="mt-1 text-xs text-gray-500">
-            Ingrese un identificador único para su folio UPEyCE. Se verificará automáticamente su disponibilidad.
+            Ingrese un identificador único para su folio UPEyCE. 
           </p>
         </div>
 
@@ -253,11 +254,11 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
           <select
             id="prioridad"
             name="prioridad"
+            
             value={formData.prioridad}
             onChange={handleChange}
             className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-guinda focus:border-guinda"
           >
-            <option value="baja">Baja - No urgente</option>
             <option value="normal">Normal - Prioridad estándar</option>
             <option value="alta">Alta - Importante</option>
             <option value="urgente">Urgente - Requiere atención inmediata</option>
@@ -344,8 +345,6 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
               <div className="mt-2 text-sm text-yellow-700">
                 <p>Su solicitud será evaluada por un administrador. Recibirá una notificación con la decisión.</p>
                 <ul className="mt-2 list-disc list-inside">
-                  <li>Tiempo promedio de respuesta: 1-3 días hábiles</li>
-                  <li>Solicitudes urgentes son priorizadas</li>
                   <li>Puede consultar el estado en cualquier momento</li>
                 </ul>
               </div>

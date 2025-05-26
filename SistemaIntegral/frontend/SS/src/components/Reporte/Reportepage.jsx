@@ -43,7 +43,7 @@ const ReportePage = () => {
   const estadosDisponibles = [
     { value: 'concluido', label: 'Concluido' },
     { value: 'en proceso', label: 'En proceso' },
-    { value: 'cancelado', label: 'Cancelado' }
+    { value: 'urgencia', label: 'urgencia' }
   ];
 
   // Opciones para el estado de archivo
@@ -601,7 +601,7 @@ const ReportePage = () => {
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                           oficio.estado === 'concluido' ? 'bg-green-100 text-green-800' :
                           oficio.estado === 'en proceso' ? 'bg-yellow-100 text-yellow-800' :
-                          oficio.estado === 'cancelado' ? 'bg-red-100 text-red-800' :
+                          oficio.estado === 'urgencia' ? 'bg-red-100 text-red-800' :
                           'bg-gray-100 text-gray-800'
                         }`}>
                           {oficio.estado}

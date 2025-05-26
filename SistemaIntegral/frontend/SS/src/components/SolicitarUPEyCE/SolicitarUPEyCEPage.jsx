@@ -41,7 +41,7 @@ const SolicitarUPEyCEPage = () => {
         }
       };
       
-      const response = await axios.get('http://localhost:3001/api/solicitudes-upeyc', config);
+      const response = await axios.get('http://localhost:3001/api/solicitudes-UPEyCE', config);
       setSolicitudes(response.data);
     } catch (error) {
       console.error('Error al cargar solicitudes:', error);
@@ -117,7 +117,7 @@ const SolicitarUPEyCEPage = () => {
       const motivo = prompt('Ingrese el motivo de cancelación (opcional):') || 'Cancelado por el usuario';
       
       await axios.put(
-        `http://localhost:3001/api/solicitudes-upeyc/${idSolicitud}/cancelar`,
+        `http://localhost:3001/api/solicitudes-UPEyCE/${idSolicitud}/cancelar`,
         { motivo },
         config
       );
@@ -133,7 +133,7 @@ const SolicitarUPEyCEPage = () => {
   // Manejar éxito al crear solicitud
   const handleSolicitudSuccess = () => {
     setShowForm(false);
-    toast.success('Solicitud enviada exitosamente');
+    //toast.success('Solicitud enviada exitosamente');
     if (activeTab === 'historial') {
       fetchSolicitudes();
     }

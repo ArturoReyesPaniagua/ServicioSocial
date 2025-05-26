@@ -36,7 +36,7 @@ const AdminSolicitudesPage = () => {
       const token = localStorage.getItem('token');
       const config = { headers: { Authorization: `Bearer ${token}` } };
       
-      const response = await axios.get('http://localhost:3001/api/solicitudes-upeyc-pendientes', config);
+      const response = await axios.get('http://localhost:3001/api/solicitudes-UPEyCE-pendientes', config);
       setSolicitudesPendientes(response.data);
     } catch (error) {
       console.error('Error al cargar solicitudes pendientes:', error);
@@ -52,7 +52,7 @@ const AdminSolicitudesPage = () => {
       const token = localStorage.getItem('token');
       const config = { headers: { Authorization: `Bearer ${token}` } };
       
-      const response = await axios.get('http://localhost:3001/api/solicitudes-upeyc', config);
+      const response = await axios.get('http://localhost:3001/api/solicitudes-UPEyCE', config);
       setSolicitudes(response.data);
     } catch (error) {
       console.error('Error al cargar todas las solicitudes:', error);
@@ -97,7 +97,7 @@ const AdminSolicitudesPage = () => {
       const token = localStorage.getItem('token');
       const config = { headers: { Authorization: `Bearer ${token}` } };
       
-      const url = `http://localhost:3001/api/solicitudes-upeyc/${selectedSolicitud.id_solicitud}/${accion}`;
+      const url = `http://localhost:3001/api/solicitudes-UPEyCE/${selectedSolicitud.id_solicitud}/${accion}`;
       const data = { comentarios_respuesta: comentarios };
       
       await axios.put(url, data, config);

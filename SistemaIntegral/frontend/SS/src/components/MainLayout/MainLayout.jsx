@@ -114,7 +114,7 @@ const MainLayout = ({ children }) => {
         </button>
         
         <div className="header-title">
-          Sistema de Gestión Integral
+          Sistema de Gestión Integral Oficios //Nombre por definir SGIO 
           {user && user.role !== 'admin' && areaName && (
             <div className="text-xs text-white opacity-80 mt-1">
               Área: {areaName}
@@ -153,6 +153,11 @@ const MainLayout = ({ children }) => {
         
         <nav className="sidebar-nav">
           <ul>
+            <li className="px-4 py-2">
+              <div className="text-xs text-white opacity-60 uppercase tracking-wider font-semibold border-b border-guinda-light pb-1">
+                Manejo de Oficios
+              </div>
+            </li>
             <li>
               <NavLink 
                 to="/oficios" 
@@ -162,7 +167,21 @@ const MainLayout = ({ children }) => {
               >
                 {({ isActive }) => (
                   <button className={isActive ? "bg-guinda-700" : ""}>
-                    📄 Gestión de Oficios
+                    📄 Oficios
+                  </button>
+                )}
+              </NavLink>
+            </li>
+                        <li>
+              <NavLink 
+                to="/Reporte" 
+                className={({ isActive }) => 
+                  isActive ? "bg-guinda-700" : ""
+                }
+              >
+                {({ isActive }) => (
+                  <button className={isActive ? "bg-guinda-700" : ""}>
+                    📊 Reporte
                   </button>
                 )}
               </NavLink>
@@ -171,7 +190,7 @@ const MainLayout = ({ children }) => {
             {/* Separador para sección UPEyCE */}
             <li className="px-4 py-2">
               <div className="text-xs text-white opacity-60 uppercase tracking-wider font-semibold border-b border-guinda-light pb-1">
-                Sistema UPEyCE
+                Sistema de Folio UPEyCE
               </div>
             </li>
 
@@ -183,7 +202,7 @@ const MainLayout = ({ children }) => {
                 }
               >
                 {({ isActive }) => (
-                    {/*
+                   
                   <button className={isActive ? "bg-guinda-700" : ""}>
                     <div className="flex items-center justify-between w-full">
                       <span>📝 Solicitar UPEyCE</span>
@@ -194,15 +213,17 @@ const MainLayout = ({ children }) => {
                       )}
                     </div>
                   </button>
-                  */}
+                 
                 )}
               </NavLink>
             </li>
-
+ 
             {/* Solo mostrar para administradores */}
             {user?.role === 'admin' && (
               <>
-                <li>
+    
+                {/*
+                  <li>
                   <NavLink 
                     to="/UPEyCE" 
                     className={({ isActive }) => 
@@ -210,15 +231,17 @@ const MainLayout = ({ children }) => {
                     }
                   >
                     {({ isActive }) => (
-                    {/*
+                    
                       <button className={isActive ? "bg-guinda-700" : ""}>
                         🗂️ Gestión UPEyCE
                       </button>
-                    */}
+                    
                     )}
                   </NavLink>
                 </li>
-
+                */}
+  
+   
                 <li>
                   <NavLink 
                     to="/AdminSolicitudes" 
@@ -227,40 +250,30 @@ const MainLayout = ({ children }) => {
                     }
                   >
                     {({ isActive }) => (
-                      {/*
+                   
                       <button className={isActive ? "bg-guinda-700" : ""}>
                         ⚙️ Aprobar Solicitudes
                       </button>
 
-                      */}
+                  
                    
                     )}
                   </NavLink>
                 </li>
+    
               </>
             )}
 
             {/* Separador para otras opciones */}
+            {user?.role === 'admin' && (
             <li className="px-4 py-2 mt-4">
               <div className="text-xs text-white opacity-60 uppercase tracking-wider font-semibold border-b border-guinda-light pb-1">
-                Reportes y Admin
+                Administración
               </div>
             </li>
+            )}
 
-            <li>
-              <NavLink 
-                to="/Reporte" 
-                className={({ isActive }) => 
-                  isActive ? "bg-guinda-700" : ""
-                }
-              >
-                {({ isActive }) => (
-                  <button className={isActive ? "bg-guinda-700" : ""}>
-                    📊 Generar Reporte
-                  </button>
-                )}
-              </NavLink>
-            </li>
+
 
             {/* Solo mostrar gestión de usuarios para administradores */}
             {user?.role === 'admin' && (
@@ -273,7 +286,7 @@ const MainLayout = ({ children }) => {
                 >
                   {({ isActive }) => (
                     <button className={isActive ? "bg-guinda-700" : ""}>
-                      👥 Lista de Usuarios 
+                      👥 Usuarios 
                     </button>
                   )}
                 </NavLink>

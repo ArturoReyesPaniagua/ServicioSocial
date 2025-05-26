@@ -152,8 +152,9 @@ const OficioView = ({ oficio, onClose, onEdit, onNavigateToOficio }) => {
             <div>
               <h2 className="text-2xl font-bold text-gray-900">Detalles del Oficio</h2>
               <p className="text-sm text-gray-500 mt-1">
-                ID: {oficio.id_oficio} | Creado: {formatDate(oficio.fecha_recepcion)}
+                 Creado: {formatDate(oficio.fecha_recepcion)}
               </p>
+
             </div>
             <button
               onClick={onClose}

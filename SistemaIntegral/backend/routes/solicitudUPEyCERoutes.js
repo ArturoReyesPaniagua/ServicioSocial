@@ -20,25 +20,25 @@ const { authenticateToken, isAdmin } = require('../middleware/authMiddleware');
 
 // Rutas para solicitudes de UPEyCE
 // Crear nueva solicitud (usuarios autenticados)
-router.post('/solicitudes-upeyc', authenticateToken, createSolicitudUPEyCE);
+router.post('/solicitudes-UPEyCE', authenticateToken, createSolicitudUPEyCE);
 
 // Obtener todas las solicitudes (filtradas según el rol del usuario)
-router.get('/solicitudes-upeyc', authenticateToken, getAllSolicitudes);
+router.get('/solicitudes-UPEyCE', authenticateToken, getAllSolicitudes);
 
 // Obtener solicitud por ID
-router.get('/solicitudes-upeyc/:id', authenticateToken, getSolicitudById);
+router.get('/solicitudes-UPEyCE/:id', authenticateToken, getSolicitudById);
 
 // Aprobar solicitud (solo administradores)
-router.put('/solicitudes-upeyc/:id/aprobar', authenticateToken, isAdmin, aprobarSolicitud);
+router.put('/solicitudes-UPEyCE/:id/aprobar', authenticateToken, isAdmin, aprobarSolicitud);
 
 // Rechazar solicitud (solo administradores)
-router.put('/solicitudes-upeyc/:id/rechazar', authenticateToken, isAdmin, rechazarSolicitud);
+router.put('/solicitudes-UPEyCE/:id/rechazar', authenticateToken, isAdmin, rechazarSolicitud);
 
 // Cancelar solicitud (usuario que la creó o administrador)
-router.put('/solicitudes-upeyc/:id/cancelar', authenticateToken, cancelarSolicitud);
+router.put('/solicitudes-UPEyCE/:id/cancelar', authenticateToken, cancelarSolicitud);
 
 // Obtener solicitudes pendientes (solo administradores)
-router.get('/solicitudes-upeyc-pendientes', authenticateToken, isAdmin, getSolicitudesPendientes);
+router.get('/solicitudes-UPEyCE-pendientes', authenticateToken, isAdmin, getSolicitudesPendientes);
 
 // Rutas para notificaciones
 // Obtener notificaciones del usuario
@@ -51,7 +51,7 @@ router.put('/notificaciones/:id/leida', authenticateToken, marcarNotificacionLei
 router.get('/estadisticas-solicitudes', authenticateToken, isAdmin, getEstadisticas);
 
 // Ruta adicional para verificar disponibilidad de número UPEyCE
-router.post('/verificar-numero-upeyc', authenticateToken, async (req, res) => {
+router.post('/verificar-numero-UPEyCE', authenticateToken, async (req, res) => {
   try {
     const { numero_UPEyCE } = req.body;
     const { connectDB } = require('../db/db');
