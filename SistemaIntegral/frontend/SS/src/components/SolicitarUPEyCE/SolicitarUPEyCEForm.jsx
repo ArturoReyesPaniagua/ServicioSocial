@@ -1,6 +1,3 @@
-// SolicitarUPEyCEForm.jsx
-// SistemaIntegral/frontend/SS/src/components/SolicitarUPEyCE/SolicitarUPEyCEForm.jsx
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
@@ -15,19 +12,17 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isCheckingNumber, setIsCheckingNumber] = useState(false);
-  const [numberAvailable, setNumberAvailable] = useState(null);
+  const [isLoadingNumber, setIsLoadingNumber] = useState(true);
   const { user } = useAuth();
 
-  // Función para verificar disponibilidad del número UPEyCE
-  const checkNumberAvailability = async (numero) => {
-    if (!numero || numero.length < 3) {
-      setNumberAvailable(null);
-      return;
-    }
+  // Obtener el siguiente número UPEyCE al cargar el componente
+  useEffect(() => {
+    fetchNextNumber();
+  }, []);
 
-    setIsCheckingNumber(true);
+  const fetchNextNumber = async () => {
     try {
+      setIsLoadingNumber(true);
       const token = localStorage.getItem('token');
       const config = {
         headers: {
@@ -35,47 +30,25 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
         }
       };
 
-      const response = await axios.post(
-        'http://localhost:3001/api/verificar-numero-UPEyCE',
-        { numero_UPEyCE: numero },
+      const response = await axios.get(
+        `http://localhost:3001/api/siguiente-numero-UPEyCE/${user.id_area || ''}`,
         config
       );
 
-      setNumberAvailable(response.data.disponible);
-      
-      if (!response.data.disponible) {
-        setErrors(prev => ({
-          ...prev,
-          numero_UPEyCE_solicitado: response.data.mensaje
-        }));
-      } else {
-        setErrors(prev => {
-          const newErrors = { ...prev };
-          delete newErrors.numero_UPEyCE_solicitado;
-          return newErrors;
-        });
-      }
+      setFormData(prev => ({
+        ...prev,
+        numero_UPEyCE_solicitado: response.data.nextNumber
+      }));
 
     } catch (error) {
-      console.error('Error verificando número:', error);
-      setNumberAvailable(null);
+      console.error('Error obteniendo siguiente número:', error);
+      toast.error('Error al obtener el número UPEyCE');
     } finally {
-      setIsCheckingNumber(false);
+      setIsLoadingNumber(false);
     }
   };
 
-  // Debounce para la verificación del número
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (formData.numero_UPEyCE_solicitado) {
-        checkNumberAvailability(formData.numero_UPEyCE_solicitado);
-      }
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [formData.numero_UPEyCE_solicitado]);
-
-  // Manejar cambios en el formulario
+  // Manejar cambios en el formulario (excepto el número que es automático)
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -92,14 +65,6 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
   // Validar formulario antes de enviar
   const validateForm = () => {
     const newErrors = {};
-    
-    if (!formData.numero_UPEyCE_solicitado) {
-      newErrors.numero_UPEyCE_solicitado = 'El número de UPEyCE es obligatorio';
-    } else if (formData.numero_UPEyCE_solicitado.length < 3) {
-      newErrors.numero_UPEyCE_solicitado = 'El número debe tener al menos 3 caracteres';
-    } else if (!numberAvailable) {
-      newErrors.numero_UPEyCE_solicitado = 'Este número no está disponible';
-    }
     
     if (!formData.justificacion) {
       newErrors.justificacion = 'La justificación es obligatoria';
@@ -144,14 +109,16 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
         onSuccess(response.data);
       }
       
-      // Limpiar formulario
+      // Limpiar formulario y obtener nuevo número
       setFormData({
         numero_UPEyCE_solicitado: '',
         justificacion: '',
         descripcion: '',
         prioridad: 'normal'
       });
-      setNumberAvailable(null);
+      
+      // Obtener el siguiente número para una nueva solicitud
+      fetchNextNumber();
       
     } catch (error) {
       console.error('Error enviando solicitud:', error);
@@ -163,6 +130,12 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
       }
       
       toast.error(errorMessage);
+      
+      // Si el error es por número duplicado, obtener uno nuevo
+      if (errorMessage.includes('existe una solicitud')) {
+        fetchNextNumber();
+      }
+      
       setErrors(prev => ({
         ...prev,
         submit: errorMessage
@@ -178,7 +151,7 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Solicitar Nuevo UPEyCE</h2>
         <p className="text-gray-600">
           Complete el formulario para solicitar un nuevo folio UPEyCE. 
-          Su solicitud será revisada por un administrador en la medida de lo posible.
+          Su solicitud será revisada por un administrador.
         </p>
         
         {user && user.nombre_area && (
@@ -197,52 +170,33 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Número UPEyCE Solicitado */}
+        {/* Número UPEyCE - Generado automáticamente */}
         <div>
-          <label htmlFor="numero_UPEyCE_solicitado" className="block text-sm font-medium text-gray-700 mb-1">
-            Número UPEyCE Solicitado *
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Número UPEyCE Asignado
           </label>
           <div className="relative">
-            <input
-              type="text"
-              id="numero_UPEyCE_solicitado"
-              name="numero_UPEyCE_solicitado"
-              autoComplete='off'
-              value={formData.numero_UPEyCE_solicitado}
-              onChange={handleChange}
-              placeholder="Recordatorio de que UPEyCE es UPEyCE + 1" 
-              className={`w-full p-3 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-guinda focus:border-guinda ${
-                errors.numero_UPEyCE_solicitado ? 'border-red-500' : 'border-gray-300'
-              }`}
-            />
-            
-            {/* Indicador de verificación */}
-            <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-              {isCheckingNumber && (
-                <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-blue-500"></div>
-              )}
-              {!isCheckingNumber && numberAvailable === true && (
-                <svg className="h-5 w-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              )}
-              {!isCheckingNumber && numberAvailable === false && (
-                <svg className="h-5 w-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              )}
-            </div>
+            {isLoadingNumber ? (
+              <div className="w-full p-3 border border-gray-300 rounded-md bg-gray-50 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-blue-500 mr-2"></div>
+                <span className="text-gray-600">Generando número...</span>
+              </div>
+            ) : (
+              <div className="w-full p-3 border border-gray-300 rounded-md bg-gray-50 flex items-center justify-between">
+                <span className="text-lg font-semibold text-gray-800">
+                  {formData.numero_UPEyCE_solicitado}
+                </span>
+                <span className="text-sm text-green-600 flex items-center">
+                  <svg className="h-5 w-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Número asignado automáticamente
+                </span>
+              </div>
+            )}
           </div>
-          
-          {errors.numero_UPEyCE_solicitado && (
-            <p className="mt-1 text-sm text-red-600">{errors.numero_UPEyCE_solicitado}</p>
-          )}
-          {!errors.numero_UPEyCE_solicitado && numberAvailable === true && (
-            <p className="mt-1 text-sm text-green-600">✓ Número disponible</p>
-          )}
-          
           <p className="mt-1 text-xs text-gray-500">
-            Ingrese un identificador único para su folio UPEyCE. 
+            Este número ha sido generado automáticamente y es único para su solicitud.
           </p>
         </div>
 
@@ -254,11 +208,11 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
           <select
             id="prioridad"
             name="prioridad"
-            
             value={formData.prioridad}
             onChange={handleChange}
             className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-guinda focus:border-guinda"
           >
+            <option value="baja">Baja - Sin urgencia</option>
             <option value="normal">Normal - Prioridad estándar</option>
             <option value="alta">Alta - Importante</option>
             <option value="urgente">Urgente - Requiere atención inmediata</option>
@@ -345,7 +299,9 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
               <div className="mt-2 text-sm text-yellow-700">
                 <p>Su solicitud será evaluada por un administrador. Recibirá una notificación con la decisión.</p>
                 <ul className="mt-2 list-disc list-inside">
+                  <li>El número UPEyCE {formData.numero_UPEyCE_solicitado} quedará reservado para su solicitud</li>
                   <li>Puede consultar el estado en cualquier momento</li>
+                  <li>Si es aprobada, el folio será creado automáticamente</li>
                 </ul>
               </div>
             </div>
@@ -366,7 +322,7 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
           )}
           <button
             type="submit"
-            disabled={isSubmitting || !numberAvailable}
+            disabled={isSubmitting || isLoadingNumber}
             className="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-guinda hover:bg-guinda-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-guinda disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {isSubmitting ? (

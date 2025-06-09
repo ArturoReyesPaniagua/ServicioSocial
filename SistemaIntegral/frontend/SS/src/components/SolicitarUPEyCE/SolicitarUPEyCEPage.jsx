@@ -85,7 +85,7 @@ const SolicitarUPEyCEPage = () => {
         }
       };
       
-      await axios.put(`http://localhost:3001/api/notificaciones/${idNotificacion}/leer`, {}, config);
+      await axios.put(`http://localhost:3001/api/notificaciones/${idNotificacion}/leida`, {}, config);
       
       // Actualizar la lista local
       setNotificaciones(prev => 

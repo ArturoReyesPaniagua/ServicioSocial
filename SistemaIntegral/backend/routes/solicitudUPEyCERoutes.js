@@ -12,6 +12,7 @@ const {
   rechazarSolicitud,
   cancelarSolicitud,
   getSolicitudesPendientes,
+  getNextUPEyCENumber,
   getNotificaciones,
   marcarNotificacionLeida,
   getEstadisticas
@@ -46,6 +47,7 @@ router.get('/notificaciones', authenticateToken, getNotificaciones);
 
 // Marcar notificación como leída
 router.put('/notificaciones/:id/leida', authenticateToken, marcarNotificacionLeida);
+router.get('/siguiente-numero-UPEyCE/:id_area?', authenticateToken, getNextUPEyCENumber);
 
 // Obtener estadísticas (solo administradores)
 router.get('/estadisticas-solicitudes', authenticateToken, isAdmin, getEstadisticas);
@@ -78,6 +80,7 @@ router.post('/verificar-numero-UPEyCE', authenticateToken, async (req, res) => {
         mensaje: 'Usuario no encontrado' 
       });
     }
+    
 
     const userArea = userResult.recordset[0].id_area;
 

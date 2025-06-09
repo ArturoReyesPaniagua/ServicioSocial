@@ -675,12 +675,75 @@ const getEstadisticas = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const getNextUPEyCENumber = async (req, res) => {
+  try {
+    const pool = await connectDB();
+    const { id_area } = req.params;
+    
+    // Obtener el área del usuario si no se especifica
+    const userArea = id_area || req.user.id_area;
+    
+    // Buscar el último número UPEyCE usado en esa área
+    const result = await pool.request()
+      .input('id_area', sql.Int, userArea)
+      .query(`
+        SELECT TOP 1 numero_UPEyCE_solicitado
+        FROM SolicitudUPEyCE
+        WHERE id_area = @id_area
+        AND numero_UPEyCE_solicitado LIKE '000%'
+        ORDER BY 
+          CAST(SUBSTRING(numero_UPEyCE_solicitado, 4, LEN(numero_UPEyCE_solicitado)) AS INT) DESC
+      `);
+    
+    let nextNumber = 1;
+    
+    if (result.recordset.length > 0) {
+      const lastNumber = result.recordset[0].numero_UPEyCE_solicitado;
+      // Extraer el número después de "000"
+      const numericPart = parseInt(lastNumber.substring(3));
+      nextNumber = numericPart + 1;
+    }
+    
+    // También verificar en la tabla UPEyCE
+    const UPEyCEResult = await pool.request()
+      .input('id_area', sql.Int, userArea)
+      .query(`
+        SELECT TOP 1 numero_UPEyCE
+        FROM UPEyCE
+        WHERE id_area = @id_area
+        AND numero_UPEyCE LIKE '000%'
+        ORDER BY 
+          CAST(SUBSTRING(numero_UPEyCE, 4, LEN(numero_UPEyCE)) AS INT) DESC
+      `);
+    
+    if (UPEyCEResult.recordset.length > 0) {
+      const lastUPEyCE = UPEyCEResult.recordset[0].numero_UPEyCE;
+      const numericPart = parseInt(lastUPEyCE.substring(3));
+      if (numericPart >= nextNumber) {
+        nextNumber = numericPart + 1;
+      }
+    }
+    
+    // Formatear el número con el prefijo "000"
+    const formattedNumber = `000${nextNumber}`;
+    
+    res.status(200).json({
+      nextNumber: formattedNumber,
+      area: userArea
+    });
+    
+  } catch (error) {
+    console.error('Error al obtener siguiente número UPEyCE:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
 
 module.exports = {
   createSolicitudUPEyCE,
   getAllSolicitudes,
   getSolicitudById,
   aprobarSolicitud,
+  getNextUPEyCENumber,
   rechazarSolicitud,
   cancelarSolicitud,
   getSolicitudesPendientes,
