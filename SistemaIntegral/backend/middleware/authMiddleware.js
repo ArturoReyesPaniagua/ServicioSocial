@@ -1,4 +1,9 @@
 // middleware/authMiddleware.js
+
+
+//middleware para manejar autenticación y autorización de usuarios con JWT y rol de administrador
+
+
 const jwt = require('jsonwebtoken');
 const sql = require('mssql');
 const { connectDB } = require('../db/db');

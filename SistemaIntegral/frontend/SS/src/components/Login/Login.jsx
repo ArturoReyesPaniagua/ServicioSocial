@@ -1,5 +1,6 @@
-// File: Login.jsx
 // SistemaIntegral/frontend/SS/src/components/Login/Login.jsx
+
+// componente encargado de manejar el inicio de sesión de los usuarios
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';

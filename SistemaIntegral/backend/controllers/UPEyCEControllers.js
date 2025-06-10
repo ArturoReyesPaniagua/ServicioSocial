@@ -1,4 +1,7 @@
-// SistemaIntegral/backend/controllers/upcydControllers.js (corregido)
+// SistemaIntegral/backend/controllers/upcydControllers.js 
+
+//Controlador para manejar las operaciones CRUD de UPEyCE
+
 const sql = require('mssql');
 const UPEyCESchema = require('../schemas/UPEyCESchema'); // Referencia corregida
 const { connectDB } = require('../db/db');

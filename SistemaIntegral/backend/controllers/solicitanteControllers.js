@@ -1,4 +1,7 @@
 // SistemaIntegral/backend/controllers/solicitanteControllers.js
+
+// Controlador para manejar las operaciones CRUD de solicitantes
+
 const sql = require('mssql');
 const solicitanteSchema = require('../schemas/solicitanteSchema');
 const { connectDB } = require('../db/db');

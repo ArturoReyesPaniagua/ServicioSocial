@@ -1,6 +1,11 @@
 direction: left
 
-Usuarios: {
+area: {
+  shape: sql_table
+  id_area: INT {constraint: primary_key , unique, AUTO_INCREMENT}
+  nombre_area: VARCHAR
+}
+usuarios: {
   shape: sql_table
   id_usuario: INT {constraint: primary_key , unique, AUTO_INCREMENT}
   username: VARCHAR {constraint: unique}
@@ -9,14 +14,15 @@ Usuarios: {
   role: ENUM('admin', 'user')
 }
 
-Oficio: {
+oficio: {
   shape: sql_table
   id_oficio: INT {constraint: primary_key , unique , AUTO_INCREMENT}
   estado: ENUM('concluido', 'en proceso', "cancelado")
-  numero_de_oficio: VARCHAR
+  numero_de_oficio: NVARCHAR(50)
   fecha_recepcion: DATETIME
   fecha_limite: DATETIME
   archivado: BOOLEAN
+  archivado_ubicacion: NVARCHAR(50)
   fecha_respuesta: DATE
   id_solicitante: INT {constraint: foreign_key}
   asunto: VARCHAR
@@ -35,38 +41,21 @@ PDF: {
   id_oficio: int {constraint: foreign_key}
 }
 
-Area: {
+responsable: {
   shape: sql_table
-  id_area: INT {constraint: primary_key}
-  nombre_area: VARCHAR
-}
-
-Responsable: {
-  shape: sql_table
-  id_responsable: INT {constraint: primary_key}
+  id_responsable: INT {constraint: primary_key , unique, AUTO_INCREMENT}
   Nombre_responsable: VARCHAR
 }
 
-Solicitante: {
+solicitante: {
   shape: sql_table
   id_solicitante: INT {constraint: primary_key, UNIQUE< AUTO_INCREMENT}
   Nombre_solicitante: VARCHAR
 }
 
-UPEyCE: {
-  shape: sql_table
-  id_UPEyCE: INT {constraint: primary_key}
-  numero_UPEyCE: NVARCHAR(50) {constraint: foreing_key}
-  id_area: INT {constraint: foreing_key}
-  id_usuario: INT {constraint: foreing_key}
-  id_usuario: INT {constraint: foreing_key}
-  fecha_creacion: DATETIME
-  descripcion: NVARCHAR
-}
-
 solicitudUPEyCE: {
   shape: sql_table
-  id_solitud: INT {constraint: Primary_key}
+  id_solitud: INT {constraint: primary_key , unique, AUTO_INCREMENT}
   numero_UPEyCE_solicitado: NVARCHAR(50)
   justificacion: NVARCHAR(200)
   descripcion: NVARCHAR(50)
@@ -74,35 +63,47 @@ solicitudUPEyCE: {
   id_area: int {constraint: foreing_key}
   id_usuario_solicita: int {constraint: foreing_key}
   fecha_solicitud: DATE
-  estado_solicitud: NVARCHAR
-  id_Usuario_responde: int {constraint: foreing_key}
-  fecha_respuesta: DATE
-  comentarios_respuesta: NVARCHAR()
-  id_UPEyCE_generado: NVARCHAR(50)
 }
 
 UPEyCE: {
   shape: sql_table
-  id_UPEyCE: INT
+  id_UPEyCE: INT {constraint: primary_key , unique, AUTO_INCREMENT}
   numero_UPEyCE: NVARCHAR(50)
-  id_area: INT
-  id_usuario_solicita: INT
-  id_Usuario_resuelve: INT
-  fecha_creacion: DATE
+  id_area: INT {constraint: foreing_key}
+  id_usuario_solicita: INT {constraint: foreing_key}
+  fecha_creacion: DATETIME
 }
 
-Oficio.id_solicitante <-> Solicitante.id_solicitante: asigna N:1
-Oficio.id_area <-> Area.id_area: asigna N:1
-Usuarios <-> Oficio: gestionan N:N
-PDF.id_oficio <-> Oficio.id_oficio: asociados 1:1
-Oficio.id_responsable <-> Responsable.id_responsable: asigna N:1
-Usuarios.id_area <-> Area.id_area: pertenece N:1
-UPEyCE.id_UPEyCE <-> Oficio.id_UPEyCE: asociados 1:N
-UPEyCE.id_usuario <-> usuarios.id_usuario: asociados N:1
-UPEyCE.id_area <-> Area.id_area: asociados 1:N
-solicitudUPEyCE.id_area <-> Area.id_area: asociados N:1
+historialSolicitudUPEyCE: {
+  shape: sql_table
+  id_historial: INT {constraint: primary_key , unique, AUTO_INCREMENT}
+  id_solicitud: INT
+  estado_anterior: NVARCHAR(20)
+  estado_nuevo: NVARCHAR(20)
+  id_usuario_cambio: INT {constraint: foreing_key}
+  comentarios: NVARCHAR(500)
+  fecha_cambio: DATETIME
+}
+
 solicitudUPEyCE.id_usuario_solicita <-> usuarios.id_usuario: asociados N:1
 solicitudUPEyCE.id_Usuario_responde <-> usuarios.id_usuario: asociados N:1
-UPEyCE.id_area <-> Area.id_area: asociado N:1
 UPEyCE.id_usuario_solicita <-> usuarios.id_usuario: asociados N:1
-UPEyCE.id_Usuario_resuelve <-> usuarios.id_usuario: asociados N:1
+UPEyCE.id_usuario_resuelve <-> usuarios.id_usuario: asociados N:1
+
+UPEyCE.id_area <-> Area.id_area: asociado N:1
+Oficio.id_area <-> Area.id_area: asigna N:1
+solicitudUPEyCE.id_area <-> Area.id_area: asociados N:1
+usuarios.id_area <-> Area.id_area: pertenece N:1
+
+UPEyCE.id_UPEyCE <-> Oficio.id_UPEyCE: asociados 1:N
+
+Oficio.id_solicitante <-> Solicitante.id_solicitante: asigna N:1
+Oficio.id_responsable <-> Responsable.id_responsable: asigna N:1
+
+PDF.id_oficio <-> Oficio.id_oficio: asociados 1:1
+
+usuarios.id_usuario <-> Oficio.id_usuario: administra N: N
+
+historialSolicitudUPEyCE.id_solicitud <-> solicitudUPEyCE.id_solitud: asociados 1:1
+
+

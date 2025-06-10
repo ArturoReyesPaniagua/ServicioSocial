@@ -1,7 +1,8 @@
-// File: ReportePage.jsx
+
 // SistemaIntegral/frontend/SS/src/components/Reporte/ReportePage.jsx
-// Este componente es la página principal para la generación de reportes
-// con filtros por estado, fechas y solicitantes
+
+
+// Este componente es la página principal para la generación de reporte con filtros por estado, fechas y solicitantes
 
 import { useState, useEffect } from 'react';
 import { format, isValid, parseISO } from 'date-fns';
@@ -46,7 +47,7 @@ const ReportePage = () => {
     { value: 'urgencia', label: 'urgencia' }
   ];
 
-  // Opciones para el estado de archivo
+  // Opciones para el estado de archivo   // se tiene que cambiar
   const opcionesArchivo = [
     { value: 'true', label: 'Archivados' },
     { value: 'false', label: 'No archivados' }

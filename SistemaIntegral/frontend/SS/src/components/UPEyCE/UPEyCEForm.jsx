@@ -1,5 +1,8 @@
-// UPEyCEForm.jsx
+
 // SistemaIntegral/frontend/SS/src/components/UPEyCE/UPEyCEForm.jsx
+
+// Este componente maneja la creación y edición de registros UPEyCE
+
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';

@@ -1,4 +1,4 @@
-// File: OficioForm.jsx
+
 // SistemaIntegral/frontend/SS/src/components/Oficios/OficioForm.jsx
 // Este componente es el formulario para crear y editar oficios
 
@@ -22,9 +22,9 @@ const OficioForm = ({ oficio, estados, onSave, onCancel }) => {
     observaciones: '',
     id_responsable: '',
     id_area: '',
-    id_UPEyCE: '',  // Añadido para integración UPEyCE
-    oficios_relacionados: '',  // Añadido para relacionar oficios
-    oficio_respuesta: ''       // Añadido para indicar oficio de respuesta
+    id_UPEyCE: '',  
+    oficios_relacionados: '',  
+    oficio_respuesta: ''       
   });
   
   const [errors, setErrors] = useState({});
@@ -119,8 +119,7 @@ const OficioForm = ({ oficio, estados, onSave, onCancel }) => {
         // Si estamos editando, inicializar los oficios relacionados seleccionados
         if (oficio && oficio.oficios_relacionados) {
           try {
-            // El campo oficios_relacionados puede estar almacenado como string (IDs separados por comas)
-            // o como array de IDs, dependiendo de cómo se maneje en el backend
+            // El campo oficios_relacionados esta almacenado como string (IDs separados por comas)
             const relacionadosIds = typeof oficio.oficios_relacionados === 'string'
               ? oficio.oficios_relacionados.split(',').map(id => id.trim())
               : oficio.oficios_relacionados;

@@ -1,5 +1,5 @@
 // SistemaIntegral/frontend/SS/src/components/MainLayout/MainLayout.jsx
-// Este componente es el diseño principal de la aplicación
+// Este componente es el diseño principal de la aplicación que incluye el encabezado, la barra lateral y el contenido principal de toda la apliacion.
 
 import { useState, useEffect } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
@@ -71,7 +71,8 @@ const MainLayout = ({ children }) => {
     fetchNotificaciones();
     
     // Actualizar notificaciones cada 30 segundos
-    const interval = setInterval(fetchNotificaciones, 30000);
+    const interval = setInterval(fetchNotificaciones, 30000);  // 30 segundos == 30000 ms puede cambiar a 60000 para 1 minuto o cualquiera que sea el tiempo que desees 
+    //lo deje asi pero me preocupa que se sature el servidor con peticiones, si es necesario cambiarlo a 1 minuto o mas
     
     return () => clearInterval(interval);
   }, [user]);

@@ -1,4 +1,7 @@
 // SistemaIntegral/backend/controllers/oficioControllers.js
+
+// controladores para manejar las operaciones CRUD de oficios y relaciones con otros modulos
+
 const sql = require('mssql');
 const oficioSchema = require('../schemas/oficiosSchema');
 const { connectDB } = require('../db/db');
@@ -39,7 +42,7 @@ const createOficio = async (req, res) => {
       asunto,
       observaciones,
       id_responsable,
-      id_area, // Este campo será ignorado para usuarios normales
+      id_area, 
       id_UPEyCE = null,
       oficios_relacionados = null,
       oficio_respuesta = null
@@ -360,7 +363,7 @@ const updateOficio = async (req, res) => {
       asunto,
       observaciones,
       id_responsable,
-      id_area, // Este campo será ignorado para usuarios normales
+      id_area, 
       id_UPEyCE,
       oficios_relacionados,
       oficio_respuesta

@@ -1,4 +1,4 @@
-// File: OficioView.jsx
+
 // SistemaIntegral/frontend/SS/src/components/Oficios/OficioView.jsx
 // Este componente muestra los detalles completos de un oficio específico con navegación entre oficios relacionados
 

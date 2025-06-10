@@ -1,18 +1,19 @@
-// File: ReporteExport.jsx
+
 // SistemaIntegral/frontend/SS/src/components/Reporte/ReporteExport.jsx
+
+
 // Este componente maneja la exportación de reportes en PDF y Excel
 
 import { useState, useEffect } from 'react';
 import { format as formatDate } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { jsPDF } from 'jspdf';
-// Importación correcta de autoTable
-import autoTable from 'jspdf-autotable';
-import * as XLSX from 'xlsx';
+import { jsPDF } from 'jspdf'; // Importar jsPDF para generar PDFs
+import autoTable from 'jspdf-autotable'; // Importar autoTable para generar tablas en PDF
+import * as XLSX from 'xlsx'; // Importar librerías necesarias para  Excel
 
 const ReporteExport = ({ 
   oficios, 
-  format: exportFormat, // Renombrar el prop para evitar conflicto
+  format: exportFormat, 
   filters, 
   solicitantes, 
   responsables, 

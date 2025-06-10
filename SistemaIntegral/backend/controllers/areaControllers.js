@@ -1,4 +1,7 @@
 // SistemaIntegral/backend/controllers/areaControllers.js
+
+//controlador para manejar las operaciones CRUD de áreas
+
 const sql = require('mssql');
 const areaSchema = require('../schemas/areaSchema');
 const { connectDB } = require('../db/db');

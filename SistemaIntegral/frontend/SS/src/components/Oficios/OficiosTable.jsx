@@ -1,4 +1,4 @@
-// File: OficiosTable.jsx
+
 // SistemaIntegral/frontend/SS/src/components/Oficios/OficiosTable.jsx
 // Este componente muestra una tabla de oficios
 // y permite realizar acciones como editar, eliminar, ver detalles y archivar 

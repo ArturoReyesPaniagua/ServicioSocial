@@ -1,5 +1,7 @@
-// userForm.jsx
+
 // SistemaIntegral/frontend/SS/src/components/userList/userForm.jsx
+
+// Este componente maneja la creación y edición de usuarios, incluyendo validaciones y manejo de áreas  
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
@@ -43,9 +45,9 @@ const UserForm = ({ user, onSave, onCancel }) => {
       setFormData({
         userId: user.userId,
         username: user.username,
-        role: user.role || 'user', // Valor por defecto en caso de que no venga role
-        password: '', // Contraseña vacía para edición
-        id_area: user.id_area || '' // Asegurar que id_area sea string vacío si es null o undefined
+        role: user.role || 'user',
+        password: '', 
+        id_area: user.id_area || '' 
       });
     } else {
       // Si es nuevo usuario, resetear el formulario
@@ -53,7 +55,7 @@ const UserForm = ({ user, onSave, onCancel }) => {
         username: '',
         password: '',
         role: 'user',
-        id_area: '' // Inicializar id_area como cadena vacía
+        id_area: '' 
       });
     }
   }, [user]);

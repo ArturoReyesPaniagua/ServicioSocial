@@ -1,4 +1,7 @@
 // SistemaIntegral/backend/controllers/responsableControllers.js
+
+// Controlador para manejar las operaciones CRUD de responsables  
+
 const sql = require('mssql');
 const responsableSchema = require('../schemas/responsableSchema');
 const { connectDB } = require('../db/db');

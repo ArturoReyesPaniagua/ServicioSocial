@@ -1,4 +1,6 @@
 // SistemaIntegral/frontend/SS/src/components/SolicitarUPEyCE/AdminSolicitudesPage.jsx
+
+// Este componente es la página de administración de solicitudes UPEyCE para administradores 
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
@@ -144,9 +146,7 @@ const AdminSolicitudesPage = () => {
   const getPrioridadColor = (prioridad) => {
     switch (prioridad) {
       case 'urgente': return 'bg-red-100 text-red-800';
-      case 'alta': return 'bg-orange-100 text-orange-800';
       case 'normal': return 'bg-blue-100 text-blue-800';
-      case 'baja': return 'bg-gray-100 text-gray-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -165,9 +165,9 @@ const AdminSolicitudesPage = () => {
   return (
     <div className="container mx-auto p-4 max-w-7xl">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-2">Gestión de Solicitudes UPEyCE</h1>
+        <h1 className="text-2xl font-bold mb-2">Administración de Solicitudes UPEyCE</h1>
         <p className="text-gray-600">
-          Administre las solicitudes de UPEyCE de todos los usuarios del sistema.
+          Administración las solicitudes de UPEyCE de todos los usuarios del sistema.
         </p>
       </div>
 

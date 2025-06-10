@@ -1,4 +1,4 @@
-// File: PDFManager.jsx
+
 // SistemaIntegral/frontend/SS/src/components/Oficios/PDFManager.jsx
 // Este componente maneja la carga, visualización y eliminación de documentos PDF asociados a un oficio específico
 

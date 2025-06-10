@@ -8,7 +8,7 @@ const oficioSchema = `
       numero_de_oficio NVARCHAR(25) NOT NULL,
       fecha_recepcion DATE,
       fecha_limite DATE,
-      archivado NVARCHAR(30),
+      archivado bit NOT NULL DEFAULT 0,
       expediente NVARCHAR(30),
       fecha_respuesta DATE,
       id_solicitante INT,

@@ -1,4 +1,8 @@
-// SistemaIntegral/backend/controllers/pdfControllers.js
+// SistemaIntegral/backend/controllers/pdfControllers.js 
+
+// controlador para manejar las operaciones CRUD de PDFs 
+
+
 const sql = require('mssql');
 const pdfSchema = require('../schemas/pdfSchema');
 const { connectDB } = require('../db/db');

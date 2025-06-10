@@ -1,5 +1,7 @@
 // SistemaIntegral/backend/db/db.js
 
+// conexion a la base de datos SQL Server con manejo de pool y consultas
+
 const sql = require('mssql');
 const config = require('./config');
 

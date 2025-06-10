@@ -1,3 +1,7 @@
+// src/components/SolicitarUPEyCE/SolicitarUPEyCEForm.jsx
+
+// Este componente permite a los usuarios solicitar un nuevo UPEyCE (Unidad de Proceso Electrónico y Control de Expedientes)
+
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
@@ -12,17 +16,19 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoadingNumber, setIsLoadingNumber] = useState(true);
+  const [isLoadingPlaceholder, setIsLoadingPlaceholder] = useState(true);
+  const [suggestedNumber, setSuggestedNumber] = useState('');
+  const [isValidatingNumber, setIsValidatingNumber] = useState(false);
   const { user } = useAuth();
 
-  // Obtener el siguiente número UPEyCE al cargar el componente
+  // Obtener el siguiente número sugerido como placeholder
   useEffect(() => {
-    fetchNextNumber();
+    fetchSuggestedNumber();
   }, []);
 
-  const fetchNextNumber = async () => {
+  const fetchSuggestedNumber = async () => {
     try {
-      setIsLoadingNumber(true);
+      setIsLoadingPlaceholder(true);
       const token = localStorage.getItem('token');
       const config = {
         headers: {
@@ -35,20 +41,54 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
         config
       );
 
-      setFormData(prev => ({
-        ...prev,
-        numero_UPEyCE_solicitado: response.data.nextNumber
-      }));
-
+      setSuggestedNumber(response.data.nextNumber);
     } catch (error) {
-      console.error('Error obteniendo siguiente número:', error);
-      toast.error('Error al obtener el número UPEyCE');
+      console.error('Error obteniendo número sugerido:', error);
+      setSuggestedNumber('0001'); // Valor por defecto
     } finally {
-      setIsLoadingNumber(false);
+      setIsLoadingPlaceholder(false);
     }
   };
 
-  // Manejar cambios en el formulario (excepto el número que es automático)
+  // Función para validar el número UPEyCE en tiempo real
+  const validateUPEyCENumber = async (numero) => {
+    if (!numero || numero.trim().length === 0) return;
+
+    try {
+      setIsValidatingNumber(true);
+      const token = localStorage.getItem('token');
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      };
+
+      const response = await axios.post(
+        'http://localhost:3001/api/verificar-numero-UPEyCE',
+        { numero_UPEyCE: numero },
+        config
+      );
+
+      if (!response.data.disponible) {
+        setErrors(prev => ({
+          ...prev,
+          numero_UPEyCE_solicitado: response.data.mensaje
+        }));
+      } else {
+        setErrors(prev => {
+          const newErrors = { ...prev };
+          delete newErrors.numero_UPEyCE_solicitado;
+          return newErrors;
+        });
+      }
+    } catch (error) {
+      console.error('Error validando número UPEyCE:', error);
+    } finally {
+      setIsValidatingNumber(false);
+    }
+  };
+
+  // Manejar cambios en el formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -60,12 +100,30 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
+
+    // Validar número UPEyCE cuando cambie (con debounce)
+    if (name === 'numero_UPEyCE_solicitado') {
+      setTimeout(() => validateUPEyCENumber(value), 500);
+    }
+  };
+
+  // Función para usar el número sugerido
+  const useSuggestedNumber = () => {
+    setFormData(prev => ({
+      ...prev,
+      numero_UPEyCE_solicitado: suggestedNumber
+    }));
+    validateUPEyCENumber(suggestedNumber);
   };
 
   // Validar formulario antes de enviar
   const validateForm = () => {
     const newErrors = {};
     
+    if (!formData.numero_UPEyCE_solicitado) {
+      newErrors.numero_UPEyCE_solicitado = 'El número UPEyCE es obligatorio';
+    }
+
     if (!formData.justificacion) {
       newErrors.justificacion = 'La justificación es obligatoria';
     } else if (formData.justificacion.length < 10) {
@@ -109,7 +167,7 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
         onSuccess(response.data);
       }
       
-      // Limpiar formulario y obtener nuevo número
+      // Limpiar formulario y obtener nuevo número sugerido
       setFormData({
         numero_UPEyCE_solicitado: '',
         justificacion: '',
@@ -117,8 +175,8 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
         prioridad: 'normal'
       });
       
-      // Obtener el siguiente número para una nueva solicitud
-      fetchNextNumber();
+      // Obtener el siguiente número sugerido para una nueva solicitud
+      fetchSuggestedNumber();
       
     } catch (error) {
       console.error('Error enviando solicitud:', error);
@@ -130,11 +188,6 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
       }
       
       toast.error(errorMessage);
-      
-      // Si el error es por número duplicado, obtener uno nuevo
-      if (errorMessage.includes('existe una solicitud')) {
-        fetchNextNumber();
-      }
       
       setErrors(prev => ({
         ...prev,
@@ -170,33 +223,48 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Número UPEyCE - Generado automáticamente */}
+        {/* Número UPEyCE - Ahora editable */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Número UPEyCE Asignado
+          <label htmlFor="numero_UPEyCE_solicitado" className="block text-sm font-medium text-gray-700 mb-1">
+            Número UPEyCE Solicitado *
           </label>
           <div className="relative">
-            {isLoadingNumber ? (
-              <div className="w-full p-3 border border-gray-300 rounded-md bg-gray-50 flex items-center justify-center">
-                <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-blue-500 mr-2"></div>
-                <span className="text-gray-600">Generando número...</span>
-              </div>
-            ) : (
-              <div className="w-full p-3 border border-gray-300 rounded-md bg-gray-50 flex items-center justify-between">
-                <span className="text-lg font-semibold text-gray-800">
-                  {formData.numero_UPEyCE_solicitado}
-                </span>
-                <span className="text-sm text-green-600 flex items-center">
-                  <svg className="h-5 w-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  Número asignado automáticamente
-                </span>
+            <input
+              type="text"
+              id="numero_UPEyCE_solicitado"
+              name="numero_UPEyCE_solicitado"
+              value={formData.numero_UPEyCE_solicitado}
+              onChange={handleChange}
+              placeholder={isLoadingPlaceholder ? 'Cargando...' : `Número sugerido: ${suggestedNumber}`}
+              className={`w-full p-3 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-guinda focus:border-guinda ${
+                errors.numero_UPEyCE_solicitado ? 'border-red-500' : 'border-gray-300'
+              }`}
+              disabled={isSubmitting}
+            />
+            {isValidatingNumber && (
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-blue-500"></div>
               </div>
             )}
           </div>
+          
+          {/* Botón para usar número sugerido */}
+          {suggestedNumber && !formData.numero_UPEyCE_solicitado && (
+            <button
+              type="button"
+              onClick={useSuggestedNumber}
+              className="mt-2 text-sm text-blue-600 hover:text-blue-800 underline"
+            >
+              Usar número sugerido: {suggestedNumber}
+            </button>
+          )}
+          
+          {errors.numero_UPEyCE_solicitado && (
+            <p className="mt-1 text-sm text-red-600">{errors.numero_UPEyCE_solicitado}</p>
+          )}
+          
           <p className="mt-1 text-xs text-gray-500">
-            Este número ha sido generado automáticamente y es único para su solicitud.
+            Ingrese el número UPEyCE que desea solicitar. El sistema verificará su disponibilidad.
           </p>
         </div>
 
@@ -299,9 +367,10 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
               <div className="mt-2 text-sm text-yellow-700">
                 <p>Su solicitud será evaluada por un administrador. Recibirá una notificación con la decisión.</p>
                 <ul className="mt-2 list-disc list-inside">
-                  <li>El número UPEyCE {formData.numero_UPEyCE_solicitado} quedará reservado para su solicitud</li>
+                  <li>El número UPEyCE quedará reservado si está disponible</li>
                   <li>Puede consultar el estado en cualquier momento</li>
                   <li>Si es aprobada, el folio será creado automáticamente</li>
+                  <li>Si el número no está disponible, deberá seleccionar otro</li>
                 </ul>
               </div>
             </div>
@@ -322,7 +391,7 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
           )}
           <button
             type="submit"
-            disabled={isSubmitting || isLoadingNumber}
+            disabled={isSubmitting || isValidatingNumber || !!errors.numero_UPEyCE_solicitado}
             className="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-guinda hover:bg-guinda-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-guinda disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {isSubmitting ? (

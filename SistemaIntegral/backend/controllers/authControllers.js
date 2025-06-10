@@ -1,4 +1,7 @@
 // SistemaIntegral/backend/controllers/authControllers.js
+
+// Controlador para manejar la autenticación de usuarios y la gestion de usuarios del sistema
+
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const sql = require("mssql");
@@ -115,7 +118,7 @@ const login = async (req, res) => {
       return res.status(401).json({ error: "Información inválida" });
     }
     
-    // Verificar la contraseña - corregir uso de bcrypt.compare
+    // Verificar la contraseña 
     console.log("Contraseña proporcionada", password);
     console.log("Contraseña almacenada", user.password);
     const passwordMatch = password === user.password;

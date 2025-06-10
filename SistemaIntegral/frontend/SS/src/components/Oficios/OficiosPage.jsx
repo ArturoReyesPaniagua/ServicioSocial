@@ -1,4 +1,4 @@
-// File: OficiosPage.jsx
+
 // SistemaIntegral/frontend/SS/src/components/Oficios/OficiosPage.jsx
 // Este componente es la página principal de gestión de oficios
 // y permite crear, editar, eliminar y ver detalles de los oficios
@@ -247,7 +247,7 @@ const OficiosPage = () => {
   return (
     <div className="container mx-auto p-4">
       <div className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center">
-        <h1 className="text-2xl font-bold mb-4 md:mb-0">Gestión de Oficios</h1>
+        <h1 className="text-2xl font-bold mb-4 md:mb-0">Administración de Oficios</h1>
         
         <div className="flex flex-col md:flex-row gap-2">
           <div className="flex gap-2">

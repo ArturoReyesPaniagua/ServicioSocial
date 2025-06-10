@@ -1,5 +1,7 @@
-// UPEyCEView.jsx
+
 // SistemaIntegral/frontend/SS/src/components/UPEyCE/UPEyCEView.jsx
+
+// Este componente muestra los detalles de un registro UPEyCE, incluyendo oficios relacionados y acciones disponibles
 
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';

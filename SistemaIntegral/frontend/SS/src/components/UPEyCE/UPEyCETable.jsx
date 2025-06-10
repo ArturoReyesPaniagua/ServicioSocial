@@ -1,5 +1,7 @@
-// UPEyCETable.jsx
+
 // SistemaIntegral/frontend/SS/src/components/UPEyCE/UPEyCETable.jsx
+
+// Este componente muestra una tabla de registros UPEyCE con funcionalidades de búsqueda, ordenamiento y acciones
 
 import { useState, useEffect, useMemo } from 'react';
 import {

@@ -1,4 +1,6 @@
 // SistemaIntegral/frontend/SS/src/components/SolicitarUPEyCE/SolicitarUPEyCEPage.jsx
+
+// component para manejar solicitudes de UPEyCE y notificaciones
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';

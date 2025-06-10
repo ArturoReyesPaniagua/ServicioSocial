@@ -27,13 +27,13 @@ async function createAdminUser() {
     // Insertar el usuario admin
     await pool.request()
       .input('username', sql.NVarChar, 'administrador')
-      .input('password', sql.NVarChar, "admin123") // Cambia esto por hashedPassword si usas bcrypt
+      .input('password', sql.NVarChar, "admin123") 
       .input('role', sql.NVarChar, 'admin')
       .query('INSERT INTO users (username, password, role) VALUES (@username, @password, @role)');
     
     console.log('¡Usuario admin creado con éxito!');
     console.log('Usuario: administrador');
-    console.log('Contraseña: admin123'); // Muestra la contraseña que configuraste
+    console.log('Contraseña: admin123'); 
     console.log('Rol: admin');
     
   } catch (error) {

@@ -1,5 +1,7 @@
-//ProtectedRoute.jsx
+
 // SistemaIntegral/frontend/SS/src/components/ProtectedRoute/ProtectedRoute.jsx
+
+
 // Este componente es un contenedor para proteger rutas que requieren autenticación
 
 import { Navigate } from 'react-router-dom';

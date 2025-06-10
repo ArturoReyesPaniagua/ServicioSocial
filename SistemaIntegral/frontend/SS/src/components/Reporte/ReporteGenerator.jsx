@@ -1,3 +1,8 @@
+// /src/components/Reporte/ReporteGenerator.jsx
+
+// este componente genera un reporte en formato PDF utilizando @react-pdf/renderer
+
+
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 

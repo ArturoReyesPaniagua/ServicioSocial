@@ -1,6 +1,7 @@
-// File: PDFUploader.jsx
+
 // SistemaIntegral/frontend/SS/src/components/PDFUploader/PDFUploader.jsx
 
+// Componente permite al usuario subir y listar PDFs a través de un formulario 
 
 import { useState, useEffect } from 'react';
 import axios from 'axios';

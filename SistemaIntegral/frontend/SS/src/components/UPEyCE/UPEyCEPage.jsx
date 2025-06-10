@@ -1,5 +1,7 @@
-// UPEyCEPage.jsx
+
 // SistemaIntegral/frontend/SS/src/components/UPEyCE/UPEyCEPage.jsx
+
+// Este componente maneja la página principal de UPEyCE, incluyendo la lista, creación, edición y eliminación de registros UPEyCE
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -18,7 +20,7 @@ const UPEyCEPage = () => {
   const [viewVisible, setViewVisible] = useState(false);
   const [deleteVisible, setDeleteVisible] = useState(false);
   const [currentUPEyCE, setCurrentUPEyCE] = useState(null);
-  const [oficioFormVisible, setOficioFormVisible] = useState(false);
+ // const [oficioFormVisible, setOficioFormVisible] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
 
