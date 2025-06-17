@@ -1,0 +1,313 @@
+direction: right
+
+frontend.axios: axios {
+  shape: rectangle
+}
+
+backend.axios: "axios" {
+  shape: rectangle
+}
+
+backend.servidor: "Servidor " {
+  shape: rectangle
+}
+
+# ## Rutas ###
+
+backend.Rutas.areaRoutes: "areaRoutes Responsable de la dirrecion del crud de areas, cuenta\n con crear, llamar todas, llamar por ID, Actualizar y borrar " {
+  shape: rectangle
+}
+
+backend.Rutas.authRoutes: "authRoutes Responsable de las dirreciones del CRUD de de usuario\n y las funciones de autentificacion (login, register), cuenta con\n  llamar todos los usuarios, por id, actualizar usuario y borrar,\n aparte de las mencionados anteriormente " {
+  shape: Rectangle
+}
+
+backend.Rutas.oficioRoutes: "oficioRoutes Reponsable de las rutas del CRUD y de los filtros de los oficios,\n permite crear, pedir todos los oficios, buscar uno en especifico por\n ID o buscarlo por cualquiera de sus atributos, borrar, actualizar\n y oficios archivados" {
+  shape: rectangle
+}
+
+backend.Rutas.pdfRoutes: "pdfRoutes Responsable de las rutas del CRUD de PDF, el llamar un\n pdf por id y asociarlos con un oficio" {
+  shape: rectangle
+}
+
+backend.Rutas.responsableRoutes: "responsableRoutes: Responsable de las rutas del CRUD de reposnsables,\n crear, borrar, actualizar, leer por id y leer todas " {
+  shape: rectangle
+}
+
+backend.Rutas.SolicitanteRoutes: "SolicitanteRoutes Responsable de las rutas del CRUD de solicitantes,\n crear, borrar, actualizar, leer por id y leer todas " {
+  shape: rectangle
+}
+
+backend.Rutas.solicitudUPEyCERoutes: "solicitudUPEyCERoutes es la unica que tanto controla el CRUD\n de solicitudes como el de notificaciones, pero esto fue un error de mi\n parte, jamas estuvo planeado poner notificaciones y solo aparecio y\n poco a poco le fui dando forma" {
+  shape: rectangle
+}
+
+backend.Rutas.UPEyCERoutes: "UPEyCERoutes: Encargado del CRUD de los folios UPEyCE,\n que permite agregar, buscar por id, borrar, y ligarla con oficios" {
+  shape: rectangle
+}
+
+frontend.axios -> backend.axios: mensaje http
+
+backend.axios -> backend.servidor
+
+backend.servidor -> backend.Rutas.pdfRoutes: get, put, read, delete (PDF)
+backend.servidor -> backend.Rutas.areaRoutes: get, put, read, delete (area)
+backend.servidor -> backend.Rutas.authRoutes: get, put, read, delete (auth)
+backend.servidor -> backend.Rutas.oficioRoutes: get, put, read, delete (oficio)
+backend.servidor -> backend.Rutas.SolicitanteRoutes: get, put, read, delete (soliictante)
+backend.servidor -> backend.Rutas.responsableRoutes: get, put, read, delete (responsable)
+backend.servidor -> backend.Rutas.UPEyCERoutes: get, put, read, delete (UPEyCE)
+backend.servidor -> backend.Rutas.solicitudUPEyCERoutes: get, put, read, delete (solicitud UPEyCE)
+
+# ## Controladores ###
+
+backend.controladores.areaControllers: areaControllers cuenta con  las funciones\n que realcionan el Form de area en OficioForm.jsx y la base \n de datos {
+  shape: rectangle
+}
+
+backend.controladores.pdfControllers: "pdfControllers cuenta con la las funciones\n que relacionan el PDFUploader con la base de datos " {
+  shape: rectangle
+}
+
+backend.controladores.authControllers: "authControllers cuenta con las funciones que relacionan todos\n los componentes de login, autentificador y el JsonWebToken " {
+  shape: rectangle
+}
+
+backend.controladores.oficioControllers: "oficioControllers cuenta con las funciones del CRUD de oficios,\n las funciones de busqueda y filtrado de los oficios que\n se relacionan con la base de datos  " {
+  shape: rectangle
+}
+
+backend.controladores.solicitanteControllers: " solicitanteControllers cuenta con las funciones del CRUD\n de solicitantes que lo relacionan con la base de datos" {
+  shape: rectangle
+}
+
+backend.controladores.responsableControllers: "responsableControllers cuenta con las funciones del crud\n de responsables que lo relacionan coon la base de datos" {
+  shape: rectangle
+}
+
+backend.controladores.UPEyCEControllers: "UPEyCEControllers cuenta con las funciones del crud de Folios \n UPEyCE para posteriormente poder ligarlo con los expedientes " {
+  shape: rectangle
+}
+backend.controladores.SolicitudUPEyCEControllers: "SolicitudUPEyCEControllers cuenta con las funciones del crud\n de solicitudes UPEyCe para que permita tanto al usuario\n estandar como al administrador  solicitar folios UPEyCE\n y guardar su historial" {
+  shape: rectangle
+}
+
+backend.Rutas.authRoutes -> backend.controladores.authControllers: se recibe alguna de estas funciones: register, login, getAllUsers,\n getUserById, updateUser, deleteUser, verifyToken
+
+backend.Rutas.areaRoutes -> backend.controladores.areaControllers: Se recibe alguna de las siguientes funciones: createArea, getAllAreas,\n getAreaById, updateArea, deleteArea cuando el APIRest\n las llama aqui es donde se encuentran
+
+backend.Rutas.pdfRoutes -> backend.controladores.pdfControllers: Se recibe alguna de las siguientes funciones:  uploadPDF, getPDF,\n  getAllPDFs, getPDFsByOficio, deletePDF, associatePDFWithOficio
+
+backend.Rutas.oficioRoutes -> backend.controladores.oficioControllers: recibe alguna de las siguientes funciones:  createOficio,\n getAllOficios, getOficioById, updateOficio, deleteOficio,\n searchOficios, getOficiosByEstado, getOficiosByArea,\n getOficiosArchivados, getOficiosByUPEyCE
+
+backend.Rutas.SolicitanteRoutes -> backend.controladores.solicitanteControllers: "se recibe alguna de las siguientes funciones:\n createSolicitante, getAllSolicitantes, getSolicitanteById,\n updateSolicitante, deleteSolicitante\n"
+
+backend.Rutas.responsableRoutes -> backend.controladores.responsableControllers: "se recibe alguna de las siguientes funciones:   createResponsable,\n getAllResponsables, getResponsableById, updateResponsable,\n deleteResponsable"
+
+backend.Rutas.UPEyCERoutes -> backend.controladores.UPEyCEControllers: "Se recibe alguna de las siguientes funciones: createUPEyCE,\n getAllUPEyCE, getUPEyCEById, updateUPEyCE, deleteUPEyCE "
+
+backend.Rutas.solicitudUPEyCERoutes -> backend.controladores.SolicitudUPEyCEControllers: "se recibe alguna de estas funciones createSolicitudUPEyCE, getAllSolicitudes,\n getSolicitudById, aprobarSolicitud, getNextUPEyCENumber,\n rechazarSolicitud, cancelarSolicitud, getSolicitudesPendientes,\n getNotificaciones, marcarNotificacionLeida, getEstadisticas "
+
+backend.middleware.authMiddleware: authMiddleware: Encargado de el JsonWebToken, la autentificacion de usuarios\n y el control del rol
+
+backend.servidor -> backend.middleware.authMiddleware: funciones como isadmin, authenticateToke que sirven \n para verificar el ron y optener el token del JsonWebToken
+
+# ## schemas ###
+
+backend.schemas.areaSchema: areaSchema: permite crear la tabla area si existe {
+  shape: rectangle
+}
+
+backend.verificaAreaSchemas: verifica si exite la tabla {
+  shape: diamond
+}
+
+backend.controladores.areaControllers -> backend.verificaAreaSchemas: Envia los querrys
+backend.verificaAreaSchemas -> backend.schemas.areaSchema: si no esta la tabla llama el squema para que la cree
+
+backend.schemas.areaSchema -> SQLServer: querrys (Select, delete,\n update y insert)
+backend.verificaAreaSchemas -> SQLServer: si se encuentra la tabla en\n la base de datos
+
+backend.schemas.schemaHistorialSolicitudUPEyCE: schemaHistorialSolicitudUPEyCE es donde se guarda la\n respuesta del administrador y el historial de el folio UPEyCE {
+  shape: rectangle
+}
+backend.verificaHistorialSolicitudUPEyCEschemas: verifica si exite la tabla {
+  shape: diamond
+}
+
+backend.controladores.SolicitudUPEyCEControllers -> backend.verificaHistorialSolicitudUPEyCEschemas: envia los querrys
+backend.verificaHistorialSolicitudUPEyCEschemas -> backend.schemas.schemaHistorialSolicitudUPEyCE: si no esta la tabla llama el squema\n para que la cree
+
+backend.schemas.schemaHistorialSolicitudUPEyCE -> SQLServer: querrys (Select y insert)
+backend.verificaHistorialSolicitudUPEyCEschemas -> SQLServer: querrys (Select y insert)
+
+# ###
+backend.schemas.schemaNotificacion: schemaNotificacion es donde se guarda las Notificacion {
+  shape: rectangle
+}
+backend.verificaNotificacionschemas: verifica si exite la tabla {
+  shape: diamond
+}
+
+backend.controladores.SolicitudUPEyCEControllers -> backend.verificaNotificacionschemas: envia los querrys
+backend.verificaNotificacionschemas -> backend.schemas.schemaNotificacion: si no esta la tabla llama el squema\n para que la cree
+
+backend.schemas.schemaNotificacion -> SQLServer: querrys (Select y insert)
+backend.verificaNotificacionschemas -> SQLServer: querrys (Select y insert)
+
+# ##
+backend.schemas.schemaNotificacionHistorial: schemaNotificacionHistorial es donde se guarda las Notificacion {
+  shape: rectangle
+}
+backend.verificaNotificacionHistorialschemas: verifica si exite la tabla {
+  shape: diamond
+}
+
+backend.controladores.SolicitudUPEyCEControllers -> backend.verificaNotificacionHistorialschemas: envia los querrys
+backend.verificaNotificacionHistorialschemas -> backend.schemas.schemaNotificacionHistorial: si no esta la tabla llama el squema\n para que la cree
+
+backend.schemas.schemaNotificacionHistorial -> SQLServer: querrys (Select y insert)
+backend.verificaNotificacionHistorialschemas -> SQLServer: querrys (Select y insert)
+
+# ###oficiosSchema
+backend.schemas.oficiosSchema: oficiosSchema es donde se guarda las Notificacion {
+  shape: rectangle
+}
+backend.verificaoficiosSchema: verifica si exite la tabla {
+  shape: diamond
+}
+
+backend.controladores.oficioControllers -> backend.verificaoficiosSchema: envia los querrys
+backend.verificaoficiosSchema -> backend.schemas.oficiosSchema: si no esta la tabla llama el squema\n para que la cree
+
+backend.schemas.schemaNotificacionHistorial -> SQLServer: querrys (Select y insert)
+backend.verificaoficiosSchema -> SQLServer: querrys (Select y insert)
+
+# ###oficiosSchema
+backend.schemas.pdfSchema: pdfSchema es donde se guarda las Notificacion {
+  shape: rectangle
+}
+backend.verificapdfSchema: verifica si exite la tabla {
+  shape: diamond
+}
+
+backend.controladores.pdfControllers -> backend.verificapdfSchema: envia los querrys
+backend.verificapdfSchema -> backend.schemas.pdfSchema: si no esta la tabla llama el squema\n para que la cree
+
+backend.schemas.pdfSchema -> SQLServer: querrys (Select, delete y insert)
+backend.verificapdfSchema -> SQLServer: querrys (Select, delete y insert)
+
+# ###responsableSchema
+backend.schemas.responsableSchema: responsableSchema es donde se guarda las Notificacion {
+  shape: rectangle
+}
+backend.verificaresponsableSchema: verifica si exite la tabla {
+  shape: diamond
+}
+
+backend.controladores.pdfControllers -> backend.verificaresponsableSchema: envia los querrys
+backend.verificaresponsableSchema -> backend.schemas.responsableSchema: si no esta la tabla llama el squema\n para que la cree
+
+backend.schemas.responsableSchema -> SQLServer: querrys (Select y insert)
+backend.verificaresponsableSchema -> SQLServer: querrys (Select y insert)
+
+# ##solicitanteSchema
+
+backend.schemas.solicitanteSchema: solicitanteSchema es donde se guarda las Notificacion {
+  shape: rectangle
+}
+backend.verificasolicitanteSchema: verifica si exite la tabla {
+  shape: diamond
+}
+
+backend.controladores.solicitanteControllers -> backend.verificasolicitanteSchema: envia los querrys
+backend.verificasolicitanteSchema -> backend.schemas.solicitanteSchema: si no esta la tabla llama el squema\n para que la cree
+
+backend.schemas.solicitanteSchema -> SQLServer: querrys (Select y insert)
+backend.verificasolicitanteSchema -> SQLServer: querrys (Select y insert)
+
+# ##solicitudUPEyCESchema
+
+backend.schemas.solicitudUPEyCESchema: solicitudUPEyCESchema es donde se guarda las Solicitudes de UPEyCE {
+  shape: rectangle
+}
+backend.verificasolicitudUPEyCESchema: verifica si exite la tabla {
+  shape: diamond
+}
+
+backend.controladores.solicitudUPEyCEControllers -> backend.verificasolicitudUPEyCESchema: envia los querrys
+backend.verificasolicitudUPEyCESchema -> backend.schemas.solicitudUPEyCESchema: si no esta la tabla llama el squema\n para que la cree
+
+backend.schemas.solicitudUPEyCESchema -> SQLServer: querrys (Select y insert)
+backend.verificasolicitudUPEyCESchema -> SQLServer: querrys (Select y insert)
+
+# ##UPEyCESchema
+
+backend.schemas.UPEyCESchema: UPEyCESchema es donde se guarda los folios UPEyCE {
+  shape: rectangle
+}
+backend.verificaUPEyCESchema: verifica si exite la tabla {
+  shape: diamond
+}
+
+backend.controladores.UPEyCEControllers -> backend.verificaUPEyCESchema: envia los querrys
+backend.verificaUPEyCESchema -> backend.schemas.UPEyCESchema: si no esta la tabla llama el squema\n para que la cree
+
+backend.schemas.UPEyCESchema -> SQLServer: querrys (Select y insert)
+backend.verificaUPEyCESchema -> SQLServer: querrys (Select y insert)
+
+# ##userSchema
+
+backend.schemas.userSchema: userSchema es donde se guarda las usuarios {
+  shape: rectangle
+}
+backend.verificauserSchema: verifica si exite la tabla {
+  shape: diamond
+}
+
+backend.controladores.authControllers -> backend.verificauserSchema: envia los querrys
+backend.verificaUuserSchema -> backend.schemas.userSchema: si no esta la tabla llama el squema\n para que la cree
+
+backend.schemas.userSchema -> SQLServer: querrys (Select, update, delete y insert)
+backend.verificauserSchema -> SQLServer: querrys (Select, update, delete y insert)
+
+SQLserver -> backend.controladores.authControllers: Dependiendo de la funcion SQLSever retorna la informacion\n dependidnedo el querry
+
+SQLserver -> backend.controladores.areaControllers: Dependiendo de la funcion SQLSever retorna la informacion\n dependidnedo el querry
+
+SQLserver -> backend.controladores.pdfControllers: Dependiendo de la funcion SQLSever retorna la informacion\n dependidnedo el querry
+
+SQLserver -> backend.controladores.oficioControllers: Dependiendo de la funcion SQLSever retorna la informacion\n dependidnedo el querry
+
+SQLserver -> backend.controladores.solicitanteControllers: Dependiendo de la funcion SQLSever retorna la informacion\n dependidnedo el querry
+
+SQLserver -> backend.controladores.responsableControllers: Dependiendo de la funcion SQLSever retorna la informacion\n dependidnedo el querry
+
+SQLserver -> backend.controladores.UPEyCEControllers: Dependiendo de la funcion SQLSever retorna la informacion\n dependidnedo el querry
+
+SQLserver -> backend.controladores.SolicitudUPEyCEControllers: Dependiendo de la funcion SQLSever retorna la\n informacion dependidnedo el querry
+SQLserver -> backend.controladores.SolicitudUPEyCEControllers: Dependiendo de la funcion SQLSever retorna\n la informacion dependidnedo el querry
+
+# ####
+backend.controladores.authControllers -> backend.axios: JSON
+
+backend.controladores.areaControllers -> backend.axios: JSON
+
+backend.controladores.pdfControllers -> backend.axios: JSON
+
+backend.controladores.oficioControllers -> backend.axios: JSON
+
+backend.controladores.solicitanteControllers -> backend.axios: JSON
+
+backend.controladores.responsableControllers -> backend.axios: JSON
+
+backend.controladores.UPEyCEControllers -> backend.axios: JSON
+
+backend.controladores.SolicitudUPEyCEControllers -> backend.axios: JSON
+
+# ##
+
+backend.axios -> frontend.axios: mensaje en protocolo http con contenido de un Json
+
+
+

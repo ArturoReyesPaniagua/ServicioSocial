@@ -7,11 +7,11 @@ const express = require("express");
 const router = express.Router();
 const authControllers = require("../controllers/authControllers");
 
-// Rutas de autenticación
+// Rutas de autenticación y registro
 router.post("/register", authControllers.register);
 router.post("/login", authControllers.login);
 
-// Rutas de gestión de usuarios
+// Rutas de gestión de usuarios para la Lista de Usuarios
 router.get("/users", authControllers.getAllUsers);
 router.get("/users/:id", authControllers.getUserById);
 router.put("/users/:id", authControllers.updateUser);

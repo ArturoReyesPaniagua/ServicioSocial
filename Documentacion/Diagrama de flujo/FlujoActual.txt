@@ -32,11 +32,11 @@ esAdmin: "Sistema válida tipo de usuario" {
 accesoSatisfactorio -> esAdmin
 
 # Opciones de menú basadas en tipo de usuario
-menuAdmin: "Menú del usuario administrador cuenta con las opciones de navegación del usuario administrador\n en las cuales estan: tablas de oficios, tablas de usuarios, registro de responsablesy solicitantes, registro de areas y generar reporte" {
+menuAdmin: "Menú del usuario administrador cuenta con las opciones de navegación del usuario administrador\n en las cuales estan: tablas de oficios, tablas de usuarios, registro de responsables y solicitantes,\n registro de areas, generar reporte, solicitar folio UPEyCE y administrar folio UPEyCE" {
   shape: rectangle
 }
 
-menuUsuario: "Menú del usuario estandard  se encuentran las opciones de navegación del usuario administrador\n en las cuales estan: tablas de oficios,registro de responsablesy solicitantes, tablas de usuarios y Generar reporte" {
+menuUsuario: "Menú del usuario estandard  se encuentran las opciones de navegación del usuario administrador en las\n cuales estan: tablas de oficios,registro de responsablesy solicitantes, tablas de usuarios,\n  Generar reporte y solicitar folio UPEyCE " {
   shape: rectangle
 }
 
@@ -47,7 +47,7 @@ AccionAdmo: "Acción a realizar?" {
   shape: diamond
 }
 
-ListaUsuarios: "Tabla usuarios: en esta tabla el usuario podra ver nombres de los usuarios, el rol que \ndesempeña y las opciones a realizar que son: ver detalles de los usuarios, modificar o eliminar usuario.  " {
+ListaUsuarios: "Tabla usuarios: en esta tabla el usuario podra ver nombres de los usuarios, el rol que \ndesempeña y las opciones a realizar que son: ver detalles de los usuarios,\n modificar o eliminar usuario.  " {
   shape: rectangle
 }
 ListaUsuariosAccion: "Acción a realizar tabla usuarios" {
@@ -505,4 +505,85 @@ FormularioEditarAreaValidar -> FormularioEditarArea: Datos invalidos
 ListaAreasAccion -> FormularioEliminarAreaValidar: Eliminar
 FormularioEliminarAreaValidar -> ListaAreas: Eliminar
 FormularioEliminarAreaValidar -> ListaAreas: Cancelar
+
+SolicirtarFolio: "Interfaz donde se solicitan y se administran las solicitudes anteriores del usuario,\n en este menú hay 3 opciones solicitar folio UPEyCE, verificar las solicitudes y ver las notificaciones" {
+  shape: rectangle
+}
+
+AccionARealizarSolicitarFolio: "Accion a realizar en menú Solicitar folio UPEyCE " {
+  shape: diamond
+}
+
+SolicitarForm: "El usuario podra llenar un formulario con la justificacion, la preoridad de la solicitud y\n si es necesario una descripcion adicional. En este componente esta el boton de cancelar y enviar" {
+  shape: rectangle
+}
+
+AccionARealizarSolicitarForm: " Acción a realizar en el form de solicitud de folio." {
+  shape: diamond
+}
+
+SolicitarFormDB: "Mandar los datos a backend (servidor)" {
+  shape: rectangle
+}
+
+ViewSolicitudes: "Historial de las solicitudes realizadas en el sistema realizadas por el usuario" {
+  shape: rectangle
+}
+viewNotificaciones: "Vista del historial de notificaciones que se han realizado por el usuario en el sistema" {
+  shape: rectangle
+}
+AccionAdmo -> SolicirtarFolio: Solicitar folio UPEyCe
+AccionUsuario -> SolicirtarFolio: Solicitar Folio UPEyCE
+SolicirtarFolio -> AccionARealizarSolicitarFolio
+SolicirtarFolio -> menuAdmin
+SolicirtarFolio -> menuUsuario
+
+AccionARealizarSolicitarFolio -> SolicitarForm: Solicitar UPEyCE
+SolicitarForm -> AccionARealizarSolicitarForm
+AccionARealizarSolicitarForm -> SolicirtarFolioDB: Aceptar
+SolicirtarFolioDB -> SolicirtarFolio: enviado
+AccionARealizarSolicitarForm -> SolicirtarFolio: Cancelar
+
+AccionARealizarSolicitarFolio -> ViewSolicitudes
+ViewSolicitudes -> SolicirtarFolio
+
+AccionARealizarSolicitarFolio -> viewNotificaciones
+ViewSolicitudes -> SolicirtarFolio
+
+AprobarSolicitudFolio: "Interfaz principal de administracion de solicitudes UPEyCE donde una\n cuenta administración en esta interfaz cuentas con 3 opciones  " {
+  shape: rectangle
+}
+
+AccionARealizarAprobarSolicitudFolio: "Seleccionar una solicitud pendiente de aprobación \n" {
+  shape: diamond
+}
+
+FormUPEyCE: " Formulario para responder solicitud de donde el administrador puede rechazar o aceptar\n folios y escribir comentarios acerca de las solicitudos" {
+  shape: rectangle
+}
+
+AccionARealizarFormUPEyCE: "Seleccionas entre rechazar o aceptar la solicitud" {
+  shape: diamond
+}
+
+FormUPEyCEDB: "Mandar datos a backend" {
+  shape: rectangle
+}
+
+
+
+ListaSolicitudes: "Lista en donde puedes ver todas las solicitudes, el area de donde \n viene quien la solicitu la preoridad, la fecha y el estado" {
+  shape: rectangle
+}
+
+Estadisticas: "Interfaz donde puedes dar un vistazo rapido a los datos que quiere mas relevantes  " {
+  shape: rectangle
+}
+
+AccionAdmo -> AprobarSolicitudFolio: Solicitar folio UPEyCe
+AprobarSolicitudFolio -> AccionARealizarAprobarSolicitudFolio
+AccionARealizarAprobarSolicitudFolio -> FormUPEyCE
+AccionARealizarAprobarSolicitudFolio -> ListaSolicitudes
+AccionARealizarAprobarSolicitudFolio -> Estadisticas
+
 

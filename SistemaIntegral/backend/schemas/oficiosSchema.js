@@ -1,4 +1,4 @@
-// SistemaIntegral/backend/schemas/oficiosSchema.js (modificado)
+// SistemaIntegral/backend/schemas/oficiosSchema.js (modificado lunes 2 de julio)
 const oficioSchema = `
   IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Oficio]') AND type in (N'U'))
   BEGIN

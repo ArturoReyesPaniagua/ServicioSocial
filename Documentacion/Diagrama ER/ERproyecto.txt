@@ -77,7 +77,7 @@ UPEyCE: {
 historialSolicitudUPEyCE: {
   shape: sql_table
   id_historial: INT {constraint: primary_key , unique, AUTO_INCREMENT}
-  id_solicitud: INT
+  id_solicitud: INT {constraint: foreing_key}
   estado_anterior: NVARCHAR(20)
   estado_nuevo: NVARCHAR(20)
   id_usuario_cambio: INT {constraint: foreing_key}
@@ -105,5 +105,35 @@ PDF.id_oficio <-> Oficio.id_oficio: asociados 1:1
 usuarios.id_usuario <-> Oficio.id_usuario: administra N: N
 
 historialSolicitudUPEyCE.id_solicitud <-> solicitudUPEyCE.id_solitud: asociados 1:1
+historialSolicitudUPEyCE.id_usuario <-> usuarios.id_usuario: asociados 1:N
 
+notificaciones: Notificaciones {
+  shape: sql_table
+  id_notificacion: INT IDENTITY(1,1) PRIMARY KEY,
+  id_usuario: INT NOT NULL {constraint: foreingKey}
+  tipo: NVARCHAR(50) NOT NULL
+  titulo: NVARCHAR(200) NOT NULL
+  mensaje: NVARCHAR(500) NOT NULL
+  leida: BIT DEFAULT 0
+  fecha_creacion: DATETIME
+  id_solicitud: INT {constraint: ForeingKey}
+}
 
+solicitudUPEyCE.id_solicitud <-> notificaciones.id_solicitud: asociados 1:1
+usuarios.id_usuario <-> notificaciones.id_usuario: asociados 1:N
+
+HistorialNoficaciones: Historial Notificaciones {
+  shape: sql_table
+  id_notificacion: INT IDENTITY(1,1) PRIMARY KEY,
+  id_usuario: INT NOT NULL {constraint: foreingKey}
+  tipo: NVARCHAR(50) NOT NULL,
+  titulo: NVARCHAR(200) NOT NULL,
+  mensaje: NVARCHAR(500) NOT NULL,
+  id_solicitud: INT NULL,
+  leida: BIT DEFAULT 0,
+  fecha_creacion: DATETIME
+}
+
+HistorialNoficaciones.id_usuario <-> usuarios.id_usuario: asociados N:1
+solicitudUPEyCE.id_solicitud <-> HistorialNoficaciones.id_solicitud: asociados 1:1
+notificaciones.id_notificacion <-> HistorialNoficaciones.id_notificacion: asociados 1:1

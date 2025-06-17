@@ -69,7 +69,7 @@ router.post('/verificar-numero-UPEyCE', authenticateToken, async (req, res) => {
     const pool = await connectDB();
     const userId = req.user.userId;
 
-    // Obtener el área del usuario
+    // Obtener el área del usuario //esto debo moverlo a Controllers
     const userResult = await pool.request()
       .input('userId', sql.Int, userId)
       .query('SELECT id_area FROM users WHERE userId = @userId');

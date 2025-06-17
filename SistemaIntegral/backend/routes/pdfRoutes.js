@@ -19,10 +19,10 @@ const {
   associatePDFWithOficio
 } = require('../controllers/pdfControllers');
 
-// Define routes with their handler functions
+// Definir sus rutas para la gestión de PDFs
 // Para todos los endpoints excepto obtener un PDF específico se requiere autenticación
 router.post('/pdfs/upload', authenticateToken, upload.single('pdf'), uploadPDF);
-router.get('/pdfs/:id', getPDF); // No requiere autenticación para permitir links directos
+router.get('/pdfs/:id', getPDF); 
 router.get('/pdfs', authenticateToken, getAllPDFs);
 router.get('/pdfs/oficio/:id_oficio', authenticateToken, getPDFsByOficio);
 router.delete('/pdfs/:id', authenticateToken, deletePDF);

@@ -15,7 +15,7 @@ const {
 const { authenticateToken, isAdmin } = require('../middleware/authMiddleware');
 
 // Rutas CRUD básicas para responsables
-// Para crear y eliminar responsables se requiere autenticación
+// Para crear, actualizar y eliminar responsables se requiere autenticación y rol de administrador
 router.post('/responsables', authenticateToken, createResponsable);
 router.get('/responsables', getAllResponsables);
 router.get('/responsables/:id', getResponsableById);

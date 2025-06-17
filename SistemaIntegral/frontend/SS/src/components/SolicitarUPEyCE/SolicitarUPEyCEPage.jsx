@@ -200,13 +200,13 @@ const SolicitarUPEyCEPage = () => {
   return (
     <div className="container mx-auto p-4 max-w-6xl">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-2">Gestión de Solicitudes UPEyCE</h1>
+        <h1 className="text-2xl font-bold mb-2"> Solicitudes UPEyCE</h1>
         <p className="text-gray-600">
-          Solicite nuevos folios UPEyCE y gestione sus solicitudes existentes.
+          Solicite nuevos folios UPEyCE y administre sus solicitudes existentes.
         </p>
       </div>
 
-      {/* Navegación por tabs */}
+      {/* Navegación por tabs */ }{/* Se refiere a que hay una interfaz que contiene interfaces por si alguien llega a leer esto*/}
       <div className="mb-6">
         <div className="border-b border-gray-200">
           <nav className="flex space-x-8">
