@@ -7,7 +7,7 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
-const ProtectedRoute = ({ children }) => { // Componente que protege rutas que requieren autenticación
+const ProtectedRoute = ({ children }) => { 
   const { isAuthenticated, loading } = useAuth(); // Extrae el estado de autenticación y carga del contexto de autenticación
 
   if (loading) { // Si está cargando, muestra un mensaje de carga
@@ -18,7 +18,8 @@ const ProtectedRoute = ({ children }) => { // Componente que protege rutas que r
     return <Navigate to="/login" replace />; // Cambia la ruta a la que quieras redirigir al usuario no autenticado // el que no logro iniciar sesión
   }
 
-  return children;
+  return children;// Si está autenticado, renderiza los hijos (la ruta protegida)
+  // Esto permite que el componente hijo se muestre si el usuario está autenticado
 };
 
 export default ProtectedRoute;

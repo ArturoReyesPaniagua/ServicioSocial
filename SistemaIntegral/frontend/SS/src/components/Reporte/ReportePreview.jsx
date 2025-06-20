@@ -1,7 +1,6 @@
 
 // SistemaIntegral/frontend/SS/src/components/Reporte/ReportePreview.jsx
 
-
 // Este componente muestra una vista previa del reporte y permite exportarlo
 
 
@@ -11,6 +10,7 @@ import { format, isValid } from 'date-fns';
 import { es } from 'date-fns/locale';
 import ReporteExport from './ReporteExport';
 
+//
 const ReportePreview = ({ 
   oficios, 
   filters, 

@@ -13,6 +13,7 @@ import DeleteConfirmation from '../common/DeleteConfirmation';
 import { format } from 'date-fns';
 import { useAuth } from '../../context/AuthContext'; // Importar el contexto de autenticación
 
+
 const OficiosPage = () => {
   const [oficios, setOficios] = useState([]);
   const [isLoading, setIsLoading] = useState(true);

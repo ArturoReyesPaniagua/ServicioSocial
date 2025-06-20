@@ -102,7 +102,7 @@ const MainLayout = ({ children }) => {
         </div>
       </header>
       
-      {/* Header de navegación y menú */}
+      {/* Header de navegación // la parte de hasta arriba dodne esta el logo y el nombre */}
       <header className="main-header">
         <button 
           className="menu-toggle"
@@ -116,9 +116,9 @@ const MainLayout = ({ children }) => {
         
         <div className="header-title">
           Sistema de Gestión Integral Oficios //Nombre por definir SGIO 
-          {user && user.role !== 'admin' && areaName && (
+          {user && user.role !== 'admin' && areaName && ( //condicion para solo usuarios 
             <div className="text-xs text-white opacity-80 mt-1">
-              Área: {areaName}
+              Área: {areaName} {/* Mostrar el nombre del área si el usuario no es administrador ya que algunos admins no tienen area*/}
             </div>
           )}
         </div>
@@ -128,7 +128,7 @@ const MainLayout = ({ children }) => {
             <span className="font-medium">{user?.username}</span>
             {user?.role && (
               <div className="text-xs opacity-80">
-                {user.role === 'admin' ? 'Administrador' : 'Usuario'}
+                {user.role === 'admin' ? 'Administrador' : 'Usuario'}{/* Mostrar el rol del usuario admin/user */}
               </div>
             )}
           </div>
@@ -141,7 +141,7 @@ const MainLayout = ({ children }) => {
         </div>
       </header>
 
-      {/* Sidebar para navegación */}
+      {/* Sidebar para navegación  español es menu lateral */}
       <aside className={`sidebar ${sidebarOpen ? '' : 'closed'}`}>
         <div className="sidebar-header">
           <h2 className="text-xl font-bold">Menú Principal</h2>

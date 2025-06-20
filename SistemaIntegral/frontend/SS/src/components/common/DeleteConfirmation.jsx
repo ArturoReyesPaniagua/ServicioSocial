@@ -6,6 +6,7 @@
 
 import React from 'react';
 
+//no utiliza react -router-dom porque no es necesario para este componente 
 
 
 const DeleteConfirmation = ({ title, message, onConfirm, onCancel }) => {

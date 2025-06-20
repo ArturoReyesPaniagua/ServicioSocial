@@ -2,7 +2,7 @@
    SistemaIntegral/frontend/SS/src/components/Oficios/OficioForm.css
    Estilos para el formulario de creación y edición de oficios */
 
-   :root {
+   :root { /* Variables de color */
     --guinda-color: #800020;
     --guinda-dark: #600018;
     --guinda-light: #9a0026;
@@ -26,7 +26,7 @@
     z-index: 50;
   }
   
-  .oficio-form-container {
+  .oficio-form-container { /* Contenedor del formulario */
     background-color: white;
     border-radius: 0.5rem;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
@@ -37,7 +37,7 @@
   }
   
   /* Encabezado del formulario */
-  .oficio-form-header {
+  .oficio-form-header { /* Encabezado del formulario */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -46,49 +46,49 @@
     border-bottom: 1px solid var(--border-color);
   }
   
-  .oficio-form-title {
+  .oficio-form-title { /* Título del formulario */
     font-size: 1.5rem;
     font-weight: 700;
     color: #1a202c;
   }
   
-  .oficio-form-close-btn {
+  .oficio-form-close-btn { /* Botón de cierre del formulario */
     color: #4a5568;
     transition: color 0.2s;
   }
   
-  .oficio-form-close-btn:hover {
+  .oficio-form-close-btn:hover { /* Efecto hover en el botón de cierre */
     color: #1a202c;
   }
   
-  .oficio-form-close-icon {
+  .oficio-form-close-icon { /* Icono de cierre del formulario */
     width: 1.5rem;
     height: 1.5rem;
   }
   
   /* Formulario */
-  .oficio-form {
+  .oficio-form { /* Contenedor del formulario */
     padding: 0 1.5rem 1.5rem;
   }
   
-  .oficio-form-grid {
+  .oficio-form-grid { /* Contenedor del formulario en grid */
     display: grid;
     grid-template-columns: 1fr;
     gap: 1.5rem;
     margin-bottom: 1.5rem;
   }
   
-  @media (min-width: 768px) {
+  @media (min-width: 768px) { /* Estilos para pantallas más grandes */
     .oficio-form-grid {
       grid-template-columns: 1fr 1fr;
     }
   }
   
-  .oficio-form-field {
+  .oficio-form-field { /* Contenedor de cada campo del formulario */
     margin-bottom: 1.5rem;
   }
   
-  .oficio-form-label {
+  .oficio-form-label { /* Etiqueta de los campos del formulario */
     display: block;
     font-size: 0.875rem;
     font-weight: 500;
@@ -98,7 +98,7 @@
   
   .oficio-form-input,
   .oficio-form-select,
-  .oficio-form-textarea {
+  .oficio-form-textarea { /* Estilos para inputs, selects y textareas */
     width: 100%;
     padding: 0.75rem;
     border: 1px solid var(--border-color);
@@ -109,35 +109,35 @@
   
   .oficio-form-input:focus,
   .oficio-form-select:focus,
-  .oficio-form-textarea:focus {
+  .oficio-form-textarea:focus { /* Estilos al enfocar los inputs, selects y textareas */
     outline: none;
     border-color: var(--guinda-color);
     box-shadow: 0 0 0 3px var(--input-focus-color);
   }
   
-  .oficio-form-input-error {
+  .oficio-form-input-error { /* Estilos para inputs con error */
     border-color: var(--error-color);
   }
   
-  .oficio-form-error {
+  .oficio-form-error { /* Mensaje de error */
     margin-top: 0.25rem;
     font-size: 0.875rem;
     color: var(--error-color);
   }
   
-  .oficio-form-textarea {
+  .oficio-form-textarea { /* Estilos específicos para textareas */
     min-height: 6rem;
     resize: vertical;
   }
   
   /* Flex container para elementos en línea */
-  .oficio-form-flex {
+  .oficio-form-flex { /* Contenedor flex para elementos en línea */
     display: flex;
     gap: 0.5rem;
   }
   
   /* Botón para agregar nuevos elementos */
-  .oficio-form-add-btn {
+  .oficio-form-add-btn { /* Botón para agregar nuevos elementos */
     margin-top: 0.25rem;
     padding: 0.75rem;
     background-color: #e2e8f0;
@@ -148,12 +148,12 @@
     transition: background-color 0.2s;
   }
   
-  .oficio-form-add-btn:hover {
+  .oficio-form-add-btn:hover { /* Efecto hover en el botón de agregar */
     background-color: #cbd5e0;
   }
   
   /* Contenedor para formulario de agregación */
-  .oficio-form-add-container {
+  .oficio-form-add-container { /* Contenedor para formulario de agregación */
     margin-top: 0.5rem;
     padding: 0.5rem;
     border: 1px solid var(--border-color);
@@ -161,13 +161,13 @@
   }
   
   /* Checkbox para archivar */
-  .oficio-form-checkbox-container {
+  .oficio-form-checkbox-container { /* Contenedor del checkbox */
     display: flex;
     align-items: center;
     margin-bottom: 1.5rem;
   }
   
-  .oficio-form-checkbox {
+  .oficio-form-checkbox { /* Estilos del checkbox */
     height: 1rem;
     width: 1rem;
     color: var(--guinda-color);
@@ -175,7 +175,7 @@
     border-radius: 0.25rem;
   }
   
-  .oficio-form-checkbox-label {
+  .oficio-form-checkbox-label { /* Etiqueta del checkbox */
     margin-left: 0.5rem;
     font-size: 0.875rem;
     color: #4a5568;
@@ -189,7 +189,7 @@
     margin-top: 1.5rem;
   }
   
-  .oficio-form-cancel-btn {
+  .oficio-form-cancel-btn { /* Botón de cancelar */
     padding: 0.5rem 1rem;
     background-color: white;
     color: #4a5568;
@@ -201,11 +201,11 @@
     transition: background-color 0.2s;
   }
   
-  .oficio-form-cancel-btn:hover {
+  .oficio-form-cancel-btn:hover { /* Efecto hover en el botón de cancelar */
     background-color: #f9fafb;
   }
   
-  .oficio-form-submit-btn {
+  .oficio-form-submit-btn { /* Botón de enviar */
     padding: 0.5rem 1rem;
     background-color: var(--guinda-color);
     color: white;
@@ -217,16 +217,16 @@
     transition: background-color 0.2s;
   }
   
-  .oficio-form-submit-btn:hover {
+  .oficio-form-submit-btn:hover { /* Efecto hover en el botón de enviar */
     background-color: var(--guinda-dark);
   }
   
-  .oficio-form-submit-btn:disabled {
+  .oficio-form-submit-btn:disabled { /* Estilos para el botón de enviar deshabilitado */
     background-color: var(--guinda-dark);
     opacity: 0.7;
     cursor: not-allowed;
   }
   
-  .oficio-form-add-submit-btn {
+  .oficio-form-add-submit-btn { /* Botón de enviar en el formulario de agregación */
     padding: 0.5rem 0.75rem;
   }

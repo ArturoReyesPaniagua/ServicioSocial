@@ -9,7 +9,7 @@
   --main-header-height: 60px; /* Altura del header de navegación */
 }
 
-.layout-container {
+.layout-container { /* Contenedor principal del layout */
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -30,15 +30,15 @@
   z-index: 90; /* Menor que el menú pero visible */
 }
 
-.header__img {
+.header__img { /* Imagen del header institucional */
   margin-right: 20px;
 }
 
-.header__logo {
+.header__logo { /* Logo del header institucional */
   max-height: 60px;
 }
 
-.header__text {
+.header__text { /* Texto del header institucional */
   font-size: 14px;
   color: #333;
 }
@@ -59,19 +59,19 @@
   z-index: 100;
 }
 
-.header-title {
+.header-title { /* Título del header de navegación */
   flex-grow: 1;
   text-align: center;
   font-weight: bold;
 }
 
-.user-info {
+.user-info { /* Información del usuario en el header de navegación */
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.logout-btn {
+.logout-btn { /* Botón de cierre de sesión */
   background-color: var(--guinda-dark);
   color: white;
   border: none;
@@ -80,7 +80,7 @@
   cursor: pointer;
 }
 
-.menu-toggle {
+.menu-toggle { /* Botón para abrir/cerrar el menú lateral */
   background: none;
   border: none;
   color: white;
@@ -102,27 +102,27 @@
   overflow-y: auto;
 }
 
-.sidebar.closed {
+.sidebar.closed {   /* Clase para cerrar el menú lateral */
   transform: translateX(-100%);
 }
 
-.sidebar-header {
+.sidebar-header {   /* Encabezado del menú lateral */
   padding: 20px;
   text-align: center;
   border-bottom: 1px solid #6b001d;
 }
 
-.sidebar-nav ul {
+.sidebar-nav ul { /* Lista de navegación del menú lateral */
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.sidebar-nav li {
+.sidebar-nav li {   /* Elementos de la lista del menú lateral */
   padding: 0;
 }
 
-.sidebar-nav button {
+.sidebar-nav button { /* Botones del menú lateral */
   width: 100%;
   padding: 15px 20px;
   text-align: left;
@@ -134,7 +134,7 @@
   font-size: 1rem;
 }
 
-.sidebar-nav button:hover {
+.sidebar-nav button:hover {/* Efecto hover en los botones del menú lateral */
   background-color: var(--guinda-light);
 }
 
@@ -144,11 +144,11 @@
   transition: margin-left 0.3s ease;
 }
 
-.main-content.sidebar-open {
+.main-content.sidebar-open { /* Ajuste para cuando el menú lateral está abierto  PROBAR PORQUE NO FUNCIONA BIEN EN ALGUNOS TAMANOS DISTINTOS A LA PESTANA TOTALMENTE ABIERTA*/
   margin-left: 250px;
 }
 
-.main-content.sidebar-closed {
+.main-content.sidebar-closed { /* Ajuste para cuando el menú lateral está cerrado */
   margin-left: 0;
 }
 
@@ -157,23 +157,23 @@
   background-color: var(--guinda-light);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 768px) { /* Estilos para dispositivos móviles NO FUNCIONA*/
   .institutional-header {
     flex-direction: column;
     height: auto;
     padding: 5px;
   }
 
-  .header__img {
+  .header__img { /* Ajuste de la imagen del header institucional COLIBRI */
     margin-right: 0;
     margin-bottom: 5px;
   }
 
-  .header__text {
+  .header__text { /* Ajuste del texto del header institucional  UPEyCE */
     text-align: center;
   }
 
-  .main-header {
+  .main-header { /* Header de navegación en móviles */
     top: auto;
     position: sticky;
   }
@@ -184,11 +184,11 @@
     height: calc(100vh - var(--main-header-height));
   }
   
-  .main-content {
+  .main-content { /* Ajuste para el contenido principal en móviles NO FUNCIONA BIEN SE INTENTO*/
     margin-top: 20px;
   }
   
-  .main-content.sidebar-open {
+  .main-content.sidebar-open { /* Ajuste para el contenido principal cuando el menú está abierto */
     margin-left: 0;
   }
 

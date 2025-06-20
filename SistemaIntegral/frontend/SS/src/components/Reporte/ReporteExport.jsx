@@ -240,7 +240,7 @@ const ReporteExport = ({
       // Agregar hoja de trabajo al libro
       XLSX.utils.book_append_sheet(wb, ws, 'Reporte');
       
-      // Generar blob y URL para descarga
+      // Generar blob ( el archivo que maneja el sistema para los PDF) y URL para descarga
       // Usamos writeFile para generar el archivo directamente
       const excelBinary = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
       
@@ -257,13 +257,13 @@ const ReporteExport = ({
       
       // Generar nombre de archivo con fecha actual
       const today = new Date();
-      const dateStr = today.getFullYear() + 
+      const dateStr = today.getFullYear() + // Formatear fecha como YYYYMMDD_HHMMSS
                      ('0' + (today.getMonth() + 1)).slice(-2) + 
                      ('0' + today.getDate()).slice(-2) + '_' +
                      ('0' + today.getHours()).slice(-2) + 
                      ('0' + today.getMinutes()).slice(-2) + 
                      ('0' + today.getSeconds()).slice(-2);
-      const fileName = `Reporte_Oficios_${dateStr}.xlsx`;
+      const fileName = `Reporte_Oficios_${dateStr}.xlsx`; // Nombre del archivo con fecha y hora
       
       setDownloadUrl(downloadUrl);
       setFileName(fileName);

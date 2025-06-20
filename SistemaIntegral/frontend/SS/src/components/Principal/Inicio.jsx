@@ -12,6 +12,9 @@ function Inicio() {
         <div className="contenedor">
             
             <Login/>
+            {/* Renderiza el componente de inicio de sesion, porque no cuenta con algo como pagina login y no esta unida al componente de sidebar 
+            es com la pagina inicia de la aplicacion.
+            */}
 
         </div>
     )

@@ -133,7 +133,7 @@ const OficioForm = ({ oficio, estados, onSave, onCancel }) => {
             const oficiosSeleccionados = availableOficios.filter(of => 
               idsNumericos.includes(of.id_oficio)
             );
-            
+            // Actualizar el estado con los oficios relacionados seleccionados
             setSelectedRelatedOficios(oficiosSeleccionados);
           } catch (error) {
             console.error('Error al parsear oficios relacionados:', error);
@@ -143,10 +143,10 @@ const OficioForm = ({ oficio, estados, onSave, onCancel }) => {
         console.error('Error al cargar oficios:', error);
       }
     };
-    
+    // Llamar a la función para cargar oficios
     fetchOficios();
   }, [oficio]);
-
+  // Efecto para formatear datos del oficio al cargar
   useEffect(() => {
     if (oficio) {
       const formattedOficio = {
@@ -186,6 +186,7 @@ const OficioForm = ({ oficio, estados, onSave, onCancel }) => {
     }
     
     try {
+      // Obtener token de autenticación
       const token = localStorage.getItem('token');
       const config = {
         headers: {
@@ -208,7 +209,7 @@ const OficioForm = ({ oficio, estados, onSave, onCancel }) => {
         ...prev,
         id_solicitante: newSolicitante.id_solicitante
       }));
-      
+      // Limpiar el campo de nuevo solicitante
       setNuevoSolicitante('');
       setMostrarFormSolicitante(false);
     } catch (error) {
@@ -229,11 +230,11 @@ const OficioForm = ({ oficio, estados, onSave, onCancel }) => {
           Authorization: `Bearer ${token}`
         }
       };
-      
+      // Enviar solicitud para crear nuevo responsable
       const response = await axios.post('http://localhost:3001/api/responsables', {
         nombre_responsable: nuevoResponsable
       }, config);
-      
+      // Agregar el nuevo responsable a la lista
       const newResponsable = response.data;
       setResponsables(prev => [...prev, { 
         id_responsable: newResponsable.id_responsable, 
@@ -245,7 +246,7 @@ const OficioForm = ({ oficio, estados, onSave, onCancel }) => {
         ...prev,
         id_responsable: newResponsable.id_responsable
       }));
-      
+      // Limpiar el campo de nuevo responsable
       setNuevoResponsable('');
       setMostrarFormResponsable(false);
     } catch (error) {
@@ -257,7 +258,7 @@ const OficioForm = ({ oficio, estados, onSave, onCancel }) => {
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
-    
+    //  Si el término de búsqueda está vacío, limpiar resultados
     if (!term.trim()) {
       setSearchResults([]);
       return;

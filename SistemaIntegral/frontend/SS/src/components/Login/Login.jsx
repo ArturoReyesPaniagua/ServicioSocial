@@ -19,7 +19,7 @@ function Login() {
     e.preventDefault();
     setError('');
     
-    // Validación básica
+    // Validación de campos vacíos porque pues la gente es muy olvidadiza xD
     if (!username.trim() || !password.trim()) {
       setError('El usuario y contraseña son obligatorios');
       return;
@@ -27,14 +27,14 @@ function Login() {
     
     setLoading(true);
     try {
-      console.log('Intentando iniciar sesión con:', { username, password: '********' });
+      //console.log('Intentando iniciar sesión con:', { username, password: '********' });
       
       const result = await login(username, password);
-      console.log('Resultado del login:', result);
+      //console.log('Resultado del login:', result);
       
       if (result.success) {
         // Redirigir a la página principal después de iniciar sesión
-        navigate('/oficios');
+        navigate('/oficios'); //la pagina proncipal es oficios que muestra la lista de oficios pero aqui se puede cambiar a la pagina que se desee
       } else {
         setError(result.message);
       }
@@ -49,7 +49,7 @@ function Login() {
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden">
-        {/* Encabezado con color guinda */}
+        {/* Encabezado con color guinda // color morena xD*/}
         <div className="bg-guinda p-6">
           <h2 className="text-2xl font-bold text-white text-center">
             Iniciar Sesión
@@ -57,7 +57,7 @@ function Login() {
         </div>
         
         <div className="p-6">
-          {/* Mensaje de error */}
+          {/* Mensaje de error en caso de que no cargue o falle algo de los componentes deberia aparte mostrar el error que trae */}
           {error && (
             <div className="mb-6 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded" role="alert">
               <p>{error}</p>
@@ -65,7 +65,7 @@ function Login() {
           )}
           
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Campo de usuario */}
+            {/* Campo de usuario del form de Login */}
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
                 Usuario
@@ -80,7 +80,7 @@ function Login() {
               />
             </div>
             
-            {/* Campo de contraseña */}
+            {/* Campo de contraseña del form de login */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
                 Contraseña
@@ -96,7 +96,7 @@ function Login() {
               />
             </div>
             
-            {/* Botón de envío */}
+            {/* Botón de envío  bien bonito*/}
             <div>
               <button
                 type="submit"
