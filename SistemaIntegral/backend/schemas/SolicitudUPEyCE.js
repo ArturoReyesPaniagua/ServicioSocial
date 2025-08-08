@@ -7,7 +7,7 @@ const solicitudUPEyCESchema = `
       id_solicitud INT IDENTITY(1,1) PRIMARY KEY,
       
       -- Información de la solicitud
-      numero_UPEyCE_solicitado NVARCHAR(50) NOT NULL,
+      ID_UPEyCE_solicitado NVARCHAR(50) NOT NULL,
       justificacion NVARCHAR(1000) NOT NULL,
       descripcion NVARCHAR(500),
       prioridad NVARCHAR(20) DEFAULT 'normal' CHECK (prioridad IN ( 'normal', 'urgente')),

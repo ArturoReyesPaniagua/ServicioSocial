@@ -52,11 +52,11 @@ const createSolicitudUPEyCE = async (req, res) => {
     await pool.request().query(solicitudUPEyCESchema);
     await pool.request().query(notificacionesHistorialSchema);
 
-    const { numero_UPEyCE_solicitado, justificacion, descripcion, prioridad = 'normal' } = req.body;
+    const { ID_UPEyCE_solicitado, justificacion, descripcion, prioridad = 'normal' } = req.body;
     const userId = req.user.userId;
 
     // Validaciones
-    if (!numero_UPEyCE_solicitado) {
+    if (!ID_UPEyCE_solicitado) {
       return res.status(400).json({ error: 'El número de UPEyCE solicitado es requerido' });
     }
 
@@ -77,11 +77,11 @@ const createSolicitudUPEyCE = async (req, res) => {
 
     // Verificar que no exista una solicitud pendiente con el mismo número
     const existingResult = await pool.request()
-      .input('numero_UPEyCE', sql.NVarChar, numero_UPEyCE_solicitado)
+      .input('ID_numero_UPEyCE', sql.NVarChar, ID_UPEyCE_solicitado)
       .input('id_area', sql.Int, id_area)
       .query(`
         SELECT id_solicitud FROM SolicitudUPEyCE 
-        WHERE numero_UPEyCE_solicitado = @numero_UPEyCE 
+        WHERE ID_UPEyCE_solicitado = @ID_numero_UPEyCE 
         AND id_area = @id_area 
         AND estado IN ('pendiente', 'aprobado')
       `);
@@ -94,7 +94,7 @@ const createSolicitudUPEyCE = async (req, res) => {
 
     // Crear la solicitud
     const result = await pool.request()
-      .input('numero_UPEyCE_solicitado', sql.NVarChar, numero_UPEyCE_solicitado)
+      .input('ID_UPEyCE_solicitado', sql.NVarChar, ID_UPEyCE_solicitado)
       .input('id_area', sql.Int, id_area)
       .input('id_usuario_solicita', sql.Int, userId)
       .input('justificacion', sql.NVarChar, justificacion)
@@ -102,8 +102,8 @@ const createSolicitudUPEyCE = async (req, res) => {
       .input('prioridad', sql.NVarChar, prioridad)
       .query(`
         INSERT INTO SolicitudUPEyCE 
-        (numero_UPEyCE_solicitado, id_area, id_usuario_solicita, justificacion, descripcion, prioridad)
-        VALUES (@numero_UPEyCE_solicitado, @id_area, @id_usuario_solicita, @justificacion, @descripcion, @prioridad);
+        (ID_UPEyCE_solicitado, id_area, id_usuario_solicita, justificacion, descripcion, prioridad)
+        VALUES (@ID_UPEyCE_solicitado, @id_area, @id_usuario_solicita, @justificacion, @descripcion, @prioridad);
         SELECT SCOPE_IDENTITY() AS id_solicitud;
       `);
 
@@ -122,7 +122,7 @@ const createSolicitudUPEyCE = async (req, res) => {
         admin.userId,
         'solicitud_creada',
         'Nueva solicitud de UPEyCE',
-        `${username} ha solicitado el UPEyCE: ${numero_UPEyCE_solicitado}`,
+        `${username} ha solicitado el UPEyCE: ${ID_UPEyCE_solicitado}`,
         solicitudId
       );
     }
@@ -317,7 +317,7 @@ const aprobarSolicitud = async (req, res) => {
     await pool.request().query(UPEyCESchema);
 
     const UPEyCEResult = await pool.request()
-      .input('numero_UPEyCE', sql.NVarChar, solicitud.numero_UPEyCE_solicitado)
+      .input('ID_UPEyCE_solicitado', sql.NVarChar, solicitud.ID_UPEyCE_solicitado)
       .input('id_area', sql.Int, solicitud.id_area)
       .input('id_usuario', sql.Int, solicitud.id_usuario_solicita)
       .input('descripcion', sql.NVarChar, solicitud.descripcion)
@@ -354,7 +354,7 @@ const aprobarSolicitud = async (req, res) => {
       solicitud.id_usuario_solicita,
       'solicitud_aprobada',
       'Solicitud de UPEyCE Aprobada',
-      `Su solicitud para el UPEyCE ${solicitud.numero_UPEyCE_solicitado} ha sido aprobada por ${adminUsername}`,
+      `Su solicitud para el UPEyCE ${solicitud.ID_UPEyCE_solicitado} ha sido aprobada por ${adminUsername}`,
       id
     );
 
@@ -430,7 +430,7 @@ const rechazarSolicitud = async (req, res) => {
       solicitud.id_usuario_solicita,
       'solicitud_rechazada',
       'Solicitud de UPEyCE Rechazada',
-      `Su solicitud para el UPEyCE ${solicitud.numero_UPEyCE_solicitado} ha sido rechazada por ${adminUsername}`,
+      `Su solicitud para el UPEyCE ${solicitud.ID_UPEyCE_solicitado} ha sido rechazada por ${adminUsername}`,
       id
     );
 
@@ -550,7 +550,7 @@ const getNotificaciones = async (req, res) => {
     let query = `
       SELECT 
         n.*,
-        s.numero_UPEyCE_solicitado
+        s.ID_UPEyCE_solicitado
       FROM Notificaciones n
       LEFT JOIN SolicitudUPEyCE s ON n.id_solicitud = s.id_solicitud
       WHERE n.id_usuario = @userId
@@ -683,27 +683,33 @@ const getNextUPEyCENumber = async (req, res) => {
     // Obtener el área del usuario si no se especifica
     const userArea = id_area || req.user.id_area;
     
-    // Buscar el último número UPEyCE usado en esa área
+    // Buscar el último número UPEyCE usado 
     const result = await pool.request()
       .input('id_area', sql.Int, userArea)
       .query(`
-        SELECT TOP 1 numero_UPEyCE_solicitado
+        SELECT TOP 1 ID_UPEyCE_solicitado
         FROM SolicitudUPEyCE
-        WHERE id_area = @id_area
-        AND numero_UPEyCE_solicitado LIKE '000%'
         ORDER BY 
-          CAST(SUBSTRING(numero_UPEyCE_solicitado, 4, LEN(numero_UPEyCE_solicitado)) AS INT) DESC
+          CAST(SUBSTRING(ID_UPEyCE_solicitado, 4, LEN(ID_UPEyCE_solicitado)) AS INT) DESC
       `);
     
     let nextNumber = 1;
     
     if (result.recordset.length > 0) {
-      const lastNumber = result.recordset[0].numero_UPEyCE_solicitado;
-      // Extraer el número después de "000"
-      const numericPart = parseInt(lastNumber.substring(3));
+      const lastNumber = result.recordset[0].ID_UPEyCE_solicitado;
+      //Extraer el número después de "000"
+      const numericPart = parseInt(lastNumber.replace(/^0+/, "")) || 0;
       nextNumber = numericPart + 1;
     }
-    
+
+ 
+
+ 
+    //const numericPart = parseInt(lastNumber.replace(/^0+/, "")) || 0;
+    //const nextNumber = numericPart + 1;
+
+
+
     // También verificar en la tabla UPEyCE
     const UPEyCEResult = await pool.request()
       .input('id_area', sql.Int, userArea)
