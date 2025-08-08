@@ -308,7 +308,7 @@ const SolicitarUPEyCEPage = () => {
                   <div className="flex justify-between items-start mb-4">
                     <div>
                       <h3 className="text-lg font-medium text-gray-900">
-                        UPEyCE: {solicitud.numero_UPEyCE_solicitado}
+                        UPEyCE: {solicitud.ID_numero_UPEyCE_solicitado}
                       </h3>
                       <p className="text-sm text-gray-500">
                         Solicitado: {formatDate(solicitud.fecha_solicitud)}
@@ -411,9 +411,9 @@ const SolicitarUPEyCEPage = () => {
                       }`}>
                         {notificacion.mensaje}
                       </p>
-                      {notificacion.numero_UPEyCE_solicitado && (
+                      {notificacion.ID_numero_UPEyCE_solicitado && (
                         <p className="text-xs text-gray-500 mt-1">
-                          UPEyCE: {notificacion.numero_UPEyCE_solicitado}
+                          UPEyCE: {notificacion.ID_numero_UPEyCE_solicitado}
                         </p>
                       )}
                     </div>

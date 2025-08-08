@@ -1,6 +1,6 @@
 // src/components/SolicitarUPEyCE/SolicitarUPEyCEForm.jsx
 
-// Este componente permite a los usuarios solicitar un nuevo UPEyCE (Unidad de Proceso Electrónico y Control de Expedientes)
+// Este componente permite a los usuarios solicitar un nuevo UPEyCE 
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
@@ -9,19 +9,19 @@ import { toast } from 'react-toastify';
 
 const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
   const [formData, setFormData] = useState({
-    numero_UPEyCE_solicitado: '',
+    ID_number_UPEyCE_solicitado: '',
     justificacion: '',
     descripcion: '',
     prioridad: 'normal'
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoadingPlaceholder, setIsLoadingPlaceholder] = useState(true);
+  //const [isLoadingPlaceholder, setIsLoadingPlaceholder] = useState(true);
   const [suggestedNumber, setSuggestedNumber] = useState('');
   const [isValidatingNumber, setIsValidatingNumber] = useState(false);
   const { user } = useAuth();
 
-  // Obtener el siguiente número sugerido como placeholder
+  // Obtener el siguiente número sugerido 
   useEffect(() => {
     fetchSuggestedNumber();
   }, []);
@@ -50,43 +50,7 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
     }
   };
 
-  // Función para validar el número UPEyCE en tiempo real
-  const validateUPEyCENumber = async (numero) => {
-    if (!numero || numero.trim().length === 0) return;
-
-    try {
-      setIsValidatingNumber(true);
-      const token = localStorage.getItem('token');
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      };
-
-      const response = await axios.post(
-        'http://localhost:3001/api/verificar-numero-UPEyCE',
-        { numero_UPEyCE: numero },
-        config
-      );
-
-      if (!response.data.disponible) {
-        setErrors(prev => ({
-          ...prev,
-          numero_UPEyCE_solicitado: response.data.mensaje
-        }));
-      } else {
-        setErrors(prev => {
-          const newErrors = { ...prev };
-          delete newErrors.numero_UPEyCE_solicitado;
-          return newErrors;
-        });
-      }
-    } catch (error) {
-      console.error('Error validando número UPEyCE:', error);
-    } finally {
-      setIsValidatingNumber(false);
-    }
-  };
+ 
 
   // Manejar cambios en el formulario
   const handleChange = (e) => {
@@ -101,17 +65,14 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
 
-    // Validar número UPEyCE cuando cambie (con debounce)
-    if (name === 'numero_UPEyCE_solicitado') {
-      setTimeout(() => validateUPEyCENumber(value), 500);
-    }
+
   };
 
   // Función para usar el número sugerido
   const useSuggestedNumber = () => {
     setFormData(prev => ({
       ...prev,
-      numero_UPEyCE_solicitado: suggestedNumber
+      ID_number_UPEyCE_solicitado: suggestedNumber
     }));
     validateUPEyCENumber(suggestedNumber);
   };
@@ -120,8 +81,8 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
   const validateForm = () => {
     const newErrors = {};
     
-    if (!formData.numero_UPEyCE_solicitado) {
-      newErrors.numero_UPEyCE_solicitado = 'El número UPEyCE es obligatorio';
+    if (!formData.ID_number_UPEyCE_solicitado) {
+      newErrors.ID_number_UPEyCE_solicitado = 'El número UPEyCE es obligatorio';
     }
 
     if (!formData.justificacion) {
@@ -169,7 +130,7 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
       
       // Limpiar formulario y obtener nuevo número sugerido
       setFormData({
-        numero_UPEyCE_solicitado: '',
+        ID_number_UPEyCE_solicitado: '',
         justificacion: '',
         descripcion: '',
         prioridad: 'normal'
@@ -223,50 +184,7 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Número UPEyCE - Ahora editable */}
-        <div>
-          <label htmlFor="numero_UPEyCE_solicitado" className="block text-sm font-medium text-gray-700 mb-1">
-            Número UPEyCE Solicitado *
-          </label>
-          <div className="relative">
-            <input
-              type="text"
-              id="numero_UPEyCE_solicitado"
-              name="numero_UPEyCE_solicitado"
-              value={formData.numero_UPEyCE_solicitado}
-              onChange={handleChange}
-              placeholder={isLoadingPlaceholder ? 'Cargando...' : `Número sugerido: ${suggestedNumber}`}
-              className={`w-full p-3 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-guinda focus:border-guinda ${
-                errors.numero_UPEyCE_solicitado ? 'border-red-500' : 'border-gray-300'
-              }`}
-              disabled={isSubmitting}
-            />
-            {isValidatingNumber && (
-              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-blue-500"></div>
-              </div>
-            )}
-          </div>
-          
-          {/* Botón para usar número sugerido */}
-          {suggestedNumber && !formData.numero_UPEyCE_solicitado && (
-            <button
-              type="button"
-              onClick={useSuggestedNumber}
-              className="mt-2 text-sm text-blue-600 hover:text-blue-800 underline"
-            >
-              Usar número sugerido: {suggestedNumber}
-            </button>
-          )}
-          
-          {errors.numero_UPEyCE_solicitado && (
-            <p className="mt-1 text-sm text-red-600">{errors.numero_UPEyCE_solicitado}</p>
-          )}
-          
-          <p className="mt-1 text-xs text-gray-500">
-            Ingrese el número UPEyCE que desea solicitar. El sistema verificará su disponibilidad.
-          </p>
-        </div>
+       
 
         {/* Prioridad */}
         <div>
@@ -280,9 +198,9 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
             onChange={handleChange}
             className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-guinda focus:border-guinda"
           >
-            <option value="baja">Baja - Sin urgencia</option>
+            
             <option value="normal">Normal - Prioridad estándar</option>
-            <option value="alta">Alta - Importante</option>
+            
             <option value="urgente">Urgente - Requiere atención inmediata</option>
           </select>
           <p className="mt-1 text-xs text-gray-500">
@@ -311,7 +229,7 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
           )}
           <div className="mt-1 flex justify-between items-center">
             <p className="text-xs text-gray-500">
-              Mínimo 10 caracteres. Sea específico sobre el propósito y la necesidad.
+              Sea específico sobre el propósito y la necesidad.
             </p>
             <span className={`text-xs ${
               formData.justificacion.length > 1000 ? 'text-red-500' : 'text-gray-400'
@@ -367,10 +285,9 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
               <div className="mt-2 text-sm text-yellow-700">
                 <p>Su solicitud será evaluada por un administrador. Recibirá una notificación con la decisión.</p>
                 <ul className="mt-2 list-disc list-inside">
-                  <li>El número UPEyCE quedará reservado si está disponible</li>
-                  <li>Puede consultar el estado en cualquier momento</li>
-                  <li>Si es aprobada, el folio será creado automáticamente</li>
-                  <li>Si el número no está disponible, deberá seleccionar otro</li>
+                  <li>Puede consultar el estado en cualquier momento.</li>
+                  <li>Si es aprobada, el folio será creado. </li>
+                  
                 </ul>
               </div>
             </div>
@@ -391,7 +308,7 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
           )}
           <button
             type="submit"
-            disabled={isSubmitting || isValidatingNumber || !!errors.numero_UPEyCE_solicitado}
+            disabled={isSubmitting || isValidatingNumber || !!errors.ID_number_UPEyCE_solicitado}
             className="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-guinda hover:bg-guinda-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-guinda disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {isSubmitting ? (

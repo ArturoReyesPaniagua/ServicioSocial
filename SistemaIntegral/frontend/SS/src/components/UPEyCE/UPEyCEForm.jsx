@@ -10,9 +10,9 @@ import axios from 'axios';
 
 const UPEyCEForm = ({ UPEyCE, onSave, onCancel }) => {
   const [formData, setFormData] = useState({
-    numero_UPEyCE: '',
-    id_area: '',
-    descripcion: ''  // Campo adicional para describir el propósito del UPEyCE
+    ID_numero_UPEyCE: '',  // ID de la solicitud asociada al UPEyCE
+    id_area: '',  // ID del área asociada al UPEyCE
+    descripcion: ''  // Campo  para describir el propósito del UPEyCE
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -36,7 +36,8 @@ const UPEyCEForm = ({ UPEyCE, onSave, onCancel }) => {
   useEffect(() => {
     if (UPEyCE) {
       setFormData({
-        numero_UPEyCE: UPEyCE.numero_UPEyCE,
+        //id_solicitud: UPEyCE.id_solicitud || '',
+        ID_numero_UPEyCE: UPEyCE.ID_numero_UPEyCE,
         id_area: UPEyCE.id_area.toString(),
         descripcion: UPEyCE.descripcion || ''
       });
@@ -69,18 +70,22 @@ const UPEyCEForm = ({ UPEyCE, onSave, onCancel }) => {
   const validateForm = () => {
     const newErrors = {};
     
-    if (!formData.numero_UPEyCE) {
-      newErrors.numero_UPEyCE = 'El número UPEyCE es obligatorio';
+    if (!formData.ID_numero_UPEyCE) {
+      newErrors.ID_numero_UPEyCE = 'El id UPEyCE es obligatorio';
     }
     
     if (!formData.id_area) {
       newErrors.id_area = 'El área es obligatoria';
     }
-    
+
+    if (!formData.descripcion) {
+      newErrors.descripcion = 'La descripción es obligatoria';
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+      
   // Manejar envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -140,14 +145,14 @@ const UPEyCEForm = ({ UPEyCE, onSave, onCancel }) => {
             {/* Número UPEyCE */}
             <div>
               <label htmlFor="numero_UPEyCE" className="block text-sm font-medium text-gray-700 mb-1">
-                Número UPEyCE *
+                ID de la solicitud del UPEyCE *
               </label>
               <input
                 type="text"
                 id="numero_UPEyCE"
                 name="numero_UPEyCE"
-                value={formData.numero_UPEyCE}
-                onChange={handleChange}
+                value={formData.ID_numero_UPEyCE}
+                onChange={handleChange} 
                 placeholder="Ej: UPEyCE-2023-001"
                 className={`w-full p-2 border ${
                   errors.numero_UPEyCE ? 'border-red-500' : 'border-gray-300'

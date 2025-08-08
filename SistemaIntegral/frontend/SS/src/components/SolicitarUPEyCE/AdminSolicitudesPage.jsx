@@ -232,7 +232,7 @@ const AdminSolicitudesPage = () => {
                   <div className="flex justify-between items-start mb-4">
                     <div>
                       <h3 className="text-lg font-medium text-gray-900">
-                        UPEyCE: {solicitud.numero_UPEyCE_solicitado}
+                        UPEyCE: {solicitud.ID_number_UPEyCE_solicitado}
                       </h3>
                       <div className="flex items-center space-x-4 text-sm text-gray-500 mt-1">
                         <span>Por: {solicitud.usuario_solicitante}</span>
@@ -325,7 +325,7 @@ const AdminSolicitudesPage = () => {
                   {solicitudes.map((solicitud) => (
                     <tr key={solicitud.id_solicitud} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {solicitud.numero_UPEyCE_solicitado}
+                        {solicitud.ID_number_UPEyCE_solicitado}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {solicitud.usuario_solicitante}
@@ -430,7 +430,7 @@ const AdminSolicitudesPage = () => {
               
               <div className="mb-4">
                 <p className="text-sm text-gray-600">
-                  UPEyCE: <strong>{selectedSolicitud?.numero_UPEyCE_solicitado}</strong>
+                  UPEyCE: <strong>{selectedSolicitud?.ID_number_UPEyCE_solicitado}</strong>
                 </p>
                 <p className="text-sm text-gray-600">
                   Solicitante: <strong>{selectedSolicitud?.usuario_solicitante}</strong>
