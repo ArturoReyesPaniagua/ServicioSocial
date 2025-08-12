@@ -103,8 +103,11 @@ const ReportePage = () => {
           Authorization: `Bearer ${token}`
         }
       };
-      
-      const response = await axios.get('http://localhost:3001/api/oficios', config);
+      const API_URL = import.meta.env.VITE_API_URL;
+      const response = await axios.get(`${API_URL}/oficios`, config);
+
+
+      //const response = await axios.get('http://localhost:3001/api/oficios', config);
       
       // El backend ya filtra por área para usuarios normales
       setOficios(response.data);
@@ -137,22 +140,30 @@ const ReportePage = () => {
       };
       
       // Cargar solicitantes
-      const solicitantesResponse = await axios.get('http://localhost:3001/api/solicitantes', config);
+      const API_URL = import.meta.env.VITE_API_URL;
+
+      const solicitantesResponse = await axios.get(`${API_URL}/solicitantes`, config);
+      //const solicitantesResponse = await axios.get('http://localhost:3001/api/solicitantes', config);
       setSolicitantes(solicitantesResponse.data);
       
       // Cargar responsables
-      const responsablesResponse = await axios.get('http://localhost:3001/api/responsables', config);
+      const responsablesResponse = await axios.get(`${API_URL}/responsables`, config);
+      //const responsablesResponse = await axios.get('http://localhost:3001/api/responsables', config);
       setResponsables(responsablesResponse.data);
       
       // Cargar áreas (solo para administradores)
       if (user.role === 'admin') {
-        const areasResponse = await axios.get('http://localhost:3001/api/areas', config);
+        const API_URL = import.meta.env.VITE_API_URL;
+        const areasResponse = await axios.get(`${API_URL}/areas`, config);
+        //const areasResponse = await axios.get('http://localhost:3001/api/areas', config);
         setAreas(areasResponse.data);
       } else if (user.id_area) {
         // Para usuarios normales, si no tenemos el nombre del área, obtenerlo
         if (!areaName && user.id_area) {
           try {
-            const areaResponse = await axios.get(`http://localhost:3001/api/areas/${user.id_area}`, config);
+            const API_URL = import.meta.env.VITE_API_URL;
+            const areaResponse = await axios.get(`${API_URL}/areas/${user.id_area}`, config);
+            //const areaResponse = await axios.get(`http://localhost:3001/api/areas/${user.id_area}`, config);
             if (areaResponse.data && areaResponse.data.nombre_area) {
               setAreaName(areaResponse.data.nombre_area);
             }

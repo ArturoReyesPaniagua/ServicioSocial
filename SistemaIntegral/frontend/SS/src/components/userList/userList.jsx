@@ -27,7 +27,10 @@ const UserList = ({
   useEffect(() => {
     const fetchAreas = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/api/areas');
+        const API_URL = import.meta.env.VITE_API_URL;
+        const response = await axios.get(`${API_URL}/areas`); // Cambiar la URL si se cambia el backend
+
+        //const response = await axios.get('http://localhost:3001/api/areas');
         console.log('Áreas recibidas:', response.data); // Para debug
         if (response.data && response.data.length > 0) {
           setAreas(response.data);

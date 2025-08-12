@@ -36,7 +36,9 @@ const OficiosTable = ({
       if (!data || !data.length) return;
       
       try {
-        const response = await axios.get('http://localhost:3001/api/pdfs');
+        const API_URL = import.meta.env.VITE_API_URL;
+        const response = await axios.get(`${API_URL}/pdfs`);
+        //const response = await axios.get('http://localhost:3001/api/pdfs');
         if (response && response.data) {
           // Crear un objeto con id_oficio como clave y el conteo de archivos como valor
           const filesCount = {};
@@ -68,8 +70,10 @@ const OficiosTable = ({
             Authorization: `Bearer ${token}`
           }
         };
-        
-        const response = await axios.get('http://localhost:3001/api/UPEyCE', config);
+        const API_URL = import.meta.env.VITE_API_URL;
+
+        const response = await axios.get(`${API_URL}/UPEyCE`, config);
+        //const response = await axios.get('http://localhost:3001/api/UPEyCE', config);
         setUPEyCEs(response.data);
       } catch (error) {
         console.error('Error al cargar UPEyCEs:', error);
@@ -84,7 +88,9 @@ const OficiosTable = ({
     const fetchArea = async () => {
       if (!data || !data.length) return;
       try {
-        const response = await axios.get('http://localhost:3001/api/areas');
+        const API_URL = import.meta.env.VITE_API_URL;
+        const responsse = await axios.get(`${API_URL}/areas`);
+        //const response = await axios.get('http://localhost:3001/api/areas');
         if (response && response.data) {
           const areas = response.data.reduce((acc, area) => {
             acc[area.id_area] = area.nombre_area;

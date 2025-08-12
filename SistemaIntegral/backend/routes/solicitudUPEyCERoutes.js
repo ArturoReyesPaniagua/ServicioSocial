@@ -12,10 +12,26 @@ const {
   rechazarSolicitud,
   cancelarSolicitud,
   getSolicitudesPendientes,
-  getNextUPEyCENumber,
+  getNextUPEyCENumberEndpoint,
   getNotificaciones,
   marcarNotificacionLeida,
   getEstadisticas
+
+
+
+
+
+ // createSolicitudUPEyCE,
+ // getAllSolicitudes,
+ // getSolicitudById,
+ //  aprobarSolicitud,
+ //  rechazarSolicitud,
+ //  cancelarSolicitud,
+ //  getSolicitudesPendientes,
+ //  getNextUPEyCENumber,
+ //  getNotificaciones,
+ //  marcarNotificacionLeida,
+ //  getEstadisticas
 } = require('../controllers/solicitudUPEyCEControllers');
 const { authenticateToken, isAdmin } = require('../middleware/authMiddleware');
 
@@ -41,13 +57,13 @@ router.put('/solicitudes-UPEyCE/:id/cancelar', authenticateToken, cancelarSolici
 // Obtener solicitudes pendientes (solo administradores)
 router.get('/solicitudes-UPEyCE-pendientes', authenticateToken, isAdmin, getSolicitudesPendientes);
 
-// Rutas para notificaciones
+// Rutas para sd
 // Obtener notificaciones del usuario
 router.get('/notificaciones', authenticateToken, getNotificaciones);
 
 // Marcar notificación como leída
 router.put('/notificaciones/:id/leida', authenticateToken, marcarNotificacionLeida);
-router.get('/siguiente-numero-UPEyCE/:id_area?', authenticateToken, getNextUPEyCENumber);
+router.get('/siguiente-numero-UPEyCE/:id_area?', authenticateToken, getNextUPEyCENumberEndpoint);
 
 // Obtener estadísticas (solo administradores)
 router.get('/estadisticas-solicitudes', authenticateToken, isAdmin, getEstadisticas);

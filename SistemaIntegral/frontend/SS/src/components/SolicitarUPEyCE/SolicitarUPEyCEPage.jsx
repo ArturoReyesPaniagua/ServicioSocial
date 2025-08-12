@@ -42,8 +42,10 @@ const SolicitarUPEyCEPage = () => {
           Authorization: `Bearer ${token}`
         }
       };
-      
-      const response = await axios.get('http://localhost:3001/api/solicitudes-UPEyCE', config);
+      const API_URL = import.meta.env.VITE_API_URL;
+      const response = await axios.get(`${API_URL}/solicitudes-UPEyCE`, config);
+
+      //const response = await axios.get('http://localhost:3001/api/solicitudes-UPEyCE', config);
       setSolicitudes(response.data);
     } catch (error) {
       console.error('Error al cargar solicitudes:', error);
@@ -66,8 +68,10 @@ const SolicitarUPEyCEPage = () => {
           Authorization: `Bearer ${token}`
         }
       };
+      const API_URL = import.meta.env.VITE_API_URL;
+      const response = await axios.get(`${API_URL}/notificaciones`, config);
       
-      const response = await axios.get('http://localhost:3001/api/notificaciones', config);
+      //const response = await axios.get('http://localhost:3001/api/notificaciones', config);
       setNotificaciones(response.data);
     } catch (error) {
       console.error('Error al cargar notificaciones:', error);
@@ -86,8 +90,9 @@ const SolicitarUPEyCEPage = () => {
           Authorization: `Bearer ${token}`
         }
       };
-      
-      await axios.put(`http://localhost:3001/api/notificaciones/${idNotificacion}/leida`, {}, config);
+      const API_URL = import.meta.env.VITE_API_URL;
+      await axios.put(`${API_URL}/notificaciones/${idNotificacion}/leida`, {}, config);
+      //await axios.put(`http://localhost:3001/api/notificaciones/${idNotificacion}/leida`, {}, config);
       
       // Actualizar la lista local
       setNotificaciones(prev => 

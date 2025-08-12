@@ -31,11 +31,15 @@ const UPEyCEView = ({ UPEyCE, onClose, onEdit, onGenerateOficio }) => {
             Authorization: `Bearer ${token}`
           }
         };
+        const API_URL = import.meta.env.VITE_API_URL;
+
+        const response = await axios.get(`${API_URL}/oficios/UPEyCE/${UPEyCE.id_UPEyCE}`, config);
         
-        const response = await axios.get(
-          `http://localhost:3001/api/oficios/UPEyCE/${UPEyCE.id_UPEyCE}`, 
-          config
-        );
+
+        //const response = await axios.get(
+        //  `http://localhost:3001/api/oficios/UPEyCE/${UPEyCE.id_UPEyCE}`, 
+        //  config
+        //);
         
         setOficiosRelacionados(response.data);
       } catch (error) {

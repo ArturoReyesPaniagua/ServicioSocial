@@ -45,7 +45,11 @@ const UPEyCETable = ({
         };
         
         // Obtenemos todos los oficios
-        const response = await axios.get('http://localhost:3001/api/oficios', config);
+        const API_URL = import.meta.env.VITE_API_URL;
+        const response = await axios.get(`${API_URL}/oficios`, config);
+
+
+        //const response = await axios.get('http://localhost:3001/api/oficios', config);
         
         // Contamos los oficios por UPEyCE
         const counts = {};

@@ -25,7 +25,10 @@ const PDFManager = ({ oficioId }) => {
   const fetchPDFs = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get(`http://localhost:3001/api/pdfs/oficio/${oficioId}`);
+      //
+      const API_URL = import.meta.env.VITE_API_URL;
+      const response = await axios.get(`${API_URL}/pdfs/oficio/${oficioId}`);
+     // const response = await axios.get(`http://localhost:3001/api/pdfs/oficio/${oficioId}`);
       setFiles(response.data);
     } catch (error) {
       console.error('Error al obtener PDFs:', error);
@@ -58,7 +61,9 @@ const PDFManager = ({ oficioId }) => {
 
     try {
       // Subir el archivo al servidor
-      const response = await axios.post('http://localhost:3001/api/pdfs/upload', formData, {
+      const API_URL = import.meta.env.VITE_API_URL;
+      const response = await axios.post(`${API_URL}/pdfs/upload`, formData, {
+      //const response = await axios.post('http://localhost:3001/api/pdfs/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -89,7 +94,11 @@ const PDFManager = ({ oficioId }) => {
     }
 
     try {
-      await axios.delete(`http://localhost:3001/api/pdfs/${idPDF}`);
+      const API_URL = import.meta.env.VITE_API_URL;
+      await axios.delete(`${API_URL}/pdfs/${idPDF}`);
+      
+      
+      //await axios.delete(`http://localhost:3001/api/pdfs/${idPDF}`);
       setMessage('Archivo eliminado exitosamente');
       // Actualizar la lista de archivos
       fetchPDFs();

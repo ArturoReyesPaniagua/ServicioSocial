@@ -113,12 +113,15 @@ const UPEyCEPage = () => {
           Authorization: `Bearer ${token}`
         }
       };
-      
-      const response = await axios.put(
-        `http://localhost:3001/api/UPEyCE/${data.id_UPEyCE}`, 
-        data, 
-        config
-      );
+      const API_URL = import.meta.env.VITE_API_URL;
+      const response = await axios.put(`${API_URL}/UPEyCE/${data.id_UPEyCE}`, data, config);
+
+
+      //const response = await axios.put(
+       // `http://localhost:3001/api/UPEyCE/${data.id_UPEyCE}`, 
+      //  data, 
+      //  config
+      //);
       
       toast.success('Control UPEyCE actualizado exitosamente');
       setFormVisible(false);
@@ -156,8 +159,12 @@ const UPEyCEPage = () => {
           Authorization: `Bearer ${token}`
         }
       };
+      const API_URL = import.meta.env.VITE_API_URL;
       
-      await axios.delete(`http://localhost:3001/api/UPEyCE/${currentUPEyCE.id_UPEyCE}`, config);
+      await axios.delete(`${API_URL}/UPEyCE/${currentUPEyCE.id_UPEyCE}`, config);
+
+
+     // await axios.delete(`http://localhost:3001/api/UPEyCE/${currentUPEyCE.id_UPEyCE}`, config);
       
       toast.success('Control UPEyCE eliminado exitosamente');
       setDeleteVisible(false);

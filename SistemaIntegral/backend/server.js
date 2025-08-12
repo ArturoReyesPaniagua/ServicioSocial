@@ -3,7 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const { connectDB } = require('./db/db');
-
+const path = require('path');
 // Importar todas las rutas
 const oficioRoutes = require('./routes/oficioRoutes');
 const pdfRoutes = require('./routes/pdfRoutes');
@@ -18,6 +18,14 @@ const solicitudUPEyCERoutes = require('./routes/solicitudUPEyCERoutes');
 require('dotenv').config();
 
 const app = express();
+// Servir archivos estáticos del frontend
+app.use(express.static(path.join(__dirname, 'dist')));
+
+// Ruta para servir el index.html en cualquier ruta (SPA)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
+
 const PORT = process.env.PORT || 3001;
 
 // ========================================

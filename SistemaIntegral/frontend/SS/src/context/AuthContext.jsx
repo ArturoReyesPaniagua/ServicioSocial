@@ -60,10 +60,16 @@ export function AuthProvider({ children }) {
   const login = async (username, password) => {
     try {
       // Ajusta la URL según la estructura actual de tu API
-      const response = await axios.post(`${API_BASE_URL}/auth/login`, {
+      const API_URL = import.meta.env.VITE_API_URL;
+      const response = await axios.post(`${API_URL}/auth/login`, {
         username,
         password
       });
+
+      //const response = await axios.post(`${API_BASE_URL}/auth/login`, {
+       // username,
+      //  password
+      //});
 
       console.log('Respuesta del servidor:', response.data);
 

@@ -28,7 +28,9 @@ const UserPage = () => {
   // Función para cargar la lista de áreas
   const fetchAreas = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/api/areas');
+      const API_URL = import.meta.env.VITE_API_URL;
+      const response = await axios.get(`${API_URL}/areas`); // Cambiar la URL si se cambia el backend
+      //const response = await axios.get('http://localhost:3001/api/areas');
       console.log('Áreas cargadas:', response.data);
       setAreas(response.data);
     } catch (error) {
@@ -48,8 +50,9 @@ const UserPage = () => {
           Authorization: `Bearer ${token}`
         }
       };
-      
-      const response = await axios.get('http://localhost:3001/api/auth/users', config);
+      const API_URL = import.meta.env.VITE_API_URL;
+      const response = await axios.get(`${API_URL}/auth/users`, config); // Cambiar la URL si se cambia el backend
+      //const response = await axios.get('http://localhost:3001/api/auth/users', config);
       
       console.log('Usuarios cargados:', response.data);
       setUsers(response.data);
@@ -84,8 +87,10 @@ const UserPage = () => {
       };
       
       console.log('Creando usuario:', { ...userData, password: '[REDACTED]' });
-      
-      const response = await axios.post('http://localhost:3001/api/auth/register', userData, config);
+      const API_URL = import.meta.env.VITE_API_URL;
+      const response = await axios.post(`${API_URL}/auth/register`, userData, config);
+
+      //const response = await axios.post('http://localhost:3001/api/auth/register', userData, config);
       
       console.log('Respuesta del servidor:', response.data);
       
@@ -132,12 +137,15 @@ const UserPage = () => {
         ...updateData, 
         password: updateData.password ? '[REDACTED]' : undefined 
       });
-      
-      const response = await axios.put(
-        `http://localhost:3001/api/auth/users/${userData.userId}`, 
-        updateData, 
-        config
-      );
+      const API_URL = import.meta.env.VITE_API_URL;
+
+      const response = await axios.put(`${API_URL}/auth/users/${userData.userId}`, updateData, config);
+
+      //const response = await axios.put(
+        //`http://localhost:3001/api/auth/users/${userData.userId}`, 
+        //updateData, 
+        //config
+      //);
       
       console.log('Respuesta del servidor:', response.data);
       
@@ -196,8 +204,9 @@ const UserPage = () => {
       };
       
       console.log('Eliminando usuario:', currentUser.username);
-      
-      await axios.delete(`http://localhost:3001/api/auth/users/${currentUser.userId}`, config);
+      const API_URL = import.meta.env.VITE_API_URL;
+      await axios.delete(`${API_URL}/auth/users/${currentUser.userId}`, config);
+      //await axios.delete(`http://localhost:3001/api/auth/users/${currentUser.userId}`, config);
       
       toast.success('Usuario eliminado exitosamente');
       setDeleteVisible(false);

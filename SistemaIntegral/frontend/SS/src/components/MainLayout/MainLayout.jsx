@@ -30,11 +30,17 @@ const MainLayout = ({ children }) => {
           const token = localStorage.getItem('token');
           if (!token) return;
           
-          const response = await axios.get(`http://localhost:3001/api/areas/${user.id_area}`, {
-            headers: {
-              Authorization: `Bearer ${token}`
+          const API_URL = import.meta.env.VITE_API_URL;
+
+          const response = await axios.get(
+            `${API_URL}/areas/${user.id_area}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
             }
-          });
+          );
+
           
           if (response.data && response.data.nombre_area) {
             setAreaName(response.data.nombre_area);
@@ -60,8 +66,13 @@ const MainLayout = ({ children }) => {
             Authorization: `Bearer ${token}`
           }
         };
-        
-        const response = await axios.get('http://localhost:3001/api/notificaciones?solo_no_leidas=true', config);
+          // Usamos la variable del .env
+        const API_URL = process.env.REACT_APP_API_URL;
+        const response = await axios.get(
+          `${API_URL}/notificaciones?solo_no_leidas=true`,
+          config
+        );
+
         setNotificacionesCount(response.data.length);
       } catch (error) {
         console.error('Error al obtener notificaciones:', error);
@@ -223,24 +234,7 @@ const MainLayout = ({ children }) => {
             {user?.role === 'admin' && (
               <>
     
-                {/*
-                  <li>
-                  <NavLink 
-                    to="/UPEyCE" 
-                    className={({ isActive }) => 
-                      isActive ? "bg-guinda-700" : ""
-                    }
-                  >
-                    {({ isActive }) => (
-                    
-                      <button className={isActive ? "bg-guinda-700" : ""}>
-                        🗂️ Gestión UPEyCE
-                      </button>
-                    
-                    )}
-                  </NavLink>
-                </li>
-                */}
+
   
    
                 <li>

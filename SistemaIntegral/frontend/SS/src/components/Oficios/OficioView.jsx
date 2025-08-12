@@ -34,10 +34,13 @@ const OficioView = ({ oficio, onClose, onEdit, onNavigateToOficio }) => {
       // Obtener información del UPEyCE si existe
       if (oficio.id_UPEyCE) {
         try {
-          const UPEyCEResponse = await axios.get(
-            `http://localhost:3001/api/UPEyCE/${oficio.id_UPEyCE}`,
-            config
-          );
+          const API_URL = import.meta.env.VITE_API_URL;
+
+          const UPEyCEResponse = await axios.get('${API_URL}/UPEyCE/${oficio.id_UPEyCE}', config);
+          //const UPEyCEResponse = await axios.get(
+           // `http://localhost:3001/api/UPEyCE/${oficio.id_UPEyCE}`,
+          //  config
+         // );
           setUPEyCEInfo(UPEyCEResponse.data);
         } catch (error) {
           console.error('Error al cargar información de UPEyCE:', error);
@@ -67,7 +70,9 @@ const OficioView = ({ oficio, onClose, onEdit, onNavigateToOficio }) => {
 
           if (idsNumericos.length > 0) {
             // Obtener todos los oficios para filtrar los relacionados
-            const oficiosResponse = await axios.get('http://localhost:3001/api/oficios', config);
+            const API_URL = import.meta.env.VITE_API_URL;
+            const oficiosResponse = await axios.get(`${API_URL}/oficios`, config);
+            //const oficiosResponse = await axios.get('http://localhost:3001/api/oficios', config);
             
             // Filtrar solo los oficios relacionados
             const relacionados = oficiosResponse.data.filter(of => 

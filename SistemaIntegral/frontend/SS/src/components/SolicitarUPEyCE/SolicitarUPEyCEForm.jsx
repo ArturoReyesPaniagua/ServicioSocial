@@ -1,56 +1,20 @@
 // src/components/SolicitarUPEyCE/SolicitarUPEyCEForm.jsx
+// Formulario actualizado - El usuario ya no puede especificar el número UPEyCE
 
-// Este componente permite a los usuarios solicitar un nuevo UPEyCE 
-
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
 const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
   const [formData, setFormData] = useState({
-    ID_number_UPEyCE_solicitado: '',
     justificacion: '',
     descripcion: '',
     prioridad: 'normal'
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  //const [isLoadingPlaceholder, setIsLoadingPlaceholder] = useState(true);
-  const [suggestedNumber, setSuggestedNumber] = useState('');
-  const [isValidatingNumber, setIsValidatingNumber] = useState(false);
   const { user } = useAuth();
-
-  // Obtener el siguiente número sugerido 
-  useEffect(() => {
-    fetchSuggestedNumber();
-  }, []);
-
-  const fetchSuggestedNumber = async () => {
-    try {
-      setIsLoadingPlaceholder(true);
-      const token = localStorage.getItem('token');
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      };
-
-      const response = await axios.get(
-        `http://localhost:3001/api/siguiente-numero-UPEyCE/${user.id_area || ''}`,
-        config
-      );
-
-      setSuggestedNumber(response.data.nextNumber);
-    } catch (error) {
-      console.error('Error obteniendo número sugerido:', error);
-      setSuggestedNumber('0001'); // Valor por defecto
-    } finally {
-      setIsLoadingPlaceholder(false);
-    }
-  };
-
- 
 
   // Manejar cambios en el formulario
   const handleChange = (e) => {
@@ -64,27 +28,12 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
-
-
-  };
-
-  // Función para usar el número sugerido
-  const useSuggestedNumber = () => {
-    setFormData(prev => ({
-      ...prev,
-      ID_number_UPEyCE_solicitado: suggestedNumber
-    }));
-    validateUPEyCENumber(suggestedNumber);
   };
 
   // Validar formulario antes de enviar
   const validateForm = () => {
     const newErrors = {};
     
-    if (!formData.ID_number_UPEyCE_solicitado) {
-      newErrors.ID_number_UPEyCE_solicitado = 'El número UPEyCE es obligatorio';
-    }
-
     if (!formData.justificacion) {
       newErrors.justificacion = 'La justificación es obligatoria';
     } else if (formData.justificacion.length < 10) {
@@ -115,12 +64,15 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
           Authorization: `Bearer ${token}`
         }
       };
-      
-      const response = await axios.post(
-        'http://localhost:3001/api/solicitudes-UPEyCE',
-        formData,
-        config
-      );
+      const API_URL = import.meta.env.VITE_API_URL;
+
+      const response = await axios.post(`${API_URL}/solicitudes-UPEyCE`,formData, config);
+
+      //const response = await axios.post(
+        //'http://localhost:3001/api/solicitudes-UPEyCE',
+        //formData,
+        //config
+      //);
       
       toast.success('Solicitud de UPEyCE enviada exitosamente');
       
@@ -128,16 +80,12 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
         onSuccess(response.data);
       }
       
-      // Limpiar formulario y obtener nuevo número sugerido
+      // Limpiar formulario
       setFormData({
-        ID_number_UPEyCE_solicitado: '',
         justificacion: '',
         descripcion: '',
         prioridad: 'normal'
       });
-      
-      // Obtener el siguiente número sugerido para una nueva solicitud
-      fetchSuggestedNumber();
       
     } catch (error) {
       console.error('Error enviando solicitud:', error);
@@ -165,7 +113,7 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Solicitar Nuevo UPEyCE</h2>
         <p className="text-gray-600">
           Complete el formulario para solicitar un nuevo folio UPEyCE. 
-          Su solicitud será revisada por un administrador.
+          Su solicitud será revisada por un administrador quien asignará el número de folio correspondiente.
         </p>
         
         {user && user.nombre_area && (
@@ -183,9 +131,8 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
         </div>
       )}
 
+ 
       <form onSubmit={handleSubmit} className="space-y-6">
-       
-
         {/* Prioridad */}
         <div>
           <label htmlFor="prioridad" className="block text-sm font-medium text-gray-700 mb-1">
@@ -198,9 +145,7 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
             onChange={handleChange}
             className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-guinda focus:border-guinda"
           >
-            
             <option value="normal">Normal - Prioridad estándar</option>
-            
             <option value="urgente">Urgente - Requiere atención inmediata</option>
           </select>
           <p className="mt-1 text-xs text-gray-500">
@@ -286,8 +231,8 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
                 <p>Su solicitud será evaluada por un administrador. Recibirá una notificación con la decisión.</p>
                 <ul className="mt-2 list-disc list-inside">
                   <li>Puede consultar el estado en cualquier momento.</li>
-                  <li>Si es aprobada, el folio será creado. </li>
-                  
+                  <li>Si es aprobada, se le asignará automáticamente el siguiente folio disponible.</li>
+                  <li>El folio asignado aparecerá en sus notificaciones.</li>
                 </ul>
               </div>
             </div>
@@ -308,7 +253,7 @@ const SolicitarUPEyCEForm = ({ onSuccess, onCancel }) => {
           )}
           <button
             type="submit"
-            disabled={isSubmitting || isValidatingNumber || !!errors.ID_number_UPEyCE_solicitado}
+            disabled={isSubmitting}
             className="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-guinda hover:bg-guinda-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-guinda disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {isSubmitting ? (

@@ -12,6 +12,7 @@ import OficioView from './OficioView';
 import DeleteConfirmation from '../common/DeleteConfirmation';
 import { format } from 'date-fns';
 import { useAuth } from '../../context/AuthContext'; // Importar el contexto de autenticación
+//import '../../.env'; //
 
 
 const OficiosPage = () => {
@@ -57,20 +58,29 @@ const OficiosPage = () => {
     setIsLoading(true);
     try {
       // URL base para cargar oficios
-      let url = 'http://localhost:3001/api/oficios';
+      const API_URL = import.meta.env.VITE_API_URL;
+      
+      let url = `${API_URL}/oficios`;
+      //let url = 'http://localhost:3001/api/oficios';
       
       // Cargar oficios según el filtro seleccionado
       if (filterType === 'archived') {
-        url = 'http://localhost:3001/api/oficios/archivado/true';
+        url = `${API_URL}/oficios/archivado/true`;
+        //url = 'http://localhost:3001/api/oficios/archivado/true';
       } else if (filterType === 'active') {
-        url = 'http://localhost:3001/api/oficios/archivado/false';
+        url = `${API_URL}/oficios/archivado/false`;
+        //url = 'http://localhost:3001/api/oficios/archivado/false';
       } else if (filterType === 'estado' && selectedEstado) {
-        url = `http://localhost:3001/api/oficios/estado/${selectedEstado}`;
+        url = `${API_URL}/oficios/estado/${selectedEstado}`;
+       // url = `http://localhost:3001/api/oficios/estado/${selectedEstado}`;
       }
+      
       else if (filterType === 'area' && selectedArea && user.role === "admin") {
-        url = `http://localhost:3001/api/oficios/area/${selectedArea}`;
+        url = `${API_URL}/oficios/area/${selectedArea}`;
+        //url = `http://localhost:3001/api/oficios/area/${selectedArea}`;
       }
-
+      
+      
       const response = await axios.get(url);
       // Actualizar el estado con los oficios obtenidos
       setOficios(response.data);
@@ -89,7 +99,9 @@ const OficiosPage = () => {
   
   const fetchAreas = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/api/areas');
+      const API_URL = import.meta.env.VITE_API_URL;
+      const response = await axios.get(`${API_URL}/areas`);
+      //const response = await axios.get('http://localhost:3001/api/areas');
       setAreas(response.data);
     } catch (error) {
       console.error('Error cargando áreas:', error);
@@ -111,8 +123,9 @@ const OficiosPage = () => {
           Authorization: `Bearer ${token}`
         }
       };
-      
-      const response = await axios.get(`http://localhost:3001/api/oficios/${oficioId}`, config);
+      const API_URL = import.meta.env.VITE_API_URL;
+      const response = await axios.get(`${API_URL}/oficios/${oficioId}`, config); 
+      //const response = await axios.get(`http://localhost:3001/api/oficios/${oficioId}`, config);
       return response.data;
     } catch (error) {
       console.error('Error al obtener oficio por ID:', error);
@@ -145,7 +158,9 @@ const OficiosPage = () => {
       oficioData.fecha_recepcion = format(new Date(oficioData.fecha_recepcion), 'yyyy-MM-dd');
       oficioData.fecha_limite = oficioData.fecha_limite ? format(new Date(oficioData.fecha_limite), 'yyyy-MM-dd') : null;
       oficioData.fecha_respuesta = oficioData.fecha_respuesta ? format(new Date(oficioData.fecha_respuesta), 'yyyy-MM-dd') : null;
-      await axios.post('http://localhost:3001/api/oficios', oficioData);
+      const API_URL = import.meta.env.VITE_API_URL;
+      await axios.post(`${API_URL}/oficios`, oficioData);
+      //await axios.post('http://localhost:3001/api/oficios', oficioData);
       toast.success('Oficio creado exitosamente');
       setFormVisible(false);
       fetchOficios();
@@ -159,7 +174,9 @@ const OficiosPage = () => {
   const handleUpdateOficio = async (oficioData) => {
     try {
       // Aquí se debe enviar el ID del oficio a actualizar junto con los datos
-      await axios.put(`http://localhost:3001/api/oficios/${oficioData.id_oficio}`, oficioData);
+      const API_URL = import.meta.env.VITE_API_URL;
+      await axios.put(`${API_URL}/oficios/${oficioData.id_oficio}`, oficioData);
+      //await axios.put(`http://localhost:3001/api/oficios/${oficioData.id_oficio}`, oficioData);
       toast.success('Oficio actualizado exitosamente');
       setFormVisible(false);
       fetchOficios();
@@ -183,7 +200,10 @@ const OficiosPage = () => {
     
     try {
       // Aquí se debe enviar el ID del oficio a eliminar
-      await axios.delete(`http://localhost:3001/api/oficios/${currentOficio.id_oficio}`);
+      const API_URL = import.meta.env.VITE_API_URL;
+
+      await axios.delete(`${API_URL}/oficios/${currentOficio.id_oficio}`);
+      //await axios.delete(`http://localhost:3001/api/oficios/${currentOficio.id_oficio}`);
       
       // Opcionalmente eliminar los PDFs asociados
       // Esto podría manejarse en el backend directamente
@@ -205,7 +225,9 @@ const OficiosPage = () => {
         archivado: !oficio.archivado
       };
       
-      await axios.put(`http://localhost:3001/api/oficios/${oficio.id_oficio}`, updatedData);
+      const API_URL = import.meta.env.VITE_API_URL;
+      await axios.put(`${API_URL}/oficios/${oficio.id_oficio}`, updatedData);
+      //await axios.put(`http://localhost:3001/api/oficios/${oficio.id_oficio}`, updatedData);
       
       toast.success(oficio.archivado 
         ? 'Oficio desarchivado exitosamente' 

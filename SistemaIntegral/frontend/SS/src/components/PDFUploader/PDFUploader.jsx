@@ -21,7 +21,9 @@ function PDFUploader() {
   const fetchPDFs = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:3001/api/pdfs'); //Cambiar la url si se cambia el backend
+      const API_URL = import.meta.env.VITE_API_URL;
+      const response = await axios.get(`${API_URL}/pdfs`); // Cambiar la URL si se cambia el backend
+      //const response = await axios.get('http://localhost:3001/api/pdfs'); //Cambiar la url si se cambia el backend
       setPdfs(response.data); //Guardar la lista de PDFs en el estado
       setLoading(false);
     } catch (error) {
@@ -51,7 +53,9 @@ function PDFUploader() {
     setMessage('');
     
     try {// esta parte es la que se encarga de subir el archivo al servidor
-      await axios.post('http://localhost:3001/api/upload-pdf', formData, {
+        const API_URL = import.meta.env.VITE_API_URL;
+      await axios.post(`${API_URL}/pdfs/upload-pdf`, formData, {
+      //await axios.post('http://localhost:3001/api/upload-pdf', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

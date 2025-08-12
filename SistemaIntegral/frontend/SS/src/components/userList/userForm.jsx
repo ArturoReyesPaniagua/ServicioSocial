@@ -25,7 +25,10 @@ const UserForm = ({ user, onSave, onCancel }) => {
   useEffect(() => {
     const fetchAreas = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/api/areas');
+        const API_URL = import.meta.env.VITE_API_URL;
+        const response = await axios.get(`${API_URL}/areas`); // Cambiar la URL si se cambia el backend
+
+        //const response = await axios.get('http://localhost:3001/api/areas');
         if (response.data && response.data.length > 0) {
           setAreas(response.data);
         } else {
@@ -81,7 +84,9 @@ const UserForm = ({ user, onSave, onCancel }) => {
     }
     
     try {
-      const response = await axios.post('http://localhost:3001/api/areas', {
+      const API_URL = import.meta.env.VITE_API_URL;
+      const response = await axios.post(`${API_URL}/areas`, {
+      //const response = await axios.post('http://localhost:3001/api/areas', {
         nombre_area: nuevaArea
       });
       

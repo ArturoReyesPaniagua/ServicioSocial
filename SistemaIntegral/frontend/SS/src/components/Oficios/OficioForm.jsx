@@ -49,15 +49,23 @@ const OficioForm = ({ oficio, estados, onSave, onCancel }) => {
     const fetchRelatedData = async () => {
       try {
         // Cargar solicitantes
-        const solicitantesResponse = await axios.get('http://localhost:3001/api/solicitantes');
+        const API_URL = import.meta.env.VITE_API_URL; 
+        const solicitantesResponse = await axios.get(`${API_URL}/solicitantes`);
+
+        //const solicitantesResponse = await axios.get('http://localhost:3001/api/solicitantes');
         setSolicitantes(solicitantesResponse.data);
         
         // Cargar responsables
-        const responsablesResponse = await axios.get('http://localhost:3001/api/responsables');
+        //const API_URL = import.meta.env.VITE_API_URL;
+        const responsablesResponse = await axios.get(`${API_URL}/responsables`);
+
+       // const responsablesResponse = await axios.get('http://localhost:3001/api/responsables');
         setResponsables(responsablesResponse.data);
         
         // Cargar áreas
-        const areasResponse = await axios.get('http://localhost:3001/api/areas');
+        //const API_URL = import.meta.env.VITE_API_URL;
+        const areasResponse = await axios.get(`${API_URL}/areas`);
+        //const areasResponse = await axios.get('http://localhost:3001/api/areas');
         setAreas(areasResponse.data);
         
         // Cargar UPEyCEs
@@ -70,7 +78,9 @@ const OficioForm = ({ oficio, estados, onSave, onCancel }) => {
           };
           
           try {
-            const UPEyCEsResponse = await axios.get('http://localhost:3001/api/UPEyCE', config);
+            const API_URL = import.meta.env.VITE_API_URL;
+            const UPEyCEsResponse = await axios.get(`${API_URL}/UPEyCE`, config);
+            //const UPEyCEsResponse = await axios.get('http://localhost:3001/api/UPEyCE', config);
             setUPEyCEs(UPEyCEsResponse.data);
           } catch (error) {
             console.error('Error al cargar UPEyCEs:', error);
@@ -107,8 +117,10 @@ const OficioForm = ({ oficio, estados, onSave, onCancel }) => {
             Authorization: `Bearer ${token}`
           }
         };
+        const API_URL = import.meta.env.VITE_API_URL;
+        const response = await axios.get(`${API_URL}/oficios`, config);
         
-        const response = await axios.get('http://localhost:3001/api/oficios', config);
+        //const response = await axios.get('http://localhost:3001/api/oficios', config);
         // Filtrar el oficio actual si estamos editando
         const availableOficios = oficio 
           ? response.data.filter(o => o.id_oficio !== oficio.id_oficio) 
@@ -193,8 +205,11 @@ const OficioForm = ({ oficio, estados, onSave, onCancel }) => {
           Authorization: `Bearer ${token}`
         }
       };
+      const API_URL = import.meta.env.VITE_API_URL;
+
+      const response = await axios.post(`${API_URL}/solicitantes`, {
       
-      const response = await axios.post('http://localhost:3001/api/solicitantes', {
+      //const response = await axios.post('http://localhost:3001/api/solicitantes', {
         nombre_solicitante: nuevoSolicitante
       }, config);
       
@@ -231,7 +246,9 @@ const OficioForm = ({ oficio, estados, onSave, onCancel }) => {
         }
       };
       // Enviar solicitud para crear nuevo responsable
-      const response = await axios.post('http://localhost:3001/api/responsables', {
+      const API_URL = import.meta.env.VITE_API_URL;
+      const response = await axios.post(`${API_URL}/responsables`, {
+      //const response = await axios.post('http://localhost:3001/api/responsables', {
         nombre_responsable: nuevoResponsable
       }, config);
       // Agregar el nuevo responsable a la lista

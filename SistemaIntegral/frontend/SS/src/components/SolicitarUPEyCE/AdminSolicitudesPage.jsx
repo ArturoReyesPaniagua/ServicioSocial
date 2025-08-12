@@ -37,8 +37,11 @@ const AdminSolicitudesPage = () => {
       setIsLoading(true);
       const token = localStorage.getItem('token');
       const config = { headers: { Authorization: `Bearer ${token}` } };
+
+      const API_URL = import.meta.env.VITE_API_URL;
+      const response = await axios.get(`${API_URL}/solicitudes-UPEyCE-pendientes`, config);
       
-      const response = await axios.get('http://localhost:3001/api/solicitudes-UPEyCE-pendientes', config);
+      //const response = await axios.get('http://localhost:3001/api/solicitudes-UPEyCE-pendientes', config);
       setSolicitudesPendientes(response.data);
     } catch (error) {
       console.error('Error al cargar solicitudes pendientes:', error);
@@ -53,8 +56,11 @@ const AdminSolicitudesPage = () => {
       setIsLoading(true);
       const token = localStorage.getItem('token');
       const config = { headers: { Authorization: `Bearer ${token}` } };
+
+      const API_URL = import.meta.env.VITE_API_URL;
+      const response = await axios.get(`${API_URL}/solicitudes-UPEyCE`,config);
       
-      const response = await axios.get('http://localhost:3001/api/solicitudes-UPEyCE', config);
+      //const response = await axios.get('http://localhost:3001/api/solicitudes-UPEyCE', config);
       setSolicitudes(response.data);
     } catch (error) {
       console.error('Error al cargar todas las solicitudes:', error);
@@ -69,8 +75,10 @@ const AdminSolicitudesPage = () => {
       setIsLoading(true);
       const token = localStorage.getItem('token');
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      
-      const response = await axios.get('http://localhost:3001/api/estadisticas-solicitudes', config);
+      const API_URL = import.meta.env.VITE_API_URL;
+      const response = await axios.get(`${API_URL}/estadisticas-solicitudes`, config);
+
+      //const response = await axios.get('http://localhost:3001/api/estadisticas-solicitudes', config);
       setEstadisticas(response.data);
     } catch (error) {
       console.error('Error al cargar estadísticas:', error);
@@ -98,8 +106,9 @@ const AdminSolicitudesPage = () => {
     try {
       const token = localStorage.getItem('token');
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      
-      const url = `http://localhost:3001/api/solicitudes-UPEyCE/${selectedSolicitud.id_solicitud}/${accion}`;
+      const API_URL = import.meta.env.VITE_API_URL;
+      const url = `${API_URL}/solicitudes-UPEyCE/${selectedSolicitud.id_solicitud}/${accion}`;
+      //const url = `http://localhost:3001/api/solicitudes-UPEyCE/${selectedSolicitud.id_solicitud}/${accion}`;
       const data = { comentarios_respuesta: comentarios };
       
       await axios.put(url, data, config);

@@ -23,7 +23,9 @@ const UPEyCEForm = ({ UPEyCE, onSave, onCancel }) => {
   useEffect(() => {
     const fetchAreas = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/api/areas');
+        const API_URL = import.meta.env.VITE_API_URL;
+        const response = await axios.get(`${API_URL}/areas`); // Cambiar la URL si se cambia el backend
+        //const response = await axios.get('http://localhost:3001/api/areas');
         setAreas(response.data);
       } catch (error) {
         console.error('Error al cargar áreas:', error);

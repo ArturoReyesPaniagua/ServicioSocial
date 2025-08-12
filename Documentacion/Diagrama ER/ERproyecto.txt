@@ -1,4 +1,4 @@
-direction: left
+direction: up
 
 area: {
   shape: sql_table
@@ -32,6 +32,7 @@ oficio: {
   id_UPEyCE: INT {constraint: foreign_key}
   oficios_relacionados: NVARCHAR,
   oficio_respuesta: NVARCHAR,
+  id_usuario: INT
 }
 
 PDF: {
@@ -55,7 +56,7 @@ solicitante: {
 
 solicitudUPEyCE: {
   shape: sql_table
-  id_solitud: INT {constraint: primary_key , unique, AUTO_INCREMENT}
+  id_solicitud: INT {constraint: primary_key , unique, AUTO_INCREMENT}
   numero_UPEyCE_solicitado: NVARCHAR(50)
   justificacion: NVARCHAR(200)
   descripcion: NVARCHAR(50)
@@ -72,6 +73,7 @@ UPEyCE: {
   id_area: INT {constraint: foreing_key}
   id_usuario_solicita: INT {constraint: foreing_key}
   fecha_creacion: DATETIME
+  id_usuario_resuelve: INT {constraint: foreing_key}
 }
 
 historialSolicitudUPEyCE: {
@@ -105,7 +107,7 @@ PDF.id_oficio <-> Oficio.id_oficio: asociados 1:1
 usuarios.id_usuario <-> Oficio.id_usuario: administra N: N
 
 historialSolicitudUPEyCE.id_solicitud <-> solicitudUPEyCE.id_solitud: asociados 1:1
-historialSolicitudUPEyCE.id_usuario <-> usuarios.id_usuario: asociados 1:N
+historialSolicitudUPEyCE.id_usuario_cambio <-> usuarios.id_usuario: asociados 1:N
 
 notificaciones: Notificaciones {
   shape: sql_table
@@ -125,7 +127,7 @@ usuarios.id_usuario <-> notificaciones.id_usuario: asociados 1:N
 HistorialNoficaciones: Historial Notificaciones {
   shape: sql_table
   id_notificacion: INT IDENTITY(1,1) PRIMARY KEY,
-  id_usuario: INT NOT NULL {constraint: foreingKey}
+  id_usuario: INT NOT NULL {constraint: foreing_Key}
   tipo: NVARCHAR(50) NOT NULL,
   titulo: NVARCHAR(200) NOT NULL,
   mensaje: NVARCHAR(500) NOT NULL,
