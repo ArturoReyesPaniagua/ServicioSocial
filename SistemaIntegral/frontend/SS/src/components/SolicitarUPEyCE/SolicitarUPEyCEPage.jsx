@@ -122,12 +122,11 @@ const SolicitarUPEyCEPage = () => {
       };
       
       const motivo = prompt('Ingrese el motivo de cancelación (opcional):') || 'Cancelado por el usuario';
-      
-      await axios.put(
-        `http://localhost:3001/api/solicitudes-UPEyCE/${idSolicitud}/cancelar`,
-        { motivo },
-        config
-      );
+      const API_URL = import.meta.env.VITE_API_URL;
+
+      await axios.put(`${API_URL}/solicitudes-UPEyCE/${idSolicitud}/cancelar`, { motivo }, config);
+
+      //await axios.put(`http://localhost:3001/api/solicitudes-UPEyCE/${idSolicitud}/cancelar`, { motivo }, config);
       
       toast.success('Solicitud cancelada exitosamente');
       fetchSolicitudes();
