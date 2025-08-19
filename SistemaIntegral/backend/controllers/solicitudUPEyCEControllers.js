@@ -1,5 +1,5 @@
 // SistemaIntegral/backend/controllers/solicitudUPEyCEControllers.js
-// controllers para manejar solicitudes de UPEyCE
+// Controlador actualizado - Sistema de tickets sin número específico
 
 const sql = require('mssql');
 const solicitudUPEyCESchema = require('../schemas/SolicitudUPEyCE');
