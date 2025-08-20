@@ -1,12 +1,16 @@
-/* File inde.css
- SistemaIntegral/frontend/SS/src/index.css
-*/
+@import './styles/components-styles.css';
+
+/* En SistemaIntegral/frontend/SS/src/index.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Estilos globales adicionales */
+
+
+/* Tus estilos existentes... */
 body {
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
   font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

@@ -1,8 +1,10 @@
 // SistemaIntegral/backend/routes/solicitudUPEyCERoutes.js
-// Este archivo contiene las rutas completas para la gestión de solicitudes de UPEyCE
+// Versión compatible que funciona con el controlador actual
 
 const express = require('express');
 const router = express.Router();
+
+// IMPORTAR SOLO LAS FUNCIONES QUE EXISTEN
 const {
   createSolicitudUPEyCE,
   getAllSolicitudes,
@@ -16,41 +18,59 @@ const {
   marcarNotificacionLeida,
   getEstadisticas
 } = require('../controllers/solicitudUPEyCEControllers');
+
 const { authenticateToken, isAdmin } = require('../middleware/authMiddleware');
 
 // Rutas para solicitudes de UPEyCE
-// Crear nueva solicitud (usuarios autenticados)
 router.post('/solicitudes-UPEyCE', authenticateToken, createSolicitudUPEyCE);
-
-// Obtener todas las solicitudes (filtradas según el rol del usuario)
 router.get('/solicitudes-UPEyCE', authenticateToken, getAllSolicitudes);
-
-// Obtener solicitud por ID
 router.get('/solicitudes-UPEyCE/:id', authenticateToken, getSolicitudById);
-
-// Aprobar solicitud (solo administradores)
 router.put('/solicitudes-UPEyCE/:id/aprobar', authenticateToken, isAdmin, aprobarSolicitud);
-
-// Rechazar solicitud (solo administradores)
 router.put('/solicitudes-UPEyCE/:id/rechazar', authenticateToken, isAdmin, rechazarSolicitud);
-
-// Cancelar solicitud (usuario que la creó o administrador)
 router.put('/solicitudes-UPEyCE/:id/cancelar', authenticateToken, cancelarSolicitud);
-
-// Obtener solicitudes pendientes (solo administradores)
 router.get('/solicitudes-UPEyCE-pendientes', authenticateToken, isAdmin, getSolicitudesPendientes);
-
-// Obtener siguiente número UPEyCE disponible (solo administradores)
 router.get('/siguiente-numero-UPEyCE/:id_area?', authenticateToken, isAdmin, getNextUPEyCENumberEndpoint);
 
 // Rutas para notificaciones
-// Obtener notificaciones del usuario
 router.get('/notificaciones', authenticateToken, getNotificaciones);
-
-// Marcar notificación como leída
 router.put('/notificaciones/:id/leida', authenticateToken, marcarNotificacionLeida);
 
-// Obtener estadísticas (solo administradores)
+// NUEVA RUTA: Conteo de notificaciones (implementación directa)
+router.get('/notificaciones/conteo', authenticateToken, async (req, res) => {
+  try {
+    console.log('📊 === OBTENIENDO CONTEO DE NOTIFICACIONES (RUTA DIRECTA) ===');
+    
+    const { connectDB } = require('../db/db');
+    const sql = require('mssql');
+    
+    const pool = await connectDB();
+    const userId = req.user.userId;
+    
+    console.log('👤 Usuario solicitando conteo:', userId);
+    
+    const result = await pool.request()
+      .input('userId', sql.Int, userId)
+      .query('SELECT COUNT(*) as no_leidas FROM Notificaciones WHERE id_usuario = @userId AND leida = 0');
+    
+    const noLeidas = result.recordset[0].no_leidas;
+    console.log('📊 Notificaciones no leídas:', noLeidas);
+    
+    res.status(200).json({ 
+      no_leidas: noLeidas,
+      usuario_id: userId,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('❌ Error obteniendo conteo de notificaciones:', error);
+    res.status(500).json({ 
+      error: error.message,
+      no_leidas: 0,
+      usuario_id: req.user?.userId 
+    });
+  }
+});
+
+// Rutas para estadísticas
 router.get('/estadisticas-solicitudes', authenticateToken, isAdmin, getEstadisticas);
 
 // Ruta adicional para verificar disponibilidad de número UPEyCE
@@ -70,7 +90,6 @@ router.post('/verificar-numero-UPEyCE', authenticateToken, async (req, res) => {
     const pool = await connectDB();
     const userId = req.user.userId;
 
-    // Obtener el área del usuario
     const userResult = await pool.request()
       .input('userId', sql.Int, userId)
       .query('SELECT id_area FROM users WHERE userId = @userId');
@@ -84,7 +103,6 @@ router.post('/verificar-numero-UPEyCE', authenticateToken, async (req, res) => {
 
     const userArea = userResult.recordset[0].id_area;
 
-    // Verificar en la tabla de UPEyCE existentes
     const existingUPEyCE = await pool.request()
       .input('numero_UPEyCE', sql.NVarChar, numero_UPEyCE)
       .query('SELECT id_UPEyCE FROM UPEyCE WHERE numero_UPEyCE = @numero_UPEyCE');
@@ -96,7 +114,6 @@ router.post('/verificar-numero-UPEyCE', authenticateToken, async (req, res) => {
       });
     }
 
-    // Verificar en solicitudes pendientes o aprobadas del mismo área
     const pendingSolicitud = await pool.request()
       .input('numero_UPEyCE', sql.NVarChar, numero_UPEyCE)
       .input('id_area', sql.Int, userArea)
@@ -114,7 +131,6 @@ router.post('/verificar-numero-UPEyCE', authenticateToken, async (req, res) => {
       });
     }
 
-    // Si llegamos aquí, el número está disponible
     res.json({
       disponible: true,
       mensaje: 'Número disponible'
