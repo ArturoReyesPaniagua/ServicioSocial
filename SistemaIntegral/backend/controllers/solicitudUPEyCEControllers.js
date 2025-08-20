@@ -4,6 +4,7 @@
 const sql = require('mssql');
 const solicitudUPEyCESchema = require('../schemas/SolicitudUPEyCE');
 const UPEyCESchema = require('../schemas/UPEyCESchema');
+const viewsSolicitudUPEyCE = require('./schemas/viewsSolicitudUPEyCE');
 const notificacionesHistorialSchema = require('../schemas/notificacionesHistorialSchema');
 const { connectDB } = require('../db/db');
 
@@ -83,6 +84,7 @@ const createSolicitudUPEyCE = async (req, res) => {
     // Asegurar que todas las tablas existan
     await pool.request().query(solicitudUPEyCESchema);
     await pool.request().query(notificacionesHistorialSchema);
+    await pool.request().query(viewsSolicitudUPEyCE);  // después vistas
 
     const { justificacion, descripcion, prioridad = 'normal' } = req.body;
     const userId = req.user.userId;

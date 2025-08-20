@@ -1,6 +1,5 @@
-// File: solicitudUPEyCERoutes.js
 // SistemaIntegral/backend/routes/solicitudUPEyCERoutes.js
-// Este archivo contiene las rutas para la gestión de solicitudes de UPEyCE
+// Este archivo contiene las rutas completas para la gestión de solicitudes de UPEyCE
 
 const express = require('express');
 const router = express.Router();
@@ -16,22 +15,6 @@ const {
   getNotificaciones,
   marcarNotificacionLeida,
   getEstadisticas
-
-
-
-
-
- // createSolicitudUPEyCE,
- // getAllSolicitudes,
- // getSolicitudById,
- //  aprobarSolicitud,
- //  rechazarSolicitud,
- //  cancelarSolicitud,
- //  getSolicitudesPendientes,
- //  getNextUPEyCENumber,
- //  getNotificaciones,
- //  marcarNotificacionLeida,
- //  getEstadisticas
 } = require('../controllers/solicitudUPEyCEControllers');
 const { authenticateToken, isAdmin } = require('../middleware/authMiddleware');
 
@@ -57,13 +40,15 @@ router.put('/solicitudes-UPEyCE/:id/cancelar', authenticateToken, cancelarSolici
 // Obtener solicitudes pendientes (solo administradores)
 router.get('/solicitudes-UPEyCE-pendientes', authenticateToken, isAdmin, getSolicitudesPendientes);
 
-// Rutas para sd
+// Obtener siguiente número UPEyCE disponible (solo administradores)
+router.get('/siguiente-numero-UPEyCE/:id_area?', authenticateToken, isAdmin, getNextUPEyCENumberEndpoint);
+
+// Rutas para notificaciones
 // Obtener notificaciones del usuario
 router.get('/notificaciones', authenticateToken, getNotificaciones);
 
 // Marcar notificación como leída
 router.put('/notificaciones/:id/leida', authenticateToken, marcarNotificacionLeida);
-router.get('/siguiente-numero-UPEyCE/:id_area?', authenticateToken, getNextUPEyCENumberEndpoint);
 
 // Obtener estadísticas (solo administradores)
 router.get('/estadisticas-solicitudes', authenticateToken, isAdmin, getEstadisticas);
@@ -85,7 +70,7 @@ router.post('/verificar-numero-UPEyCE', authenticateToken, async (req, res) => {
     const pool = await connectDB();
     const userId = req.user.userId;
 
-    // Obtener el área del usuario //esto debo moverlo a Controllers
+    // Obtener el área del usuario
     const userResult = await pool.request()
       .input('userId', sql.Int, userId)
       .query('SELECT id_area FROM users WHERE userId = @userId');
@@ -96,7 +81,6 @@ router.post('/verificar-numero-UPEyCE', authenticateToken, async (req, res) => {
         mensaje: 'Usuario no encontrado' 
       });
     }
-    
 
     const userArea = userResult.recordset[0].id_area;
 
@@ -118,7 +102,7 @@ router.post('/verificar-numero-UPEyCE', authenticateToken, async (req, res) => {
       .input('id_area', sql.Int, userArea)
       .query(`
         SELECT id_solicitud FROM SolicitudUPEyCE 
-        WHERE numero_UPEyCE_solicitado = @numero_UPEyCE 
+        WHERE numero_UPEyCE_asignado = @numero_UPEyCE 
         AND id_area = @id_area 
         AND estado IN ('pendiente', 'aprobado')
       `);
