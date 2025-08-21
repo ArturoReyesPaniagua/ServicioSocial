@@ -1,5 +1,5 @@
-// SistemaIntegral/backend/schemas/solicitudUPEyCESchema.js
-// Esquema actualizado SIN views, solo tablas base
+// SistemaIntegral/backend/schemas/SolicitudUPEyCE.js
+// Schema simplificado para el sistema de tickets con asignación manual de folios
 
 const solicitudUPEyCESchema = `
   -- Crear tabla SolicitudUPEyCE si no existe
@@ -8,7 +8,7 @@ const solicitudUPEyCESchema = `
     CREATE TABLE [dbo].[SolicitudUPEyCE] (
       id_solicitud INT IDENTITY(1,1) PRIMARY KEY,
       
-      -- Área que solicita el UPEyCE
+      -- Área que solicita el folio
       id_area INT NOT NULL,
       
       -- Usuario que hace la solicitud
@@ -29,7 +29,9 @@ const solicitudUPEyCESchema = `
       -- Respuesta del administrador
       id_usuario_responde INT NULL,
       comentarios_respuesta NVARCHAR(500) NULL,
-      numero_UPEyCE_asignado NVARCHAR(50) NULL,
+      
+      -- NUEVO: Número de folio asignado por el administrador
+      numero_folio_asignado NVARCHAR(50) NULL,
       
       -- Foreign Keys
       CONSTRAINT FK_SolicitudUPEyCE_Area FOREIGN KEY (id_area) REFERENCES Area(id_area),
@@ -42,6 +44,18 @@ const solicitudUPEyCESchema = `
     CREATE INDEX IX_SolicitudUPEyCE_Area ON SolicitudUPEyCE(id_area);
     CREATE INDEX IX_SolicitudUPEyCE_Usuario ON SolicitudUPEyCE(id_usuario_solicita);
     CREATE INDEX IX_SolicitudUPEyCE_Fecha ON SolicitudUPEyCE(fecha_solicitud);
+    CREATE INDEX IX_SolicitudUPEyCE_Folio ON SolicitudUPEyCE(numero_folio_asignado);
+  END
+
+  -- Agregar columna numero_folio_asignado si no existe en tabla existente
+  IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[SolicitudUPEyCE]') AND type in (N'U'))
+  BEGIN
+    IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[SolicitudUPEyCE]') AND name = 'numero_folio_asignado')
+    BEGIN
+      ALTER TABLE [dbo].[SolicitudUPEyCE] ADD numero_folio_asignado NVARCHAR(50) NULL;
+      CREATE INDEX IX_SolicitudUPEyCE_Folio ON SolicitudUPEyCE(numero_folio_asignado);
+      PRINT 'Columna numero_folio_asignado agregada a SolicitudUPEyCE';
+    END
   END
 
   -- Crear tabla HistorialSolicitudUPEyCE si no existe
@@ -66,6 +80,9 @@ const solicitudUPEyCESchema = `
       -- Comentarios del cambio
       comentarios NVARCHAR(500) NULL,
       
+      -- NUEVO: Número de folio asignado (si aplica)
+      numero_folio_asignado NVARCHAR(50) NULL,
+      
       -- Foreign Keys
       CONSTRAINT FK_HistorialSolicitud_Solicitud FOREIGN KEY (id_solicitud) REFERENCES SolicitudUPEyCE(id_solicitud) ON DELETE CASCADE,
       CONSTRAINT FK_HistorialSolicitud_Usuario FOREIGN KEY (id_usuario_cambio) REFERENCES users(userId) ON DELETE NO ACTION
@@ -74,6 +91,16 @@ const solicitudUPEyCESchema = `
     -- Índices para mejorar rendimiento
     CREATE INDEX IX_HistorialSolicitud_Solicitud ON HistorialSolicitudUPEyCE(id_solicitud);
     CREATE INDEX IX_HistorialSolicitud_Fecha ON HistorialSolicitudUPEyCE(fecha_cambio);
+  END
+
+  -- Agregar columna numero_folio_asignado al historial si no existe
+  IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[HistorialSolicitudUPEyCE]') AND type in (N'U'))
+  BEGIN
+    IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[HistorialSolicitudUPEyCE]') AND name = 'numero_folio_asignado')
+    BEGIN
+      ALTER TABLE [dbo].[HistorialSolicitudUPEyCE] ADD numero_folio_asignado NVARCHAR(50) NULL;
+      PRINT 'Columna numero_folio_asignado agregada a HistorialSolicitudUPEyCE';
+    END
   END
 
   -- Crear tabla Notificaciones si no existe
@@ -96,11 +123,11 @@ const solicitudUPEyCESchema = `
       fecha_lectura DATETIME NULL,
       
       -- Referencia opcional a solicitud
-      id_solicitud_referencia INT NULL,
+      id_solicitud INT NULL,
       
       -- Foreign Keys
       CONSTRAINT FK_Notificaciones_Usuario FOREIGN KEY (id_usuario) REFERENCES users(userId) ON DELETE CASCADE,
-      CONSTRAINT FK_Notificaciones_Solicitud FOREIGN KEY (id_solicitud_referencia) REFERENCES SolicitudUPEyCE(id_solicitud) ON DELETE SET NULL
+      CONSTRAINT FK_Notificaciones_Solicitud FOREIGN KEY (id_solicitud) REFERENCES SolicitudUPEyCE(id_solicitud) ON DELETE SET NULL
     );
     
     -- Índices para optimización
@@ -109,7 +136,7 @@ const solicitudUPEyCESchema = `
     CREATE INDEX IX_Notificaciones_Fecha ON Notificaciones(fecha_creacion);
   END
 
-  PRINT 'Esquemas de solicitudes UPEyCE creados exitosamente (sin views)';
+  PRINT 'Schema de SolicitudUPEyCE actualizado correctamente con asignación manual de folios';
 `;
 
 module.exports = solicitudUPEyCESchema;

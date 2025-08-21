@@ -1,10 +1,10 @@
 // SistemaIntegral/backend/routes/solicitudUPEyCERoutes.js
-// Versión compatible que funciona con el controlador actual
+// Rutas actualizadas para el sistema de tickets con asignación manual de folios
 
 const express = require('express');
 const router = express.Router();
 
-// IMPORTAR SOLO LAS FUNCIONES QUE EXISTEN
+// Importar funciones del controlador
 const {
   createSolicitudUPEyCE,
   getAllSolicitudes,
@@ -13,7 +13,7 @@ const {
   rechazarSolicitud,
   cancelarSolicitud,
   getSolicitudesPendientes,
-  getNextUPEyCENumberEndpoint,
+  getSuggestedFolioNumber,  // NUEVA FUNCIÓN
   getNotificaciones,
   marcarNotificacionLeida,
   getEstadisticas
@@ -21,24 +21,52 @@ const {
 
 const { authenticateToken, isAdmin } = require('../middleware/authMiddleware');
 
-// Rutas para solicitudes de UPEyCE
-router.post('/solicitudes-UPEyCE', authenticateToken, createSolicitudUPEyCE);
-router.get('/solicitudes-UPEyCE', authenticateToken, getAllSolicitudes);
-router.get('/solicitudes-UPEyCE/:id', authenticateToken, getSolicitudById);
-router.put('/solicitudes-UPEyCE/:id/aprobar', authenticateToken, isAdmin, aprobarSolicitud);
-router.put('/solicitudes-UPEyCE/:id/rechazar', authenticateToken, isAdmin, rechazarSolicitud);
-router.put('/solicitudes-UPEyCE/:id/cancelar', authenticateToken, cancelarSolicitud);
-router.get('/solicitudes-UPEyCE-pendientes', authenticateToken, isAdmin, getSolicitudesPendientes);
-router.get('/siguiente-numero-UPEyCE/:id_area?', authenticateToken, isAdmin, getNextUPEyCENumberEndpoint);
+// ========================================
+// RUTAS PARA SOLICITUDES DE FOLIOS
+// ========================================
 
-// Rutas para notificaciones
+// Crear nueva solicitud de folio
+router.post('/solicitudes-folio', authenticateToken, createSolicitudUPEyCE);
+
+// Obtener todas las solicitudes (usuario ve solo las suyas, admin ve todas)
+router.get('/solicitudes-folio', authenticateToken, getAllSolicitudes);
+
+// Obtener solicitud específica por ID
+router.get('/solicitudes-folio/:id', authenticateToken, getSolicitudById);
+
+// NUEVA RUTA: Obtener número de folio sugerido para un área
+router.get('/sugerir-folio/:id_area', authenticateToken, isAdmin, getSuggestedFolioNumber);
+
+// Obtener solicitudes pendientes (solo administradores)
+router.get('/solicitudes-folio-pendientes', authenticateToken, isAdmin, getSolicitudesPendientes);
+
+// ========================================
+// RUTAS PARA APROBACIÓN/RECHAZO (ADMIN)
+// ========================================
+
+// Aprobar solicitud con asignación manual de folio
+router.put('/solicitudes-folio/:id/aprobar', authenticateToken, isAdmin, aprobarSolicitud);
+
+// Rechazar solicitud
+router.put('/solicitudes-folio/:id/rechazar', authenticateToken, isAdmin, rechazarSolicitud);
+
+// Cancelar solicitud (usuario o admin)
+router.put('/solicitudes-folio/:id/cancelar', authenticateToken, cancelarSolicitud);
+
+// ========================================
+// RUTAS PARA NOTIFICACIONES
+// ========================================
+
+// Obtener notificaciones del usuario
 router.get('/notificaciones', authenticateToken, getNotificaciones);
+
+// Marcar notificación como leída
 router.put('/notificaciones/:id/leida', authenticateToken, marcarNotificacionLeida);
 
-// NUEVA RUTA: Conteo de notificaciones (implementación directa)
+// Conteo de notificaciones no leídas (implementación directa)
 router.get('/notificaciones/conteo', authenticateToken, async (req, res) => {
   try {
-    console.log('📊 === OBTENIENDO CONTEO DE NOTIFICACIONES (RUTA DIRECTA) ===');
+    console.log('📊 === OBTENIENDO CONTEO DE NOTIFICACIONES ===');
     
     const { connectDB } = require('../db/db');
     const sql = require('mssql');
@@ -61,87 +89,40 @@ router.get('/notificaciones/conteo', authenticateToken, async (req, res) => {
       timestamp: new Date().toISOString()
     });
   } catch (error) {
-    console.error('❌ Error obteniendo conteo de notificaciones:', error);
-    res.status(500).json({ 
-      error: error.message,
-      no_leidas: 0,
-      usuario_id: req.user?.userId 
-    });
+    console.error('❌ Error obteniendo conteo:', error);
+    res.status(500).json({ error: error.message });
   }
 });
 
-// Rutas para estadísticas
-router.get('/estadisticas-solicitudes', authenticateToken, isAdmin, getEstadisticas);
+// ========================================
+// RUTAS PARA ESTADÍSTICAS
+// ========================================
 
-// Ruta adicional para verificar disponibilidad de número UPEyCE
-router.post('/verificar-numero-UPEyCE', authenticateToken, async (req, res) => {
+// Obtener estadísticas de solicitudes
+router.get('/estadisticas-folios', authenticateToken, getEstadisticas);
+
+// Ruta de prueba para verificar conexión
+router.get('/test-folios', authenticateToken, async (req, res) => {
   try {
-    const { numero_UPEyCE } = req.body;
     const { connectDB } = require('../db/db');
-    const sql = require('mssql');
-    
-    if (!numero_UPEyCE) {
-      return res.status(400).json({ 
-        disponible: false, 
-        mensaje: 'Debe proporcionar un número UPEyCE' 
-      });
-    }
-
     const pool = await connectDB();
-    const userId = req.user.userId;
-
-    const userResult = await pool.request()
-      .input('userId', sql.Int, userId)
-      .query('SELECT id_area FROM users WHERE userId = @userId');
-
-    if (userResult.recordset.length === 0) {
-      return res.status(404).json({ 
-        disponible: false, 
-        mensaje: 'Usuario no encontrado' 
-      });
-    }
-
-    const userArea = userResult.recordset[0].id_area;
-
-    const existingUPEyCE = await pool.request()
-      .input('numero_UPEyCE', sql.NVarChar, numero_UPEyCE)
-      .query('SELECT id_UPEyCE FROM UPEyCE WHERE numero_UPEyCE = @numero_UPEyCE');
-
-    if (existingUPEyCE.recordset.length > 0) {
-      return res.json({
-        disponible: false,
-        mensaje: 'Este número UPEyCE ya está en uso'
-      });
-    }
-
-    const pendingSolicitud = await pool.request()
-      .input('numero_UPEyCE', sql.NVarChar, numero_UPEyCE)
-      .input('id_area', sql.Int, userArea)
-      .query(`
-        SELECT id_solicitud FROM SolicitudUPEyCE 
-        WHERE numero_UPEyCE_asignado = @numero_UPEyCE 
-        AND id_area = @id_area 
-        AND estado IN ('pendiente', 'aprobado')
-      `);
-
-    if (pendingSolicitud.recordset.length > 0) {
-      return res.json({
-        disponible: false,
-        mensaje: 'Ya existe una solicitud pendiente o aprobada con este número en su área'
-      });
-    }
-
-    res.json({
-      disponible: true,
-      mensaje: 'Número disponible'
+    
+    // Verificar que las tablas existen
+    const tablas = await pool.request().query(`
+      SELECT TABLE_NAME 
+      FROM INFORMATION_SCHEMA.TABLES 
+      WHERE TABLE_NAME IN ('SolicitudUPEyCE', 'Notificaciones', 'HistorialSolicitudUPEyCE')
+    `);
+    
+    res.status(200).json({
+      message: 'Conexión exitosa al sistema de folios',
+      tablas_encontradas: tablas.recordset.map(t => t.TABLE_NAME),
+      usuario: req.user.username,
+      timestamp: new Date().toISOString()
     });
-
   } catch (error) {
-    console.error('Error verificando número UPEyCE:', error);
-    res.status(500).json({ 
-      disponible: false, 
-      mensaje: 'Error interno del servidor' 
-    });
+    console.error('Error en test:', error);
+    res.status(500).json({ error: error.message });
   }
 });
 
